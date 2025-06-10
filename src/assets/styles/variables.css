@@ -1,0 +1,38 @@
+@font-face {
+  font-family: 'Bebas Neue Cyrillic';
+  src: url('/fonts/BebasNeueCyrillicRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Amsterdam Three';
+  src: url('/fonts/Amsterdam.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+  
+  :root {
+    /* 🎨 Colores */
+    --color-petroleo: #44838F;
+    --color-menta: #68D0BD;
+    --color-verde-claro: #BBDFDB;
+    --color-azul-profundo: #143251;
+    --color-negro: #000000;
+    --color-blanco: #ffffff;
+  
+    /* 🖋️ Tipografías */
+    --font-titulo: 'Bebas Neue Cyrillic', sans-serif;
+    --font-mano: 'Amsterdam Three', cursive;
+    --font-texto: 'Lato', sans-serif;
+  }
+  
+  body {
+    font-family: var(--font-texto);
+    background-color: var(--color-blanco);
+    color: var(--color-azul-profundo);
+    margin: 0;
+    padding: 0;
+  }
+  

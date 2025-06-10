@@ -1,0 +1,47 @@
+[
+  {
+    "nombre": "Alicia Maccarone",
+    "texto": "Rocío es una de las mejores coach de circo con las que he tenido el placer de entrenar. Tiene una mente brillante para crear y secuenciar trucos en el mástil chino. He aprendido una cantidad inmensa de conocimientos valiosos. Siento que puedo hacer cualquier cosa con el apoyo y la energía que me transmite. Me considero extremadamente afortunada de haber tenido muchas oportunidades de entrenar con ella.",
+    "profesion": "testimonial1"
+  },
+  {
+    "nombre": "Jesse Huygh",
+    "texto": "Las clases de Rocío están muy bien estructuradas. Se desarrolla una secuencia lógica donde los ejercicios de calentamiento forman parte del desarrollo del sentido de orientación y de la activación corporal necesaria para los movimientos que se trabajan en clase. Su conciencia corporal y su sensibilidad hacia el cuerpo, desde el punto de vista de la movilidad y la conciencia global, tienen un impacto positivo. Además, su energía desbordante es una gran motivación para alcanzar tus objetivos.",
+    "profesion":"testimonial2"
+  },
+  {
+    "nombre": "Charlène Moreau",
+    "texto": "Tuve la oportunidad de hacer una formación con Rocío, y fue una experiencia de lo más enriquecedora. Es una profesora excepcional, que combina pedagogía, creatividad y una escucha atenta. Lo que me marcó especialmente fue su enfoque original y reflexivo, especialmente en el acondicionamiento físico. Da mucha importancia a enseñarnos a proteger nuestro cuerpo mientras optimizamos nuestras capacidades. Sus ejercicios son innovadores, bien estructurados y realmente efectivos para progresar. Es una profesora inspiradora y apasionada, que sabe transmitir su conocimiento con entusiasmo y empatía. Una experiencia valiosa que recomiendo sin duda!",
+    "profesion":"testimonial3"
+  },
+  {
+    "nombre": "Nely Carrasco",
+    "texto": "Rocio como profesora es genial, es muy buena dando tips para poder poder lograr la figura o el truco que está enseñando en el mástil o en el suelo. Es muy ingeniosa y exigente en las preparaciones físicas. Eso me encantó porque sacó lo mejor de mí y me dejó motivada a seguir superándome. Fue una experiencia muy enriquecedora.",
+    "profesion":"testimonial4"
+  },
+  {
+    "nombre": "Anna Kapp",
+    "texto": "El estilo de Rocío en el mástil siempre me ha inspirado muchísimo, y cuando pude tomar clases con ella, sentí que avanzaba mucho y que su metodología me servía un montón! Desde temprano en mi viaje de mástil, ella lograba ver lo que me hacía falta trabajar en lo físico y lo mental. Pone en evidencia mis fuerzas y lo que me va bien, y me motiva a siempre llevarlo más lejos. Cuando yo dudo de mi misma, ella sabe que puedo y me lo recuerda!",
+    "profesion":"testimonial5"
+  },
+  {
+    "nombre": "Marlène Racca",
+    "texto": "Trabajar con Rocío es muy valioso para mí. Ella encuentra rápidamente lo que me falta para realizar el movimiento que quiero hacer, y me propone ejercicios específicos que se enfocan en esa área para corregirla. Además del acompañamiento puramente técnico, me orienta hacia áreas de investigación que son interesantes para mí. También siento que me motiva mucho y me ayuda a desarrollar confianza en mi práctica y mi progreso. ¡Gracias, Rocío!",
+    "profesion":"testimonial6"
+  },
+  {
+    "nombre": "Georgina",
+    "texto": "Entrenar con Rocío ha sido un verdadero placer. Me hizo descubrir progresiones técnicas increíbles y originales que nunca había visto antes, lo que realmente me ayudó a desbloquear figuras en las que estaba atascada, y también me dio nuevos desafíos para explorar. Tiene un excelente ojo para los detalles y siempre daba correcciones claras y precisas que me permitieron progresar rápidamente y con seguridad. Además de eso, transmite una energía suave y amable, realmente escucha a sus estudiantes y crea un espacio de aprendizaje que es a la vez apoyador, agradable y lleno de potencial.",
+    "profesion":"testimonial7"
+  },
+  {
+    "nombre": "Iara Gueller",
+    "texto": "Me encantó la didáctica y la atención que Rocío pone en sus explicaciones para lograr una correcta ejecución de los ejercicios. Aprendí nuevas formas de trabajar la flexibilidad, tanto de manera activa como pasiva que pude aplicar en las disciplinas de circo que hago!",
+    "profesion":"testimonial8"
+  },
+  {
+    "nombre": "Tino Dubot",
+    "texto": "Une approche pédagogique sensible et efficace. J'ai retrouvé le plaisir de m'entraîner grâce à elle. Merci Rocío !",
+    "profesion":"testimonial9"
+  }
+]

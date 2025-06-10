@@ -1,0 +1,83 @@
+.admin-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .class-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .class-item {
+    background: #2f6294;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+  }
+  
+  .class-item h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #007bff;
+  }
+  
+  .class-item a {
+    text-decoration: none;
+    color: #17a2b8;
+    margin-top: 5px;
+  }
+  
+  .class-item a:hover {
+    background-color: #0c3763;
+    text-decoration: underline;
+  }
+  
+  .add-button {
+    display: block;
+    width: fit-content;
+    padding: 10px 15px;
+    margin: 20px auto;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .add-button:hover {
+    background-color: #218838;
+  }
+  
+  .edit-button, .delete-button {
+    display: inline-block;
+    padding: 8px 12px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .edit-button {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .delete-button {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: #a71d2a;
+  }
+  

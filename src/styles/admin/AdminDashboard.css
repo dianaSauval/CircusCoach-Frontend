@@ -1,0 +1,82 @@
+/* 🎨 Estilo del Panel de Administración con estética de Rocío */
+
+.admin-dashboard {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  text-align: center;
+}
+
+.admin-title {
+  font-family: var(--font-titulo);
+  font-size: 2.8rem;
+  margin-bottom: 3rem;
+  text-transform: uppercase;
+  text-decoration: underline;
+  color: var(--color-azul-profundo);
+}
+
+.admin-sections {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.admin-card {
+  background-color: var(--color-verde-claro);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  width: 320px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.admin-card:hover {
+  transform: translateY(-4px);
+}
+
+.admin-card-title {
+  font-family: var(--font-titulo);
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.admin-card-desc {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.admin-card-button {
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  font-weight: bold;
+  padding: 0.7rem 1.4rem;
+  border-radius: 1.2rem;
+  text-decoration: none;
+  font-size: 1rem;
+  font-family: var(--font-texto);
+  transition: background-color 0.3s ease;
+}
+
+.admin-card-button:hover {
+  background-color: #5cc8b2;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .admin-sections {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .admin-card {
+    width: 90%;
+  }
+}

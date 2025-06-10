@@ -1,0 +1,84 @@
+.video-file-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--color-verde-claro);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.file-icon {
+  font-size: 24px;
+}
+
+.file-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  font-weight: bold;
+}
+
+.check-icon {
+  color: green;
+  font-size: 20px;
+}
+
+.delete-button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.progress-bar-container {
+  margin-top: 10px;
+  width: 100%;
+  background-color: #eee;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 20px;
+  background-color: var(--color-petroleo);
+  color: white;
+  text-align: center;
+  line-height: 20px;
+  font-size: 12px;
+}
+.deleted-confirmation {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background-color: #e6ffed;
+  border: 1px solid #b2f5bf;
+  border-radius: 8px;
+  color: #276749;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.deleted-confirmation .check-icon {
+  font-size: 1.2rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,248 @@
+/* 🎨 Estilos para la gestión de cursos con estética de Rocío */
+:root {
+  --primary-color: var(--color-azul-profundo);
+  --secondary-color: #0a406e;
+  --background-color: #f8fbfc;
+  --white: #ffffff;
+  --gray-light: #e2e2e2;
+  --gray-dark: #636e72;
+  --success: var(--color-menta);
+  --danger: #d72638;
+}
+
+.manage-courses-container {
+  width: 100%;
+  padding: 3rem 2rem;
+  box-sizing: border-box;
+  background: var(--background-color);
+  font-family: var(--font-texto);
+}
+
+.manage-courses-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+}
+
+/* 🧱 Layout principal */
+.courses-layout {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: 2rem;
+  transition: grid-template-columns 0.3s ease;
+}
+
+.courses-layout.collapsed {
+  grid-template-columns: 5% 95%;
+}
+
+/* 📋 Lista de cursos */
+.courses-list {
+  width: 100%;
+  background: var(--white);
+  padding: 2rem 1.5rem;
+  border-radius: 16px;
+  overflow-y: auto;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.courses-list.collapsed {
+  padding: 1rem;
+  color: transparent;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* 🔽 Flechita lateral general */
+.collapse-toggleCourses {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  background-color: var(--color-azul-profundo);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  transition: all 0.3s ease;
+}
+
+/* Cuando está colapsado */
+.collapse-toggleCourses.collapsed {
+  left: 0px;
+  top: 20px;
+}
+
+/* Cuando está expandido */
+.collapse-toggleCourses.expanded {
+  left: 340px;
+  top: 20px;
+}
+
+.course-card {
+  background: #f3fdfc;
+  padding: 1.2rem;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--gray-light);
+}
+
+.course-title {
+  font-weight: bold;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.course-title.selected {
+  color: var(--color-petroleo);
+}
+
+.visibility-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 1rem;
+  color: var(--gray-dark);
+  font-weight: 500;
+}
+
+.course-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.course-actions .btn {
+  padding: 0.4rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.course-actions .btn.green {
+  background-color: var(--color-menta);
+  color: white;
+}
+
+.course-actions .btn.red {
+  background-color: var(--danger);
+  color: white;
+}
+
+.course-actions .btn.icon {
+  font-size: 1.2rem;
+  background: none;
+  color: var(--gray-dark);
+}
+
+/* 📋 Panel derecho */
+.course-edit-panel {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* ℹ️ Placeholder si no hay selección */
+.placeholder {
+  font-style: italic;
+  color: var(--gray-dark);
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* 📱 Responsive */
+@media (max-width: 1024px) {
+  .courses-layout {
+    grid-template-columns: 100%;
+  }
+
+  .courses-layout.collapsed {
+    grid-template-columns: 0% 100%;
+  }
+
+  .courses-list.collapsed {
+    color: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .manage-courses-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .manage-courses-container h1 {
+    font-size: 1.8rem;
+  }
+
+  .course-title {
+    font-size: 1rem;
+  }
+
+  .course-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .course-actions .btn {
+    width: 100%;
+    font-size: 1rem;
+  }
+}
+
+/* 📱 En mobile ajustamos posición */
+@media (max-width: 768px) {
+
+    .courses-layout.collapsed {
+    grid-template-columns: 100%;
+  }
+  .collapse-toggleCourses.collapsed {
+    left: 0px;
+    top: 0px;
+  }
+
+  /* Cuando está expandido */
+  .collapse-toggleCourses.expanded {
+    left: 340px;
+    top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .collapse-toggleCourses {
+    width: 28px;
+    height: 28px;
+    font-size: 0.9rem;
+  }
+
+   .collapse-toggleCourses.collapsed {
+    left: 0px;
+    top: 0px;
+  }
+
+  /* Cuando está expandido */
+  .collapse-toggleCourses.expanded {
+    left: 300px;
+    top: 20px;
+  }
+}

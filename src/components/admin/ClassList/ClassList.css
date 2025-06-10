@@ -1,0 +1,121 @@
+.class-list {
+  margin-top: 10px;
+  background: #dbedeb;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 🔹 Cada clase en la lista */
+.class-item {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-blanco);
+  margin: 8px 0;
+  border-radius: 10px;
+  border: 1px solid var(--color-menta);
+  transition: all 0.3s ease-in-out;
+}
+
+/* 🔹 Si la clase está seleccionada */
+.class-item.selected {
+  background: #e0f8f2;
+  border: 2px solid var(--color-azul-profundo);
+}
+
+/* 🔹 Contenido de la clase */
+.class-formationContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* 🔹 Indicadores de visibilidad */
+.class-visibilityClass {
+  display: flex;
+  justify-content: start;
+  text-align: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.visible {
+  color: var(--color-petroleo);
+}
+
+.not-visible {
+  color: red;
+}
+
+/* 🔹 Cabecera y título */
+.class-header {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  cursor: pointer;
+}
+
+.class-title {
+  transition: color 0.3s ease;
+}
+
+.class-title.selected {
+  color: var(--color-azul-profundo);
+}
+
+/* 🔹 Botón eliminar */
+.delete-btn {
+  background-color: #DC3545;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #c1303f;
+}
+
+/* 🔹 Sin clases */
+.no-classes {
+  font-size: 1rem;
+  color: var(--color-azul-profundo);
+  text-align: center;
+  padding: 10px;
+  font-style: italic;
+}
+
+/* 🔹 Responsive */
+@media (max-width: 480px) {
+  .class-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .class-formationContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 6px;
+  }
+
+  .delete-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .class-list{
+    padding: 5px;
+  }
+
+  .class-visibilityClass {
+  font-size: 0.80rem;
+}
+}

@@ -1,0 +1,230 @@
+/* 🔹 Estilos Generales */
+.header {
+  background-color: var(--color-petroleo);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: var(--color-blanco);
+  position: fixed;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 80px;
+  box-sizing: border-box;
+}
+
+.header-logo img {
+  height: 65px;
+  transform: scale(1.8);
+  transform-origin: left center;
+  max-height: 80px;
+}
+
+/* 🔹 Menú de navegación */
+.header-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-link {
+  font-family: var(--font-titulo);
+  font-size: 1.5rem;
+  letter-spacing: 1.5px;
+  color: var(--color-blanco);
+  text-decoration: none;
+  background: none;
+  border: none;
+  position: relative;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+/* Línea inferior al hacer hover o estar activa */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 2px;
+  background-color: var(--color-menta);
+  bottom: -4px;
+  left: 0;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+  color: var(--color-menta);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* 🔹 Íconos y Sesión */
+.header-icons {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.header-icon:hover {
+  transform: scale(1.2);
+  color: var(--color-menta);
+}
+
+/* 🔹 Botón hamburguesa */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-blanco);
+  cursor: pointer;
+  z-index: 1001;
+}
+
+  /* Ocultar en mobile */
+  .desktop-only {
+    display: inline-flex;
+  }
+  
+  .mobile-only {
+    display: none;
+  }
+
+  .language-selector {
+    position: relative;
+    margin-left: 1rem;
+    display: inline-block;
+  }
+  
+  .language-button {
+    background: none;
+    border: none;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    color: var(--color-blanco);
+  }
+  
+  .language-button:hover {
+    color: var(--color-menta); /* o el color principal de tu web */
+  }
+  
+  .language-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: var(--color-petroleo);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 8px 0;
+    margin: 4px 0 0;
+    width: 150px;
+    z-index: 999;
+  }
+  
+  .language-dropdown li {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .language-dropdown li:hover {
+    color: var(--color-menta);
+  }
+  
+  .globe-icon {
+    font-size: 18px;
+  }
+  
+.cart-icon-container {
+  color: var(--color-blanco);
+  position: relative;
+}
+
+.cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+
+
+/* 🌐 Responsive */
+@media (max-width: 768px) {
+  .header {
+    grid-template-columns: 1fr auto;
+    padding: 0.5rem 1rem;
+    height: 80px;
+  }
+
+  .header-logo {
+    grid-column: 1 / 2;
+  }
+
+  .menu-toggle {
+    display: block;
+    grid-column: 2 / 3;
+    justify-self: end;
+  }
+
+  .header-icons {
+    display: none;
+  }
+
+
+.desktop-only {
+  display: none;
+}
+
+.mobile-only {
+  display: inline-flex;
+}
+
+  /* Menú desplegable */
+  .header-nav {
+    position: absolute;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background-color: var(--color-petroleo);
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 1rem;
+    display: none;
+    z-index: 999;
+  }
+
+  .header-nav.open {
+    display: flex;
+  }
+
+  .header-nav .nav-link {
+    text-align: center;
+    font-size: 1.1rem;
+  }
+}

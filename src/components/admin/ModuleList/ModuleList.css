@@ -1,0 +1,197 @@
+/* 🔹 Contenedor de la lista de módulos */
+.module-list {
+  margin-top: 10px;
+  background: #dbedeb;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 🔹 Estilos para cada módulo */
+.module-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-blanco);
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 12px;
+  border: 2px solid var(--color-verde-claro);
+  transition: all 0.3s ease-in-out;
+}
+
+/* 🔹 Si el módulo está seleccionado */
+.module-item.selected {
+  background: var(--color-verde-claro);
+  border: 2px solid var(--color-petroleo);
+}
+
+/* 🔹 Contenido del módulo */
+.module-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* 🔹 Indicadores de visibilidad */
+.module-visibility {
+  display: flex;
+  justify-content: flex-start;
+  align-items: start;
+  text-align: right;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-family: var(--font-texto);
+}
+
+.visible {
+  display: flex;
+  gap: 3px;
+  color: var(--color-petroleo);
+  font-weight: bold;
+}
+
+.not-visible {
+  display: flex;
+  gap: 3px;
+  color: var(--color-negro);
+  opacity: 0.8;
+  font-weight: bold;
+}
+
+/* 🔹 Cabecera del módulo */
+.module-header {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  justify-content: space-between;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+}
+
+/* 🔹 Botón de flecha */
+.toggle-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--color-azul-profundo);
+  transition: transform 0.2s ease;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.1);
+}
+
+/* 🔹 Acciones del módulo */
+.module-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: 12px;
+}
+
+/* 🔹 Botones */
+.small-btn {
+  padding: 6px 12px;
+  background: var(--color-petroleo);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-size: 0.95rem;
+  font-family: var(--font-texto);
+}
+
+.small-btn:hover {
+  background: #2c5a61;
+  transform: scale(1.05);
+}
+
+.delete-btn {
+  padding: 6px 12px;
+  background: var(--color-negro);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-size: 0.95rem;
+  font-family: var(--font-texto);
+}
+
+.delete-btn:hover {
+  background: #333;
+  transform: scale(1.05);
+}
+
+/* 🔹 Estilo para las clases desplegadas */
+.module-classes {
+  margin-top: 10px;
+  padding-left: 20px;
+  border-left: 3px solid var(--color-petroleo);
+}
+
+/* 🔹 Estilo por defecto */
+.module-title,
+.class-title {
+  color: var(--color-azul-profundo);
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+/* 🔹 Cambiar color cuando están seleccionados */
+.module-title.selected,
+.class-title.selected {
+  color: var(--color-azul-profundo);
+}
+
+/* 🔹 Responsive */
+@media (max-width: 768px) {
+  .module-list {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .module-title{
+    font-size: 1rem;
+  }
+
+  .module-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .module-classes {
+  padding-left: 0.5px;
+  }
+
+  .module-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: 0;
+    margin-top: 10px;
+  }
+
+  .module-visibility{
+    width: 100%;
+    flex-direction: row;
+  }
+  .module-visibility span{
+    font-size: small;
+    display: flex;
+    gap: 2px;
+  }
+
+    .toggle-btn{
+    font-size: 1rem;
+  }
+
+}

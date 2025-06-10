@@ -1,0 +1,100 @@
+.home-hero {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('https://res.cloudinary.com/dkdhdy9e5/image/upload/v1743084512/CircusCoach/26_tljw6r.jpg'); /* Cambiar por la ruta correcta */
+  background-size: cover;
+  background-position: center 30%;
+  background-repeat: no-repeat;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.home-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.5); /* Capa blanca semitransparente */
+  z-index: 1;
+}
+
+.home-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+  max-width: 1000px;
+  text-align: center;
+  color: var(--color-negro);
+}
+
+.home-content h1 {
+  font-family: var(--font-titulo);
+  font-size: 2rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--color-azul-profundo);
+  margin-bottom: 2rem;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.home-content button {
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-bottom: 2.8rem;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 0 transparent;
+  width: 350px;
+}
+
+.home-content button:hover {
+  background-color: var(--color-menta);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.home-description, .home-description p {
+  font-family: var(--font-texto);
+  font-size: 1.1rem;
+  font-weight: bold;
+  line-height: 1.7;
+  text-align: center;
+  padding: 0 1rem;
+  color: var(--color-azul-profundo);
+}
+
+/* 🌐 Responsive */
+@media (max-width: 768px) {
+  .home-content h1 {
+    font-size: 1.2rem;
+  }
+
+  .home-content button {
+    font-size: 0.9rem;
+    padding: 0.8rem 1.5rem;
+  }
+
+  .home-description {
+    font-size: 0.95rem;
+    text-align: left;
+  }
+
+  .home-hero {
+    height: auto;
+    padding: 4rem 1.5rem;
+  }
+}
+

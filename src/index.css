@@ -1,0 +1,23 @@
+/* 🔹 Reset global */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 🔹 HTML y body ocupan toda la pantalla */
+html, body {
+  height: 100%;
+}
+
+/* 🔹 Root */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 🔹 Mejor scroll */
+html {
+  scroll-behavior: smooth;
+}

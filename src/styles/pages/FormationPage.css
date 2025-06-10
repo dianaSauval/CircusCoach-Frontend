@@ -1,0 +1,142 @@
+.formation-hero {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-image: url('https://res.cloudinary.com/dkdhdy9e5/image/upload/v1743077401/CircusCoach/4_cgnxsx.jpg'); /* Asegurate que el path sea correcto */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    padding: 2rem;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+ 
+  /* 👇 Overlay para oscurecer la imagen */
+  .formation-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.4); /* Blanco con transparencia */
+    /* Si preferís oscurecer: usa rgba(0, 0, 0, 0.4) */
+    z-index: 1;
+  }
+  
+  .formation-buttons {
+    position: relative;
+    z-index: 2; /* Asegura que esté sobre el overlay */
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 400px;
+  }
+  
+  .formation-buttons button {
+    background-color: var(--color-menta);
+    color: var(--color-azul-profundo);
+    font-family: var(--font-titulo);    
+    font-size: 1.3rem;
+    letter-spacing: 1px;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .formation-buttons button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .section {
+    padding: 15px 20px;
+    background-color: #f4f4f4;
+    color: #02142B;
+    text-align: center;
+    width: 100% !important;    
+  }
+
+  .school{
+    background: linear-gradient(
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0.55)
+    ), url('https://res.cloudinary.com/dkdhdy9e5/image/upload/v1743203344/CircusCoach/20230317_122348_chhvjn.jpg') center/cover no-repeat;
+    
+  }
+  
+  .formation-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+  
+  .formation-card {
+    width: 300px;
+    height: 350px;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+  
+    background-color: transparent;
+    box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.15);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  
+  .formation-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 8px 12px 20px rgba(0, 0, 0, 0.25);
+  }
+  
+  /* ✨ Al hacer clic: "hundido" */
+  .formation-card:active {
+    transform: translateY(2px);
+    box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* 📸 Imagen rellena y animada */
+  .formation-image-presentation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  
+  /* 🔍 Zoom suave al hacer hover en la card */
+  .formation-card:hover .formation-image-presentation {
+    transform: scale(1.05);
+  }
+  
+  
+  /* 🌐 Responsive */
+  @media (max-width: 768px) {
+    .formation-hero {
+      justify-content: center;
+      height: auto;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+  
+    .formation-buttons {
+      width: 100%;
+      align-items: center;
+    }
+  
+    .formation-buttons button {
+      width: 100%;
+    }
+  }
+  

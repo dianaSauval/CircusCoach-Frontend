@@ -1,0 +1,65 @@
+/* 🔹 Box-sizing global */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 🔹 Estructura base */
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  font-family: 'Lato', sans-serif; /* Estética de Ro */
+  background-color: var(--color-blanco, #f5f7fa);
+  color: var(--color-azul-profundo, #143251);
+  scroll-behavior: smooth;
+}
+
+/* 🔹 Contenedor principal */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding-top: 80px;
+  width: 100%;
+}
+
+/* 🔹 Ajuste del contenido */
+.main-content {
+  flex: 1;
+  padding: 20px 40px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+/* 📱 Mobile (≤ 480px) */
+@media (max-width: 480px) {
+  .main-content {
+    padding: 15px 20px;
+  }
+
+  .app-container {
+    padding-top: 60px;
+  }
+}
+
+/* 📱 Tablets (481px - 1024px) */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .main-content {
+    padding: 20px 30px;
+  }
+  .app-container{
+    min-height: auto;
+  }
+}
+
+/* 🖥️ Desktop grande (≥ 1440px) */
+@media (min-width: 1440px) {
+  .main-content {
+    max-width: 1400px;
+    padding: 20px 80px;
+  }
+}

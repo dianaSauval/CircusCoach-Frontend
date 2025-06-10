@@ -1,0 +1,129 @@
+/* 🔹 Clases 🔹 */
+/* 🔹 Contenedor del formulario */
+.class-form-container {
+    max-width: 600px;
+    margin: auto;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    max-height: 400px; /* Para que el formulario no desborde la página */
+  }
+  
+  /* 🔹 Títulos */
+  .class-form-container h2 {
+    font-size: 1.4rem;
+    text-align: center;
+    color: #0A58CA;
+    margin-bottom: 15px;
+  }
+  
+  .class-form-container h3 {
+    font-size: 1.2rem;
+    color: #0A58CA;
+    margin-top: 20px;
+    border-bottom: 2px solid #0A58CA;
+    padding-bottom: 5px;
+  }
+  
+  /* 🔹 Grupos de entrada */
+  .input-group {
+    margin-bottom: 15px;
+  }
+  
+  .input-group label {
+    display: block;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+  }
+  
+  .input-group input,
+  .input-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.95rem;
+  }
+  
+  /* 🔹 Tamaño del textarea */
+  .input-group textarea {
+    height: 80px;
+    resize: none;
+  }
+  
+  /* 🔹 Efectos en inputs */
+  .input-group input:focus,
+  .input-group textarea:focus {
+    border-color: #0A58CA;
+    outline: none;
+    box-shadow: 0 0 5px rgba(10, 88, 202, 0.3);
+  }
+  
+  /* 🔹 Selector de modalidad */
+.mode-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: #fff;
+  margin-bottom: 10px;
+  transition: border-color 0.3s ease;
+}
+
+.mode-select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.formation-image {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+/* 🔹 Bloques de PDF y Video */
+.pdf-block,
+.video-block {
+  background-color: #ffffff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-left: 4px solid #0A58CA;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* 🔹 Botones de acción */
+.class-form-container button {
+  display: inline-block;
+  margin-top: 8px;
+  margin-right: 8px;
+  padding: 8px 12px;
+  background-color: #0A58CA;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.class-form-container button:hover {
+  background-color: #084298;
+}
+
+/* 🔹 Botón de eliminación más visual */
+.class-form-container button:hover:has(> svg) {
+  background-color: #dc3545;
+}
+
+/* 🔹 Espacio entre secciones de PDF y Video */
+.class-form-container h3 + .pdf-block,
+.class-form-container h3 + .video-block {
+  margin-top: 10px;
+}

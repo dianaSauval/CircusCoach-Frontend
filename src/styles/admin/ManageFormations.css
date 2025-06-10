@@ -1,0 +1,273 @@
+/* 🎨 Estilos mejorados para la gestión de formaciones con estética de Rocío */
+
+:root {
+  --primary-color: var(--color-azul-profundo);
+  --secondary-color: #0a406e;
+  --background-color: #f8fbfc;
+  --white: #ffffff;
+  --gray-light: #e2e2e2;
+  --gray-dark: #636e72;
+  --success: var(--color-menta);
+  --danger: #d72638;
+}
+
+.manage-formations-container {
+  width: 100%;
+  padding: 3rem 2rem;
+  box-sizing: border-box;
+  background: var(--background-color);
+  font-family: var(--font-texto);
+  position: relative;
+}
+
+.manage-formations-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+}
+
+.formations-layout {
+  display: grid;
+  grid-template-columns: 45% 55%;
+  gap: 2rem;
+}
+
+.formations-list {
+  background: var(--white);
+  padding: 2rem;
+  border-radius: 16px;
+  overflow-y: hidden;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.add-button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 1rem;
+  background: var(--success);
+  color: var(--color-azul-profundo);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: bold;
+  transition: all 0.3s;
+  font-family: var(--font-texto);
+}
+
+.add-button:hover {
+  background: #5cc8b2;
+  transform: translateY(-2px);
+}
+
+.formation-item {
+  background: var(--white);
+  padding: 1.2rem;
+  margin: 1rem 0;
+  border-radius: 1rem;
+  border: 1px solid var(--gray-light);
+  transition: all 0.3s;
+}
+
+.formation-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.formation-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.formation-visibility {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 5px;
+  font-size: 0.95rem;
+}
+
+.visible {
+  color: var(--success);
+  font-weight: bold;
+}
+
+.not-visible {
+  color: var(--danger);
+  font-weight: bold;
+}
+
+.formation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: var(--primary-color);
+  width: 100%;
+  margin: 0.5rem 0;
+}
+
+.formationEdit-title {
+  cursor: pointer;
+  transition: color 0.3s ease;
+  color: var(--color-azul-profundo);
+}
+
+.formationEdit-title.selected {
+  color: var(--color-petroleo);
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+.toggle-btn:hover {
+  color: var(--color-petroleo);
+}
+
+.formation-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.small-btn,
+.delete-btn {
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: var(--font-texto);
+  transition: all 0.3s;
+}
+
+.small-btn {
+  background: var(--success);
+  color: var(--color-azul-profundo);
+}
+
+.small-btn:hover {
+  background: #5cc8b2;
+}
+
+.delete-btn {
+  background: var(--danger);
+  color: var(--white);
+}
+
+.delete-btn:hover {
+  background: #a71d2a;
+}
+
+.formation-modules {
+  margin-top: 1rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--color-petroleo);
+}
+
+/* 👉 Nueva clase para colapsar el panel lateral */
+/* 🎯 Flechita flotante estilizada */
+.collapse-toggle {
+  position: absolute;
+  top: 9rem;
+  left: 42%;
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  border: none;
+  font-size: 1.3rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease, left 0.3s ease;
+  z-index: 10;
+}
+
+.collapse-toggle:hover {
+  background-color: #5cc8b2;
+}
+
+/* Cuando está colapsado, cambiamos la posición hacia el costado izquierdo */
+.collapsed-position {
+  left: 2.5rem;
+}
+
+/* 🔽 Cuando está colapsado */
+.formations-list.collapsed {
+  width: 30px;
+  padding: 1rem 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.formations-layout.collapsed {
+  grid-template-columns: 100%;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .formations-layout {
+    grid-template-columns: 100%;
+  }
+
+  .formation-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .formation-actions {
+    justify-content: flex-start;
+  }
+  .collapse-toggle {
+    top: 8.5rem;
+    left: 82%;
+  }
+
+  .formations-list {
+    padding: 1rem;
+  }
+
+  .formation-item{
+    padding: 15px;
+  }
+
+  .formations-list.collapsed {
+    width: 0px;
+    padding: 0;
+  }
+
+  .collapsed-position {
+    left: 0.3rem;
+  }
+
+  .formation-modules {
+    padding: 0;
+  }
+
+  .manage-formations-container {
+    padding: 3rem 1rem;
+  }
+
+  .toggle-btn{
+    font-size: 1rem;
+  }
+}

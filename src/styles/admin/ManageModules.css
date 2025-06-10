@@ -1,0 +1,81 @@
+.admin-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  
+  .module-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .module-item {
+    background: #f8f9fa;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .module-item h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #007bff;
+  }
+  
+  .module-item a {
+    text-decoration: none;
+    color: #17a2b8;
+    margin-top: 5px;
+  }
+  
+  .module-item a:hover {
+    text-decoration: underline;
+  }
+  
+  .add-button {
+    display: block;
+    width: fit-content;
+    padding: 10px 15px;
+    margin: 20px auto;
+    background-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .add-button:hover {
+    background-color: #218838;
+  }
+  
+  .edit-button, .delete-button {
+    display: inline-block;
+    padding: 8px 12px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .edit-button {
+    background-color: #ffc107;
+    color: black;
+  }
+  
+  .delete-button {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .delete-button:hover {
+    background-color: #a71d2a;
+  }
+  

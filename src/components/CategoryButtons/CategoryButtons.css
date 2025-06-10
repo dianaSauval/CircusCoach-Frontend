@@ -1,0 +1,68 @@
+.category-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding: 2rem 1rem;
+  }
+  
+  .category-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-menta);
+    color: var(--color-azul-profundo);
+    font-family: var(--font-texto);
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: none;
+    border-radius: 2rem;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    width: 300px;
+    text-align: center;
+  }
+  
+  /* Hover con efecto de elevación y sombra suave */
+  .category-button:hover {
+    background-color: var(--color-verde-claro);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Animación activa (cuando NavLink está en esa ruta) */
+  .category-button.active {
+    background-color: var(--color-azul-profundo);
+    color: var(--color-blanco);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Animación de onda al hacer clic (opcional) */
+  .category-button::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    transition: width 0.4s ease, height 0.4s ease;
+    z-index: 0;
+  }
+  
+  .category-button:active::after {
+    width: 200%;
+    height: 200%;
+  }
+  
+  /* Para que el texto esté sobre la animación */
+  .category-button {
+    z-index: 1;
+  }
+  

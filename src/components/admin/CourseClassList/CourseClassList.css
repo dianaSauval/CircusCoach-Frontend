@@ -1,0 +1,74 @@
+.course-classes {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.courseClass-item {
+  background-color: #eef9f8;
+  border: 1px solid var(--gray-light);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: all 0.3s ease;
+}
+
+.courseClass-item.selected {
+  border: 2px solid var(--color-petroleo);
+  background-color: #d6f4f0;
+}
+
+.class-visibility {
+  display: flex;
+  justify-content: end;
+  align-items: end;
+  text-align: end;
+  font-weight: 500;
+  font-size: 0.82rem;
+  color: var(--gray-dark);
+}
+
+.class-visibility span {  
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.class-title {
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  cursor: pointer;
+}
+
+.class-title:hover {
+  text-decoration: none;
+  color: var(--color-petroleo);;
+}
+
+.delete-btn {
+  align-self: flex-start;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #bb2d3b;
+}
+
+.no-classes {
+  font-style: italic;
+  color: var(--gray-dark);
+  margin-top: 1rem;
+}

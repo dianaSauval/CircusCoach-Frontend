@@ -1,0 +1,78 @@
+.biografia-section {
+    width: 100%;
+    background: url('https://res.cloudinary.com/dkdhdy9e5/image/upload/v1743212998/CircusCoach/12_zvtt9t.png') center/cover no-repeat;
+    padding: 4rem 2rem;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .biografia-content {
+    max-width: 1000px;
+    width: 100%;
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+  }
+  
+  .biografia-texto {
+    font-family: var(--font-texto);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--color-azul-profundo);
+  }
+  
+  .biografia-texto p {
+    margin-bottom: 1.5rem;
+  }
+  
+  .biografia-pdf {
+    display: inline-flex;
+    gap: 0.6rem;
+    font-weight: bold;
+    color: var(--color-azul-profundo);
+    margin-top: 2rem;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  /* Este bloque es la clave 👇 */
+  .biografia-texto .biografia-pdf {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  
+  .biografia-pdf:hover {
+    color: var(--color-petroleo);
+  }
+  
+  .pdf-icon {
+    font-size: 1.4rem;
+    color: var(--color-petroleo);
+  }
+  
+  .firma-rocio {
+    font-family: var(--font-mano);
+    font-size: 2rem;
+    color: var(--color-azul-profundo);
+    margin-top: 2.5rem;
+    text-align: right;
+  }
+  
+  /* 📱 Responsive */
+  @media (max-width: 768px) {
+    .biografia-content {
+      padding: 2rem 1.5rem;
+    }
+  
+    .biografia-texto {
+      font-size: 1rem;
+    }
+  
+    .firma-rocio {
+      text-align: center;
+    }
+  }
+  
