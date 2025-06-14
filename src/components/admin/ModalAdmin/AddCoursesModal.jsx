@@ -8,6 +8,10 @@ import UploadVideoField from "../UploadVideoField/UploadVideoField";
 import { FaTrashAlt } from "react-icons/fa";
 import { v4 as uuidv4 } from "uuid";
 import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
+import {
+  eliminarArchivoDesdeFrontend,
+  subirPdfDesdeFrontend,
+} from "../../../services/uploadCloudinary";
 
 const AddCoursesModal = ({
   courseId,
@@ -110,18 +114,38 @@ const AddCoursesModal = ({
 
   const inputClass = (field) => (errors[field] ? "error" : "");
 
-  const addNewPDF = () => {
-    setFormData((prev) => ({
-      ...prev,
-      pdfs: [
-        ...(prev.pdfs || []),
-        {
+  const addNewPDF = async () => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".pdf";
+    fileInput.click();
+
+    fileInput.onchange = async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      try {
+        const { url, public_id } = await subirPdfDesdeFrontend(file);
+
+        const nuevoPdf = {
+          _id: uuidv4(),
           url: { es: "", en: "", fr: "" },
           title: { es: "", en: "", fr: "" },
           description: { es: "", en: "", fr: "" },
-        },
-      ],
-    }));
+          public_id,
+        };
+
+        nuevoPdf.url[activeTab] = url;
+
+        setFormData((prev) => ({
+          ...prev,
+          pdfs: [...(prev.pdfs || []), nuevoPdf],
+        }));
+      } catch (err) {
+        console.error("❌ Error al subir PDF:", err);
+        alert("Hubo un error al subir el PDF. Intenta nuevamente.");
+      }
+    };
   };
 
   const addNewVideo = () => {
@@ -277,8 +301,39 @@ const AddCoursesModal = ({
                       handlePDFChange(i, "description", e.target.value)
                     }
                   />
+                  <button
+                    type="button"
+                    className="delete-button"
+                    title="Eliminar PDF"
+                    onClick={async () => {
+                      const updated = [...formData.pdfs];
+                      const eliminado = updated.splice(i, 1)[0];
+
+                      if (eliminado.public_id) {
+                        try {
+                          await eliminarArchivoDesdeFrontend(
+                            eliminado.public_id
+                          );
+                          console.log("🗑 PDF eliminado de Cloudinary");
+                        } catch (err) {
+                          console.error(
+                            "❌ Error al eliminar PDF de Cloudinary:",
+                            err
+                          );
+                          alert(
+                            "Hubo un error al eliminar el PDF de Cloudinary."
+                          );
+                        }
+                      }
+
+                      setFormData((prev) => ({ ...prev, pdfs: updated }));
+                    }}
+                  >
+                    <FaTrashAlt />
+                  </button>
                 </div>
               ))}
+
               <button type="button" onClick={addNewPDF}>
                 ➕ Agregar PDF
               </button>

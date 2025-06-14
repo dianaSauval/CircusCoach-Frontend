@@ -15,7 +15,7 @@
 
 .course-edit-panel h4 {
   margin: 1rem 0 0.5rem;
-  font-weight:100;
+  font-weight: 100;
 }
 
 .course-image {
@@ -33,25 +33,9 @@
   border-radius: 12px;
 }
 
-.pdf-preview-item,
-.video-embed-container {
-  background: var(--color-blanco);
-  padding: 1rem;
-  border-radius: 10px;
-  margin-bottom: 1rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
 .pdf-preview-item p,
 .no-material {
   margin: 0.5rem 0;
-}
-
-.video-embed-container iframe {
-  width: 100%;
-  height: 360px;
-  border-radius: 8px;
-  border: none;
 }
 
 .no-material {
@@ -105,6 +89,70 @@ button.toggle-visibility.hidden:hover {
   margin-top: 10px;
 }
 
+/* Bloques individuales para PDFs y videos */
+.pdf-preview-item,
+.video-preview-item {
+  background: var(--color-blanco);
+  border: 2px dashed var(--color-petroleo);
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0px 2px 8px rgba(20, 50, 81, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.pdf-preview-item:hover,
+.video-preview-item:hover {
+  transform: scale(1.01);
+}
+
+/* Estilo para título y descripción */
+.pdf-preview-item strong,
+.video-preview-item strong {
+  color: var(--color-azul-profundo);
+  font-weight: 600;
+}
+
+.pdf-preview-item p,
+.video-preview-item p {
+  margin: 0.4rem 0;
+  font-size: 1rem;
+}
+
+/* Botón PDF */
+.pdf-preview-item a {
+  display: inline-block;
+  background: var(--color-petroleo);
+  color: white;
+  padding: 0.5rem 1rem;
+  margin-top: 0.6rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.pdf-preview-item a:hover {
+  background: var(--color-azul-profundo);
+}
+
+/* Video + título y descripción */
+.video-preview-item iframe {
+  width: 100%;
+  height: 300px;
+  margin-top: 0.8rem;
+  border-radius: 8px;
+  border: none;
+}
+
+/* Estado 'no-material' */
+.no-material {
+  font-style: italic;
+  color: #555;
+  margin: 0.6rem 0;
+}
+
 /* 📱 Responsive: pantallas más chicas */
 @media (max-width: 768px) {
   .course-edit-panel {
@@ -124,7 +172,7 @@ button.toggle-visibility.hidden:hover {
   }
 
   .pdf-preview-item,
-  .video-embed-container {
+  .video-preview-item {
     padding: 0.8rem;
   }
 
@@ -140,8 +188,7 @@ button.toggle-visibility.hidden:hover {
     font-size: 1.2rem;
   }
 
-  .course-edit-panel p,
-  .video-preview-item p {
+  .course-edit-panel p {
     font-size: 1rem;
   }
 

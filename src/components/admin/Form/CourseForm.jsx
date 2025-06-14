@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./CourseForm.css";
 import UploadVideoField from "../UploadVideoField/UploadVideoField";
 import { v4 as uuidv4 } from "uuid";
+import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 
 const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
   const [formData, setFormData] = useState({ ...initialData });
@@ -261,9 +262,47 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
             {formData.videos
               ?.filter((video) => video.url?.[activeTab])
               .map((video, i) => (
-                <div key={i} className="nested-section uploaded-summary">
-                  🎥 <strong>{video.title?.[activeTab]}</strong> —{" "}
-                  {video.description?.[activeTab]}
+                <div
+                  key={i}
+                  className="nested-section uploaded-summary"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: "1rem",
+                  }}
+                >
+                  <div>
+                    🎥 <strong>{video.title?.[activeTab]}</strong>
+                    <p className="video-description">
+                      {video.description?.[activeTab] || "Sin descripción"}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="remove-btn"
+                    onClick={async () => {
+                      const videoUrl = video.url?.[activeTab];
+                      if (!videoUrl) return;
+
+                      try {
+                        await eliminarVideoDeVimeo(videoUrl);
+                        console.log("✅ Video eliminado de Vimeo");
+
+                        const updated = formData.videos.filter(
+                          (v) => v._id !== video._id
+                        );
+                        setFormData((prev) => ({ ...prev, videos: updated }));
+                      } catch (err) {
+                        console.error("❌ Error al eliminar video:", err);
+                        alert(
+                          "Hubo un error al eliminar el video. Intenta nuevamente."
+                        );
+                      }
+                    }}
+                  >
+                    ❌
+                  </button>
                 </div>
               ))}
           </div>
@@ -299,9 +338,19 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
             </div>
 
             <div className="form-section">
-              <label>
-                Video de presentación (URL pública - YouTube, Vimeo, etc.):
+              <label style={{ color: "#444", fontWeight: "bold" }}>
+                🎞️ Enlace público del video promocional (YouTube, Vimeo, etc.):
               </label>
+              <small
+                style={{
+                  fontStyle: "italic",
+                  display: "block",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                Pegá aquí un link directo al video visible públicamente.
+              </small>
+
               <input
                 type="text"
                 value={formData.video?.[activeTab] || ""}

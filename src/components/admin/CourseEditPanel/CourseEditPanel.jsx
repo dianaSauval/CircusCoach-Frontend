@@ -20,14 +20,16 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const isClass = Boolean(selectedClass);
 
   useEffect(() => {
+    if (!isClass || !data) return; // Solo clases, y si data está presente
+
     const checkAllVideos = async () => {
-      const videos = isClass ? data.videos || [] : [data.video];
+      const videos = data.videos || [];
 
       for (const video of videos) {
         const rawUrl = video?.url?.[activeTab];
         const embedUrl = getVideoEmbedUrl(rawUrl);
 
-        if (embedUrl) {
+        if (embedUrl?.includes("vimeo.com")) {
           const videoId = embedUrl.split("/").pop();
           const status = await checkVimeoAvailability(videoId);
           setVideoStatus((prev) => ({ ...prev, [videoId]: status }));
@@ -36,7 +38,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
     };
 
     checkAllVideos();
-    const interval = setInterval(checkAllVideos, 15000); // verifica cada 15 segundos
+    const interval = setInterval(checkAllVideos, 15000);
     return () => clearInterval(interval);
   }, [data, activeTab, isClass]);
 
@@ -96,6 +98,9 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
       );
     } else {
       const url = data.pdf?.[activeTab];
+      const title = data?.pdfTitle?.[activeTab];
+      const description = data?.pdfDescription?.[activeTab];
+
       if (!url) {
         return (
           <p className="no-material">
@@ -108,10 +113,21 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
           </p>
         );
       }
+
       return (
         <>
           <h3>{labelByLang[activeTab].pdf}</h3>
           <div className="pdf-preview-item">
+            {title && (
+              <p>
+                <strong>📌 Título:</strong> {title}
+              </p>
+            )}
+            {description && (
+              <p>
+                <strong>📝 Descripción:</strong> {description}
+              </p>
+            )}
             <a href={url} target="_blank" rel="noopener noreferrer">
               🔗 Ver PDF
             </a>
@@ -122,33 +138,92 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   };
 
   const renderVideos = () => {
-    const videos = isClass ? data.videos || [] : [data.video];
-
-    // Filtramos los que tienen video en este idioma
-    const videosEnIdioma = videos.filter(
-      (video) => video?.url?.[activeTab]?.trim() !== ""
-    );
-
-    if (videosEnIdioma.length === 0) {
-      return (
-        <p className="no-material">
-          📭{" "}
-          {activeTab === "es"
-            ? "Aún no se ha cargado un video en este idioma."
-            : activeTab === "en"
-            ? "No video has been uploaded in this language yet."
-            : "Aucune vidéo n’a été ajoutée dans cette langue."}
-        </p>
+    if (isClass) {
+      const videos = data.videos || [];
+      const videosEnIdioma = videos.filter(
+        (video) => video?.url?.[activeTab]?.trim() !== ""
       );
-    }
 
-    return videosEnIdioma.map((video, i) => {
-      const rawUrl = video.url?.[activeTab];
+      if (videosEnIdioma.length === 0) {
+        return (
+          <p className="no-material">
+            📭{" "}
+            {activeTab === "es"
+              ? "Aún no se ha cargado un video en este idioma."
+              : activeTab === "en"
+              ? "No video has been uploaded in this language yet."
+              : "Aucune vidéo n’a été ajoutée dans cette langue."}
+          </p>
+        );
+      }
+
+      return videosEnIdioma.map((video, i) => {
+        const rawUrl = video.url?.[activeTab];
+        const embedUrl = getVideoEmbedUrl(rawUrl);
+        const title = video.title?.[activeTab];
+        const description = video.description?.[activeTab];
+
+        if (!embedUrl) {
+          return (
+            <p key={i} className="no-material">
+              ❌{" "}
+              {activeTab === "es"
+                ? "El enlace no es válido o no se puede mostrar como video embebido."
+                : activeTab === "en"
+                ? "The link is invalid or cannot be embedded."
+                : "Le lien est invalide ou ne peut pas être intégré."}
+            </p>
+          );
+        }
+
+        const videoId = embedUrl.split("/").pop();
+        const status = videoStatus[videoId];
+
+        if (status === "processing") {
+          return (
+            <p key={i} className="no-material">
+              ⏳{" "}
+              {activeTab === "es"
+                ? "El video aún está siendo procesado por Vimeo."
+                : activeTab === "en"
+                ? "The video is still being processed by Vimeo."
+                : "La vidéo est encore en cours de traitement par Vimeo."}
+            </p>
+          );
+        }
+
+        return (
+          <div key={i} className="video-preview-item">
+            {title && (
+              <p>
+                <strong>📌 Título:</strong> {title}
+              </p>
+            )}
+            {description && (
+              <p>
+                <strong>📝 Descripción:</strong> {description}
+              </p>
+            )}
+            <iframe
+              src={embedUrl}
+              width="100%"
+              height="360"
+              frameBorder="0"
+              allow="autoplay; fullscreen"
+              allowFullScreen
+              title={`video-${i}`}
+            />
+          </div>
+        );
+      });
+    } else {
+      // 👇 Lógica para CURSOS (video promocional)
+      const rawUrl = data.video?.[activeTab];
       const embedUrl = getVideoEmbedUrl(rawUrl);
 
       if (!embedUrl) {
         return (
-          <p key={i} className="no-material">
+          <p className="no-material">
             ❌{" "}
             {activeTab === "es"
               ? "El enlace no es válido o no se puede mostrar como video embebido."
@@ -159,24 +234,8 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
         );
       }
 
-      const videoId = embedUrl.split("/").pop();
-      const status = videoStatus[videoId];
-
-      if (status === "processing") {
-        return (
-          <p key={i} className="no-material">
-            ⏳{" "}
-            {activeTab === "es"
-              ? "El video aún está siendo procesado por Vimeo."
-              : activeTab === "en"
-              ? "The video is still being processed by Vimeo."
-              : "La vidéo est encore en cours de traitement par Vimeo."}
-          </p>
-        );
-      }
-
       return (
-        <div key={i} className="video-embed-container">
+        <div className="video-preview-item">
           <iframe
             src={embedUrl}
             width="100%"
@@ -184,11 +243,11 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
             frameBorder="0"
             allow="autoplay; fullscreen"
             allowFullScreen
-            title={`video-${i}`}
+            title={`video-promo`}
           />
         </div>
       );
-    });
+    }
   };
 
   const handleSave = async (updatedData) => {

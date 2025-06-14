@@ -1,25 +1,26 @@
 // utils/videoEmbed.js
-export function getVideoEmbedUrl(url) {
+export const getVideoEmbedUrl = (url) => {
   if (!url) return null;
 
-  // YouTube
-  const ytMatch = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/
-  );
-  if (ytMatch) {
-    return `https://www.youtube.com/embed/${ytMatch[1]}`;
+  // Vimeo (normal o player)
+  if (url.includes("vimeo.com")) {
+    const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+    const id = match?.[1];
+    return id ? `https://player.vimeo.com/video/${id}` : null;
   }
 
-  // Vimeo
-  const vimeoMatch = url.match(
-    /(?:vimeo\.com\/(?:video\/)?|player\.vimeo\.com\/video\/)(\d+)/
-  );
-  if (vimeoMatch) {
-    return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+  // YouTube normal
+  if (url.includes("youtube.com/watch")) {
+    const match = url.match(/[?&]v=([^&]+)/);
+    const id = match?.[1];
+    return id ? `https://www.youtube.com/embed/${id}` : null;
   }
 
-  return null;
-}
+  // YouTube short links
+  if (url.includes("youtu.be")) {
+    const id = url.split("/").pop();
+    return id ? `https://www.youtube.com/embed/${id}` : null;
+  }
 
-
-
+  return null; // No se pudo parsear
+};

@@ -239,6 +239,28 @@
   color: #666;
 }
 
+.pdf-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.pdf-entry input {
+  flex: 1 1 30%;
+}
+
+.pdf-entry .delete-button {
+  background: none;
+  border: none;
+  color: #c0392b;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.3rem;
+}
+
+
 
 
 @media (max-width: 480px) {
