@@ -16,11 +16,12 @@ const UploadVideoField = ({ activeLang = "es", onUploadSuccess }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setVideoFile(file);
-    // ✅ Ya no autocompletamos el título con el nombre del archivo
   };
 
   const handleUpload = async () => {
-    if (!videoFile) return;
+    if (!videoFile) return alert("Seleccioná un archivo de video.");
+    if (!title.trim()) return alert("Escribí un título antes de subir.");
+
     setUploading(true);
     setError(null);
     setUploadProgress(0);
@@ -37,31 +38,17 @@ const UploadVideoField = ({ activeLang = "es", onUploadSuccess }) => {
       );
 
       setUploadProgress(100);
-
       const publicUrl = rawUrl.replace("/videos/", "/");
 
       const videoObj = {
-        url: {
-          es: activeLang === "es" ? publicUrl : "",
-          en: activeLang === "en" ? publicUrl : "",
-          fr: activeLang === "fr" ? publicUrl : "",
-        },
-        title: {
-          es: activeLang === "es" ? title : "",
-          en: activeLang === "en" ? title : "",
-          fr: activeLang === "fr" ? title : "",
-        },
-        description: {
-          es: activeLang === "es" ? description : "",
-          en: activeLang === "en" ? description : "",
-          fr: activeLang === "fr" ? description : "",
-        },
+        url: publicUrl,
+        title,
+        description,
       };
 
       setVideoUrl(publicUrl);
-      setDeleted(false); // en caso de que haya eliminado antes
+      setDeleted(false);
       onUploadSuccess?.(videoObj);
-
       setVideoFile(null);
     } catch (err) {
       console.error("❌ Error subiendo video:", err);

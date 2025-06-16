@@ -44,11 +44,9 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
   const renderPDFs = () => {
     if (isClass) {
-      const visibles = (data.pdfs || []).filter(
-        (pdf) =>
-          pdf.url?.[activeTab] ||
-          pdf.title?.[activeTab] ||
-          pdf.description?.[activeTab]
+      // ✅ CLASE: PDFs por idioma
+      const visibles = (data?.pdfs || []).filter(
+        (pdf) => pdf?.url?.[activeTab]
       );
 
       if (visibles.length === 0) {
@@ -69,34 +67,28 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
           <h3>{labelByLang[activeTab].pdfs}</h3>
           {visibles.map((pdf, i) => (
             <div key={i} className="pdf-preview-item">
-              {pdf.title?.[activeTab] && (
-                <p>
-                  <strong>📌 Título:</strong> {pdf.title[activeTab]}
-                </p>
-              )}
+              <p>
+                <strong>📌 Título:</strong>{" "}
+                {pdf.title?.[activeTab] || "(sin título)"}
+              </p>
               {pdf.description?.[activeTab] && (
                 <p>
                   <strong>📝 Descripción:</strong> {pdf.description[activeTab]}
                 </p>
               )}
-              {pdf.url?.[activeTab] ? (
-                <a
-                  href={pdf.url[activeTab]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  🔗 Ver PDF
-                </a>
-              ) : (
-                <p className="no-material">
-                  ❌ Sin enlace al PDF en este idioma.
-                </p>
-              )}
+              <a
+                href={pdf.url[activeTab]}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                🔗 Ver PDF
+              </a>
             </div>
           ))}
         </>
       );
     } else {
+      // 📄 CURSO: un solo PDF (público)
       const url = data.pdf?.[activeTab];
       const title = data?.pdfTitle?.[activeTab];
       const description = data?.pdfDescription?.[activeTab];
@@ -118,16 +110,6 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
         <>
           <h3>{labelByLang[activeTab].pdf}</h3>
           <div className="pdf-preview-item">
-            {title && (
-              <p>
-                <strong>📌 Título:</strong> {title}
-              </p>
-            )}
-            {description && (
-              <p>
-                <strong>📝 Descripción:</strong> {description}
-              </p>
-            )}
             <a href={url} target="_blank" rel="noopener noreferrer">
               🔗 Ver PDF
             </a>
@@ -374,7 +356,6 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
           )}
 
           <div className="pdf-preview-container">
-            <h3>📄 PDFs Cargados</h3>
             {renderPDFs()}
           </div>
 

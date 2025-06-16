@@ -190,10 +190,12 @@ const ManageCourses = () => {
       )}
       <ConfirmModal
         isOpen={confirmModalOpen}
-        onClose={() => {
-          setConfirmModalOpen(false);
-          setCourseToDelete(null);
-        }}
+       onClose={() => {
+  console.log("CANCELAR MODAL");
+  setConfirmModalOpen(false);
+  setCourseToDelete(null);
+}}
+
         onConfirm={async () => {
           try {
             await deleteCourse(courseToDelete);

@@ -120,3 +120,63 @@
 .remove-btn:hover {
   background-color: #c0392b;
 }
+
+.selected-option {
+  background-color: var(--color-verde-claro);
+  font-weight: bold;
+  border-radius: 6px;
+}
+
+
+.pdf-file-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--color-verde-claro);
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.pdf-file-card a {
+  font-weight: bold;
+  color: var(--color-azul-profundo);
+  text-decoration: underline;
+}
+
+.pdf-title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+  font-weight: bold;
+}
+
+.pdf-description {
+  font-style: italic;
+  color: var(--color-azul-profundo);
+  font-size: 0.95rem;
+}
+
+.pdf-icon {
+  font-size: 24px;
+}
+
+.pdf-check-icon {
+  color: green;
+  font-size: 20px;
+}
+
+.pdf-delete-button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+  font-size: 18px;
+}
+
