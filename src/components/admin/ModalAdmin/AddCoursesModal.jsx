@@ -37,7 +37,9 @@ const [formDataClass, setFormDataClass] = useState({
   content: { es: "", en: "", fr: "" },
   secondaryContent: { es: "", en: "", fr: "" },
   visible: { es: true, en: false, fr: false },
+  videoIds: [], // 👈 nuevo campo
 });
+
 
 
   const handleChangeCourse = (e) => {

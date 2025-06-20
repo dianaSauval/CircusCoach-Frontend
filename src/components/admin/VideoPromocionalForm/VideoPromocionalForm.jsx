@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
-import { subirVideoAVimeo, eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
+import { subirVideoPromocional, eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 import { FaCheckCircle, FaTrashAlt } from "react-icons/fa";
 import "./VideoPromocionalForm.css";
 
-const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTempVideo }) => {
-  const videoUrl = formData.video?.[activeTab] || "";
+const VideoPromocionalForm = ({
+  formData = { video: {} },
+  setFormData,
+  activeTab,
+  onAddTempVideo
+}) => {
+  const videoUrl = formData?.video?.[activeTab] || "";
 
   const [uploadModes, setUploadModes] = useState({ es: null, en: null, fr: null });
   const uploadMode = uploadModes[activeTab];
@@ -12,10 +17,28 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
   const [videoFile, setVideoFile] = useState(null);
   const [titles, setTitles] = useState({ es: "", en: "", fr: "" });
   const [tempUrls, setTempUrls] = useState({ es: "", en: "", fr: "" });
-
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      const tempVideo = formData?.video?.[activeTab];
+      if (tempVideo?.includes("vimeo.com")) {
+        onAddTempVideo?.(tempVideo);
+      }
+    };
+  }, []);
+
+  if (typeof setFormData !== "function") {
+    return (
+      <div className="video-promocional-form">
+        <p style={{ color: "red" }}>
+          Error interno: la función setFormData no fue pasada correctamente.
+        </p>
+      </div>
+    );
+  }
 
   const setUploadModeForLang = (lang, mode) => {
     setUploadModes((prev) => ({ ...prev, [lang]: mode }));
@@ -36,22 +59,24 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
   };
 
   const handleUpload = async () => {
-    if (!videoFile) return;
+    if (!videoFile || !titles[activeTab]) return;
+
     setUploading(true);
     setUploadProgress(0);
     setError(null);
 
     try {
-      const rawUrl = await subirVideoAVimeo(videoFile, titles[activeTab], "", (progress) => {
-        setUploadProgress(Math.round(progress));
-      });
-
-      const publicUrl = rawUrl.replace("/videos/", "/");
+      const publicUrl = await subirVideoPromocional(
+        videoFile,
+        titles[activeTab],
+        "",
+        (progress) => setUploadProgress(progress)
+      );
 
       setFormData((prev) => ({
         ...prev,
         video: {
-          ...prev.video,
+          ...(prev?.video || {}),
           [activeTab]: publicUrl,
         },
       }));
@@ -72,14 +97,14 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
     setFormData((prev) => ({
       ...prev,
       video: {
-        ...prev.video,
+        ...(prev?.video || {}),
         [activeTab]: url,
       },
     }));
   };
 
   const handleRemove = async () => {
-    const url = formData.video?.[activeTab];
+    const url = formData?.video?.[activeTab];
     if (!url) return;
 
     if (url.includes("vimeo.com")) {
@@ -93,7 +118,7 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
     setFormData((prev) => ({
       ...prev,
       video: {
-        ...prev.video,
+        ...(prev?.video || {}),
         [activeTab]: "",
       },
     }));
@@ -103,15 +128,6 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
     setTempUrls((prev) => ({ ...prev, [activeTab]: "" }));
     setUploadModeForLang(activeTab, null);
   };
-
-  useEffect(() => {
-    return () => {
-      const tempVideo = formData.video?.[activeTab];
-      if (tempVideo && tempVideo.includes("vimeo.com")) {
-        onAddTempVideo?.(tempVideo);
-      }
-    };
-  }, []);
 
   return (
     <div className="video-promocional-form">
@@ -135,7 +151,7 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
           <input
             type="text"
             placeholder={`Título (${activeTab})`}
-            value={titles[activeTab]}
+            value={titles[activeTab] || ""}
             onChange={handleTitleChange}
             disabled={uploading}
           />
@@ -154,7 +170,7 @@ const VideoPromocionalForm = ({ formData = {}, setFormData, activeTab, onAddTemp
           <input
             type="text"
             placeholder={`Pega aquí el enlace del video (${activeTab})`}
-            value={tempUrls[activeTab]}
+            value={tempUrls[activeTab] || ""}
             onChange={handleTempUrlChange}
           />
           <button

@@ -20,21 +20,24 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const isClass = Boolean(selectedClass);
 
   useEffect(() => {
-    if (!isClass || !data) return; // Solo clases, y si data está presente
+    if (!data) return;
 
     const checkAllVideos = async () => {
-      const videos = data.videos || [];
+      const videos = isClass ? data.videos || [] : [data.video];
+      const newStatus = {};
 
       for (const video of videos) {
-        const rawUrl = video?.url?.[activeTab];
+        const rawUrl = isClass ? video?.url?.[activeTab] : video?.[activeTab];
         const embedUrl = getVideoEmbedUrl(rawUrl);
 
         if (embedUrl?.includes("vimeo.com")) {
           const videoId = embedUrl.split("/").pop();
           const status = await checkVimeoAvailability(videoId);
-          setVideoStatus((prev) => ({ ...prev, [videoId]: status }));
+          newStatus[videoId] = status;
         }
       }
+
+      setVideoStatus(newStatus);
     };
 
     checkAllVideos();
@@ -159,17 +162,31 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
         }
 
         const videoId = embedUrl.split("/").pop();
-        const status = videoStatus[videoId];
+        const isVimeo = embedUrl.includes("vimeo.com");
+        const status = isVimeo ? videoStatus[videoId] : "ready";
 
-        if (status === "processing") {
+        if (isVimeo && (!status || status === "processing")) {
           return (
             <p key={i} className="no-material">
               ⏳{" "}
               {activeTab === "es"
-                ? "El video aún está siendo procesado por Vimeo."
+                ? "El video está siendo procesado por Vimeo. Pronto estará disponible."
                 : activeTab === "en"
                 ? "The video is still being processed by Vimeo."
                 : "La vidéo est encore en cours de traitement par Vimeo."}
+            </p>
+          );
+        }
+
+        if (status === "error") {
+          return (
+            <p key={i} className="no-material">
+              ❌{" "}
+              {activeTab === "es"
+                ? "Hubo un error al cargar el video desde Vimeo. Intentalo más tarde."
+                : activeTab === "en"
+                ? "There was an error loading the video from Vimeo. Please try again later."
+                : "Une erreur s’est produite lors du chargement de la vidéo depuis Vimeo."}
             </p>
           );
         }
@@ -199,11 +216,29 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
         );
       });
     } else {
-      // 👇 Lógica para CURSOS (video promocional)
-      const rawUrl = data.video?.[activeTab];
-      const embedUrl = getVideoEmbedUrl(rawUrl);
+      // 👇 CURSO: video promocional
+      const rawUrl = data.video?.[activeTab]?.trim();
 
-      if (!embedUrl) {
+      if (!rawUrl) {
+        return (
+          <p className="no-material">
+            📭{" "}
+            {activeTab === "es"
+              ? "Aún no se ha cargado un video en este idioma."
+              : activeTab === "en"
+              ? "No video has been uploaded in this language yet."
+              : "Aucune vidéo n’a été ajoutée dans cette langue."}
+          </p>
+        );
+      }
+
+      const embedUrl = getVideoEmbedUrl(rawUrl);
+      const videoId = embedUrl?.split("/").pop();
+    const isVimeo = embedUrl.includes("vimeo.com");
+const status = isVimeo ? videoStatus[videoId] : "ready";
+
+
+      if (!embedUrl || !videoId) {
         return (
           <p className="no-material">
             ❌{" "}
@@ -212,6 +247,32 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
               : activeTab === "en"
               ? "The link is invalid or cannot be embedded."
               : "Le lien est invalide ou ne peut pas être intégré."}
+          </p>
+        );
+      }
+
+      if (status === "processing") {
+        return (
+          <p className="no-material">
+            ⏳{" "}
+            {activeTab === "es"
+              ? "El video aún se está procesando en Vimeo."
+              : activeTab === "en"
+              ? "The video is still being processed on Vimeo."
+              : "La vidéo est encore en traitement sur Vimeo."}
+          </p>
+        );
+      }
+
+      if (status === "error") {
+        return (
+          <p className="no-material">
+            ❌{" "}
+            {activeTab === "es"
+              ? "No se pudo cargar el video desde Vimeo. Intentalo más tarde."
+              : activeTab === "en"
+              ? "Unable to load the video from Vimeo. Please try again later."
+              : "Impossible de charger la vidéo depuis Vimeo. Réessayez plus tard."}
           </p>
         );
       }
@@ -225,7 +286,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
             frameBorder="0"
             allow="autoplay; fullscreen"
             allowFullScreen
-            title={`video-promo`}
+            title="video-promo"
           />
         </div>
       );
@@ -355,9 +416,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
             </>
           )}
 
-          <div className="pdf-preview-container">
-            {renderPDFs()}
-          </div>
+          <div className="pdf-preview-container">{renderPDFs()}</div>
 
           <div className="video-preview-container">
             <h3>🎥 Videos Cargados</h3>

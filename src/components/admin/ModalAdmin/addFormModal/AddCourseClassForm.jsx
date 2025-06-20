@@ -47,64 +47,80 @@ const AddCourseClassForm = ({
     setPdfInputs(updated);
   };
 
- const subirPDF = async (index) => {
-  const pdf = pdfInputs[index];
-  if (!pdf.file) return alert("Seleccioná un archivo PDF primero.");
+  const subirPDF = async (index) => {
+    const pdf = pdfInputs[index];
+    if (!pdf.file) return alert("Seleccioná un archivo PDF primero.");
 
-  const titulo = pdf.title?.[activeTab]?.trim();
-  if (!titulo) return alert("Escribí un título antes de subir el PDF.");
+    const titulo = pdf.title?.[activeTab]?.trim();
+    if (!titulo) return alert("Escribí un título antes de subir el PDF.");
 
-  try {
-    const updated = [...pdfInputs];
-    updated[index].uploading = true;
-    setPdfInputs(updated);
+    try {
+      const updated = [...pdfInputs];
+      updated[index].uploading = true;
+      setPdfInputs(updated);
 
-    // 🔥 Le pasamos el título como segundo argumento para usar como nombre en Cloudinary
-    const { url, public_id } = await subirPdfPrivado(pdf.file, titulo);
+      // 🔥 Le pasamos el título como segundo argumento para usar como nombre en Cloudinary
+      const { url, public_id } = await subirPdfPrivado(pdf.file, titulo);
 
-    const nuevoPdf = {
-      _id: pdf._id,
-      url: { es: "", en: "", fr: "" },
-      public_id: { es: "", en: "", fr: "" },
-      title: pdf.title,
-      description: pdf.description,
-    };
-    nuevoPdf.url[activeTab] = url;
-    nuevoPdf.public_id[activeTab] = public_id;
+      const nuevoPdf = {
+        _id: pdf._id,
+        url: { es: "", en: "", fr: "" },
+        public_id: { es: "", en: "", fr: "" },
+        title: pdf.title,
+        description: pdf.description,
+      };
+      nuevoPdf.url[activeTab] = url;
+      nuevoPdf.public_id[activeTab] = public_id;
 
-    setFormData((prev) => ({
-      ...prev,
-      [activeTab]: {
-        ...prev[activeTab],
-        pdfs: [...(prev[activeTab]?.pdfs || []), nuevoPdf],
-      },
-    }));
+      setFormData((prev) => ({
+        ...prev,
+        [activeTab]: {
+          ...prev[activeTab],
+          pdfs: [...(prev[activeTab]?.pdfs || []), nuevoPdf],
+        },
+      }));
 
-    setTempPdfPublicIds((prev) => [...prev, public_id]);
+      setTempPdfPublicIds((prev) => [...prev, public_id]);
 
-    setPdfInputs((prev) => prev.filter((_, i) => i !== index));
-  } catch (err) {
-    console.error("❌ Error al subir PDF:", err);
-    alert("Error al subir el PDF.");
-  }
+      setPdfInputs((prev) => prev.filter((_, i) => i !== index));
+    } catch (err) {
+      console.error("❌ Error al subir PDF:", err);
+      alert("Error al subir el PDF.");
+    }
+  };
+
+ const addNewVideo = () => {
+  const newId = uuidv4();
+
+  setFormData((prev) => {
+    const updated = { ...prev };
+
+    // Agregar el nuevo ID al array global
+    updated.videoIds = [...(prev.videoIds || []), newId];
+
+    // En cada idioma, asegurarse de que tenga ese ID aunque esté vacío
+    ["es", "en", "fr"].forEach((lang) => {
+      const langVideos = updated[lang]?.videos || [];
+      if (!langVideos.some((v) => v._id === newId)) {
+        updated[lang] = {
+          ...(updated[lang] || {}),
+          videos: [
+            ...langVideos,
+            {
+              _id: newId,
+              url: {},
+              title: {},
+              description: {},
+            },
+          ],
+        };
+      }
+    });
+
+    return updated;
+  });
 };
 
-
-  const addNewVideo = () => {
-    const newId = uuidv4();
-    setFormData((prev) => ({
-      ...prev,
-      videos: [
-        ...(prev.videos || []),
-        {
-          _id: newId,
-          url: { es: "", en: "", fr: "" },
-          title: { es: "", en: "", fr: "" },
-          description: { es: "", en: "", fr: "" },
-        },
-      ],
-    }));
-  };
 
   const handleCancel = async () => {
     for (const id of tempPdfPublicIds) {
@@ -246,49 +262,62 @@ const AddCourseClassForm = ({
       </button>
 
       <h3>🎥 Videos</h3>
-      {formData.videos?.map((video) => {
-        const yaSubido = video.url?.[activeTab];
+      {formData.videoIds?.map((videoId) => {
+        const currentVideo = formData[activeTab]?.videos?.find(
+          (v) => v._id === videoId
+        ) || {
+          _id: videoId,
+          url: {},
+          title: {},
+          description: {},
+        };
+
         return (
-          <div key={video._id} className="video-entry">
-            {!yaSubido ? (
-              <UploadVideoField
-                activeLang={activeTab}
-                videoId={video._id}
-                onUploadSuccess={(videoObj) => {
-                  setFormData((prev) => {
-                    const nuevosVideos = prev.videos.map((v) =>
-                      v._id === video._id ? { ...videoObj, _id: video._id } : v
-                    );
-                    const nuevaUrl = videoObj.url?.[activeTab];
-                    if (nuevaUrl) {
-                      setTempVideoUrls((prev) => [...prev, nuevaUrl]);
-                    }
-                    return { ...prev, videos: nuevosVideos };
-                  });
-                }}
-              />
-            ) : (
-              <div className="uploaded-summary">
-                <div className="video-summary-text">
-                  🎥 <strong>{video.title?.[activeTab]}</strong>
-                  <p className="video-description">
-                    {video.description?.[activeTab] || "Sin descripción"}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="delete-button"
-                  onClick={() => {
-                    setFormData((prev) => ({
-                      ...prev,
-                      videos: prev.videos.filter((v) => v._id !== video._id),
-                    }));
-                  }}
-                >
-                  <FaTrashAlt />
-                </button>
-              </div>
-            )}
+          <div key={videoId} className="video-entry">
+            <UploadVideoField
+              activeLang={activeTab}
+              video={currentVideo}
+              onUploadSuccess={(videoPartial) => {
+                setFormData((prev) => {
+                  const lang = activeTab;
+                  const currentVideos = prev[lang]?.videos || [];
+
+                  const updatedVideos = currentVideos.some(
+                    (v) => v._id === videoId
+                  )
+                    ? currentVideos.map((v) =>
+                        v._id === videoId
+                          ? {
+                              ...v,
+                              url: { ...v.url, ...videoPartial.url },
+                              title: { ...v.title, ...videoPartial.title },
+                              description: {
+                                ...v.description,
+                                ...videoPartial.description,
+                              },
+                            }
+                          : v
+                      )
+                    : [
+                        ...currentVideos,
+                        {
+                          _id: videoId,
+                          url: videoPartial.url,
+                          title: videoPartial.title,
+                          description: videoPartial.description,
+                        },
+                      ];
+
+                  return {
+                    ...prev,
+                    [lang]: {
+                      ...(prev[lang] || {}),
+                      videos: updatedVideos,
+                    },
+                  };
+                });
+              }}
+            />
           </div>
         );
       })}

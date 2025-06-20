@@ -2,9 +2,11 @@ import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
 import {
   eliminarArchivoDesdeFrontend,
-  subirPdfPublico,
+  subirImagenCurso,
 } from "../../../../services/uploadCloudinary";
 import { createCourse } from "../../../../services/courseService";
+import UploadPdfPublicoField from "../../../common/UploadPdfPublicoField/UploadPdfPublicoField";
+import VideoPromocionalForm from "../../VideoPromocionalForm/VideoPromocionalForm";
 
 const AddCourseForm = ({
   activeTab,
@@ -25,6 +27,10 @@ const AddCourseForm = ({
     visible: { es: false, en: false, fr: false },
   });
 
+  const [tempPublicIds, setTempPublicIds] = useState([]);
+  const [imagenFile, setImagenFile] = useState(null);
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -34,30 +40,6 @@ const AddCourseForm = ({
         [activeTab]: value,
       },
     }));
-  };
-
-  const handleUploadPdfPublico = async () => {
-    const fileInput = document.createElement("input");
-    fileInput.type = "file";
-    fileInput.accept = ".pdf";
-    fileInput.click();
-
-    fileInput.onchange = async () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-
-      try {
-        const { url, public_id } = await subirPdfPublico(file);
-        setFormData((prev) => ({
-          ...prev,
-          pdf: { ...prev.pdf, [activeTab]: url },
-          public_id_pdf: { ...prev.public_id_pdf, [activeTab]: public_id },
-        }));
-      } catch (err) {
-        console.error("❌ Error al subir PDF público:", err);
-        alert("Error al subir el PDF público");
-      }
-    };
   };
 
   const handleSubmit = async () => {
@@ -73,7 +55,17 @@ const AddCourseForm = ({
     }
 
     try {
-      const created = await createCourse(formData);
+      const transformedData = {
+        ...formData,
+        pdf: {
+          es: formData.pdf.es?.url || "",
+          en: formData.pdf.en?.url || "",
+          fr: formData.pdf.fr?.url || "",
+        },
+      };
+
+      const created = await createCourse(transformedData);
+
       onSubmitSuccess(created);
       onClose();
     } catch (err) {
@@ -83,19 +75,13 @@ const AddCourseForm = ({
   };
 
   const handleCancel = async () => {
-    // Eliminamos los PDFs subidos en todos los idiomas, si existen
-    for (const lang of ["es", "en", "fr"]) {
-      const publicId = formData.public_id_pdf?.[lang];
-      if (publicId) {
-        try {
-          await eliminarArchivoDesdeFrontend(publicId);
-          console.log(`🗑️ PDF en ${lang} eliminado correctamente`);
-        } catch (err) {
-          console.warn(
-            `⚠️ No se pudo eliminar el PDF en ${lang}:`,
-            err.message
-          );
-        }
+    // Eliminamos los PDFs subidos temporalmente (por idioma activo)
+    for (const id of tempPublicIds) {
+      try {
+        await eliminarArchivoDesdeFrontend(id, "raw");
+        console.log(`🗑️ PDF con public_id ${id} eliminado correctamente`);
+      } catch (err) {
+        console.warn(`⚠️ No se pudo eliminar el PDF ${id}:`, err.message);
       }
     }
 
@@ -135,53 +121,119 @@ const AddCourseForm = ({
       />
       {errors.price && <div className="field-error">{errors.price}</div>}
 
-      <input
-        type="text"
-        name="image"
-        value={formData.image[activeTab]}
-        onChange={handleChange}
-        placeholder={`Imagen (${activeTab})`}
-      />
-
-      <div className="upload-field">
-        {formData.pdf[activeTab] ? (
-          <div className="uploaded-summary">
-            <a
-              href={formData.pdf[activeTab]}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              📄 Ver PDF subido
-            </a>
+      <div className="upload-image-field">
+        <label>Imagen del curso ({activeTab})</label>
+        {formData.image[activeTab] ? (
+          <div className="uploaded-image-preview">
+            <img
+              src={formData.image[activeTab]}
+              alt="Imagen subida"
+              style={{ maxWidth: "200px", borderRadius: "8px" }}
+            />
             <button
-              type="button"
-              className="delete-button"
+              className="btn red"
               onClick={async () => {
-                const publicId = formData.public_id_pdf?.[activeTab];
-                if (publicId) await eliminarArchivoDesdeFrontend(publicId);
-                setFormData((prev) => ({
-                  ...prev,
-                  pdf: { ...prev.pdf, [activeTab]: "" },
-                  public_id_pdf: { ...prev.public_id_pdf, [activeTab]: "" },
-                }));
+                try {
+                  // extraer el public_id desde la URL
+                  const url = formData.image[activeTab];
+                  const match = url.match(
+                    /\/upload\/(?:v\d+\/)?ImagenesCursos\/(.+)\.(jpg|png|jpeg|webp)/i
+                  );
+                  const publicId = match ? `ImagenesCursos/${match[1]}` : null;
+
+                  if (publicId) {
+                    await eliminarArchivoDesdeFrontend(publicId, "image");
+                    console.log("🗑 Imagen eliminada correctamente");
+                  }
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    image: { ...prev.image, [activeTab]: "" },
+                  }));
+                } catch (err) {
+                  console.warn("⚠️ Error al eliminar imagen:", err.message);
+                  alert("No se pudo eliminar la imagen.");
+                }
               }}
             >
-              <FaTrashAlt />
+              <FaTrashAlt /> Eliminar
             </button>
           </div>
         ) : (
-          <button type="button" onClick={handleUploadPdfPublico}>
-            📤 Subir PDF
-          </button>
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setImagenFile(e.target.files[0])}
+            />
+            {imagenFile && (
+              <button
+                className="btn blue"
+                disabled={subiendoImagen}
+                onClick={async () => {
+                  if (!imagenFile) return;
+                  setSubiendoImagen(true);
+                  try {
+                    const resultado = await subirImagenCurso(
+                      imagenFile,
+                      formData.title[activeTab] || "imagen-curso"
+                    );
+
+                    setFormData((prev) => ({
+                      ...prev,
+                      image: {
+                        ...prev.image,
+                        [activeTab]: resultado.url,
+                      },
+                    }));
+                    setImagenFile(null);
+                  } catch (err) {
+                    alert("Error al subir imagen", err);
+                  } finally {
+                    setSubiendoImagen(false);
+                  }
+                }}
+              >
+                {subiendoImagen ? "Subiendo..." : "Subir Imagen"}
+              </button>
+            )}
+          </>
         )}
       </div>
+      <label>PDF de presentación del curso ({activeTab})</label>
+      <UploadPdfPublicoField
+        activeLang={activeTab}
+        pdfUrl={formData.pdf}
+        setPdfUrl={(updater) =>
+          setFormData((prev) => ({
+            ...prev,
+            pdf:
+              typeof updater === "function"
+                ? updater(prev.pdf) // ✅ aplicar la función si lo es
+                : updater,
+          }))
+        }
+        publicId={formData.public_id_pdf}
+        setPublicId={(updater) =>
+          setFormData((prev) => ({
+            ...prev,
+            public_id_pdf:
+              typeof updater === "function"
+                ? updater(prev.public_id_pdf)
+                : updater,
+          }))
+        }
+        onTempUpload={(id) => setTempPublicIds((prev) => [...prev, id])}
+      />
 
-      <input
-        type="text"
-        name="video"
-        value={formData.video[activeTab]}
-        onChange={handleChange}
-        placeholder={`Video (${activeTab})`}
+      <label>Video promocional del curso ({activeTab})</label>
+      <VideoPromocionalForm
+        formData={formData}
+        setFormData={setFormData}
+        activeTab={activeTab}
+        onAddTempVideo={
+          (url) => setTempPublicIds((prev) => [...prev, url]) // si querés tener control para eliminarlos luego
+        }
       />
 
       <div className="modal-buttons">
