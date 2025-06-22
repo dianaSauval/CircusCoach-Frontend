@@ -6,7 +6,8 @@ import {
 } from "../../../../services/uploadCloudinary";
 import { createCourse } from "../../../../services/courseService";
 import UploadPdfPublicoField from "../../../common/UploadPdfPublicoField/UploadPdfPublicoField";
-import VideoPromocionalForm from "../../VideoPromocionalForm/VideoPromocionalForm";
+import VideoPromocionalForm from "../../../common/VideoPromocionalForm/VideoPromocionalForm";
+import UploadImagenField from "../../../common/UploadImagenField/UploadImagenField";
 
 const AddCourseForm = ({
   activeTab,
@@ -121,85 +122,17 @@ const AddCourseForm = ({
       />
       {errors.price && <div className="field-error">{errors.price}</div>}
 
-      <div className="upload-image-field">
-        <label>Imagen del curso ({activeTab})</label>
-        {formData.image[activeTab] ? (
-          <div className="uploaded-image-preview">
-            <img
-              src={formData.image[activeTab]}
-              alt="Imagen subida"
-              style={{ maxWidth: "200px", borderRadius: "8px" }}
-            />
-            <button
-              className="btn red"
-              onClick={async () => {
-                try {
-                  // extraer el public_id desde la URL
-                  const url = formData.image[activeTab];
-                  const match = url.match(
-                    /\/upload\/(?:v\d+\/)?ImagenesCursos\/(.+)\.(jpg|png|jpeg|webp)/i
-                  );
-                  const publicId = match ? `ImagenesCursos/${match[1]}` : null;
+      <UploadImagenField
+        activeLang={activeTab}
+        value={formData.image[activeTab]}
+        onChange={(url) =>
+          setFormData((prev) => ({
+            ...prev,
+            image: { ...prev.image, [activeTab]: url },
+          }))
+        }
+      />
 
-                  if (publicId) {
-                    await eliminarArchivoDesdeFrontend(publicId, "image");
-                    console.log("🗑 Imagen eliminada correctamente");
-                  }
-
-                  setFormData((prev) => ({
-                    ...prev,
-                    image: { ...prev.image, [activeTab]: "" },
-                  }));
-                } catch (err) {
-                  console.warn("⚠️ Error al eliminar imagen:", err.message);
-                  alert("No se pudo eliminar la imagen.");
-                }
-              }}
-            >
-              <FaTrashAlt /> Eliminar
-            </button>
-          </div>
-        ) : (
-          <>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setImagenFile(e.target.files[0])}
-            />
-            {imagenFile && (
-              <button
-                className="btn blue"
-                disabled={subiendoImagen}
-                onClick={async () => {
-                  if (!imagenFile) return;
-                  setSubiendoImagen(true);
-                  try {
-                    const resultado = await subirImagenCurso(
-                      imagenFile,
-                      formData.title[activeTab] || "imagen-curso"
-                    );
-
-                    setFormData((prev) => ({
-                      ...prev,
-                      image: {
-                        ...prev.image,
-                        [activeTab]: resultado.url,
-                      },
-                    }));
-                    setImagenFile(null);
-                  } catch (err) {
-                    alert("Error al subir imagen", err);
-                  } finally {
-                    setSubiendoImagen(false);
-                  }
-                }}
-              >
-                {subiendoImagen ? "Subiendo..." : "Subir Imagen"}
-              </button>
-            )}
-          </>
-        )}
-      </div>
       <label>PDF de presentación del curso ({activeTab})</label>
       <UploadPdfPublicoField
         activeLang={activeTab}

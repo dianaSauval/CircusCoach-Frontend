@@ -294,6 +294,7 @@ const status = isVimeo ? videoStatus[videoId] : "ready";
   };
 
   const handleSave = async (updatedData) => {
+     console.log("🔄 handleSave recibió:", updatedData);
     try {
       if (selectedClass) {
         await updateCourseClass(selectedClass._id, updatedData);

@@ -1,0 +1,81 @@
+.upload-imagen-field {
+  margin-bottom: 1.5rem;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+}
+
+.upload-imagen-field label {
+  font-family: var(--font-titulo);
+  font-size: 1.2rem;
+  color: var(--color-petroleo);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.uploaded-image-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: var(--color-verde-claro);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.uploaded-image-preview img {
+  max-width: 150px;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid var(--color-petroleo);
+}
+
+.uploaded-image-preview .btn {
+  background-color: var(--color-petroleo);
+  color: var(--color-blanco);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-titulo);
+  transition: background-color 0.2s;
+}
+
+.uploaded-image-preview .btn:hover {
+  background-color: var(--color-azul-profundo);
+}
+
+.upload-imagen-field input[type="file"] {
+  margin-bottom: 0.5rem;
+}
+
+.upload-imagen-field .btn {
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-family: var(--font-titulo);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.upload-imagen-field .btn:hover {
+  background-color: var(--color-verde-claro);
+}
+
+.upload-imagen-field input[type="text"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--color-petroleo);
+  border-radius: 8px;
+  font-family: var(--font-texto);
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+.upload-imagen-field input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-azul-profundo);
+}

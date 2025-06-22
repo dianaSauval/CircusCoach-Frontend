@@ -8,6 +8,7 @@ const CourseClassList = ({
   selectedClass,
   setSelectedClass,
   onClassDeleted,
+  onDeleteClass,
 }) => {
   const [localClasses, setLocalClasses] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -26,20 +27,29 @@ const CourseClassList = ({
     setShowModal(true);
   };
 
-  const confirmDelete = async () => {
-    try {
-      await deleteCourseClass(classToDelete);
-      setLocalClasses((prev) =>
-        prev.filter((cls) => cls._id !== classToDelete)
-      );
-      if (onClassDeleted) onClassDeleted();
-    } catch (error) {
-      console.error("Error al eliminar clase:", error);
-    } finally {
-      setShowModal(false);
-      setClassToDelete(null);
+ const confirmDelete = async () => {
+  try {
+    const cls = localClasses.find((c) => c._id === classToDelete);
+    if (!cls) return;
+
+    if (onDeleteClass) {
+      await onDeleteClass(cls); // ✅ usa la función completa desde ManageCourses
+    } else {
+      await deleteCourseClass(classToDelete); // fallback por si no la pasan
     }
-  };
+
+    setLocalClasses((prev) =>
+      prev.filter((cls) => cls._id !== classToDelete)
+    );
+    if (onClassDeleted) onClassDeleted();
+  } catch (error) {
+    console.error("Error al eliminar clase:", error);
+  } finally {
+    setShowModal(false);
+    setClassToDelete(null);
+  }
+};
+
 
   return (
     <div className="course-classes">

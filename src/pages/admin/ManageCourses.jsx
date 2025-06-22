@@ -3,7 +3,11 @@ import "../../styles/admin/ManageCourses.css";
 import CourseEditPanel from "../../components/admin/CourseEditPanel/CourseEditPanel";
 import CourseClassList from "../../components/admin/CourseClassList/CourseClassList";
 import AddCoursesModal from "../../components/admin/ModalAdmin/AddCoursesModal";
-import { deleteCourse, getAllCourses } from "../../services/courseService";
+import {
+  deleteCourse,
+  deleteCourseClass,
+  getAllCourses,
+} from "../../services/courseService";
 import ConfirmModal from "../../components/common/ConfirmModal";
 
 const ManageCourses = () => {
@@ -93,6 +97,17 @@ const ManageCourses = () => {
     setShowModal(true);
   };
 
+  const handleDeleteClass = async (cls) => {
+    try {
+      await deleteCourseClass(cls._id);
+      console.log("✅ Clase eliminada:", cls._id);
+      handleCourseOrClassUpdated();
+      if (selectedClass?._id === cls._id) setSelectedClass(null);
+    } catch (error) {
+      console.error("❌ Error al eliminar clase:", error);
+    }
+  };
+
   return (
     <div className="manage-courses-container">
       <h1 className="main-title">📘 Cursos</h1>
@@ -164,6 +179,7 @@ const ManageCourses = () => {
                       selectedClass={selectedClass}
                       setSelectedClass={handleSelectClass}
                       onClassDeleted={handleCourseOrClassUpdated}
+                      onDeleteClass={handleDeleteClass}
                     />
                   )}
                 </div>
@@ -190,12 +206,11 @@ const ManageCourses = () => {
       )}
       <ConfirmModal
         isOpen={confirmModalOpen}
-       onClose={() => {
-  console.log("CANCELAR MODAL");
-  setConfirmModalOpen(false);
-  setCourseToDelete(null);
-}}
-
+        onClose={() => {
+          console.log("CANCELAR MODAL");
+          setConfirmModalOpen(false);
+          setCourseToDelete(null);
+        }}
         onConfirm={async () => {
           try {
             await deleteCourse(courseToDelete);
