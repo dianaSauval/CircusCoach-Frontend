@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { FaTrashAlt } from "react-icons/fa";
-import {
-  eliminarArchivoDesdeFrontend,
-  subirImagenCurso,
-} from "../../../../services/uploadCloudinary";
+import { eliminarArchivoDesdeFrontend } from "../../../../services/uploadCloudinary";
 import { createCourse } from "../../../../services/courseService";
 import UploadPdfPublicoField from "../../../common/UploadPdfPublicoField/UploadPdfPublicoField";
 import VideoPromocionalForm from "../../../common/VideoPromocionalForm/VideoPromocionalForm";
@@ -20,6 +17,7 @@ const AddCourseForm = ({
   const [formData, setFormData] = useState({
     title: { es: "", en: "", fr: "" },
     description: { es: "", en: "", fr: "" },
+    image_public_id: { es: "", en: "", fr: "" },
     image: { es: "", en: "", fr: "" },
     pdf: { es: "", en: "", fr: "" },
     public_id_pdf: { es: "", en: "", fr: "" },
@@ -29,8 +27,6 @@ const AddCourseForm = ({
   });
 
   const [tempPublicIds, setTempPublicIds] = useState([]);
-  const [imagenFile, setImagenFile] = useState(null);
-  const [subiendoImagen, setSubiendoImagen] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,6 +82,16 @@ const AddCourseForm = ({
       }
     }
 
+const publicIdImagen = formData.image_public_id?.[activeTab];
+if (publicIdImagen) {
+  try {
+    await eliminarArchivoDesdeFrontend(publicIdImagen, "image"); // sin prefijo doble
+    console.log(`🗑️ Imagen temporal eliminada: ${publicIdImagen}`);
+  } catch (err) {
+    console.warn(`⚠️ No se pudo eliminar la imagen temporal:`, err.message);
+  }
+}
+
     onClose();
   };
 
@@ -125,10 +131,11 @@ const AddCourseForm = ({
       <UploadImagenField
         activeLang={activeTab}
         value={formData.image[activeTab]}
-        onChange={(url) =>
+        onChange={(url, publicId) =>
           setFormData((prev) => ({
             ...prev,
             image: { ...prev.image, [activeTab]: url },
+            image_public_id: { ...prev.image_public_id, [activeTab]: publicId }, // ✅ guardamos el id
           }))
         }
       />

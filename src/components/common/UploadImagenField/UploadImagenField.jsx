@@ -17,7 +17,7 @@ const UploadImagenField = ({ activeLang, value, onChange }) => {
     setUploading(true);
     try {
       const result = await subirImagenCurso(file, titulo.trim());
-      onChange(result.url);
+      onChange(result.url, result.public_id);
       setFile(null);
       setTitulo("");
     } catch (err) {

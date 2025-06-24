@@ -1,12 +1,107 @@
 import { useState, useEffect } from "react";
 import "./UploadVideoField.css";
+import { v4 as uuidv4 } from "uuid";
 import {
   subirVideoPrivado,
   eliminarVideoDeVimeo,
 } from "../../../services/uploadVimeoService";
 import { FaTrashAlt, FaCheckCircle, FaFileVideo } from "react-icons/fa";
 
-const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
+const UploadVideoField = ({
+  activeLang = "es",
+  videos = [],
+  onChange = () => {},
+  onTempUpload = () => {},
+}) => {
+  const [localVideos, setLocalVideos] = useState([]);
+  const [addedIds, setAddedIds] = useState([]);
+
+  useEffect(() => {
+    setLocalVideos(videos);
+  }, [videos]);
+
+  const handleUploadSuccess = (videoPartial) => {
+    const updated = localVideos.map((v) =>
+      v._id === videoPartial._id
+        ? {
+            ...v,
+            url: { ...v.url, ...videoPartial.url },
+            title: { ...v.title, ...videoPartial.title },
+            description: { ...v.description, ...videoPartial.description },
+          }
+        : v
+    );
+    setLocalVideos(updated);
+    onChange(updated);
+  };
+
+  const handleDelete = async (videoId) => {
+    const video = localVideos.find((v) => v._id === videoId);
+    const url = video?.url?.[activeLang];
+    if (url) {
+      try {
+        await eliminarVideoDeVimeo(url);
+      } catch (err) {
+        console.warn("❌ No se pudo eliminar el video de Vimeo:", err);
+      }
+    }
+    const updated = localVideos.filter((v) => v._id !== videoId);
+    setLocalVideos(updated);
+    onChange(updated);
+  };
+
+const addNewVideo = () => {
+  const newId = uuidv4();
+  const nuevo = {
+    _id: newId,
+    url: { [activeLang]: "" },
+    title: { [activeLang]: "" },
+    description: { [activeLang]: "" },
+  };
+  const updated = [...localVideos, nuevo];
+  setLocalVideos(updated);
+  onChange(updated);
+  setAddedIds((prev) => [...prev, newId]); // para que lo veas aunque aún esté vacío
+};
+
+  const videosToShow = localVideos.filter(
+  (video) =>
+    addedIds.includes(video._id) ||
+    video.url?.[activeLang] ||
+    video.title?.[activeLang] ||
+    video.description?.[activeLang]
+);
+
+  return (
+    <div className="upload-video-field-multiple">
+     {videosToShow.map((video) => (
+        <SingleVideoUploader
+          key={video._id}
+          video={video}
+          activeLang={activeLang}
+          onUploadSuccess={handleUploadSuccess}
+          onDelete={() => handleDelete(video._id)}
+          onTempUpload={onTempUpload} // ✅ ESTA LÍNEA FALTABA
+        />
+      ))}
+
+      <button type="button" onClick={addNewVideo} style={{ marginTop: 8 }}>
+        ➕ Agregar Video
+      </button>
+    </div>
+  );
+};
+
+export default UploadVideoField;
+
+// 👇 Subcomponente reutilizado para cada video
+const SingleVideoUploader = ({
+  video,
+  activeLang,
+  onUploadSuccess,
+  onDelete,
+  onTempUpload = () => {},
+}) => {
   const [videoFile, setVideoFile] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -15,7 +110,6 @@ const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
   const [error, setError] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
 
-  // 🔁 Cargar valores iniciales del idioma activo
   useEffect(() => {
     setTitle(video?.title?.[activeLang] || "");
     setDescription(video?.description?.[activeLang] || "");
@@ -48,7 +142,6 @@ const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
       setUploadProgress(100);
       const publicUrl = rawUrl;
 
-      // 🧠 Actualizamos solo el idioma activo
       const videoPartial = {
         _id: video._id,
         url: { [activeLang]: publicUrl },
@@ -56,7 +149,11 @@ const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
         description: { [activeLang]: description },
       };
 
-      onUploadSuccess?.(videoPartial);
+      onUploadSuccess(videoPartial);
+      if (publicUrl) {
+        onTempUpload(publicUrl); // << Notifica al padre que se subió este video
+      }
+
       setVideoUrl(publicUrl);
       setVideoFile(null);
     } catch (err) {
@@ -65,31 +162,6 @@ const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
     } finally {
       setUploading(false);
     }
-  };
-
-  const handleDelete = async () => {
-    try {
-      if (videoUrl) {
-        await eliminarVideoDeVimeo(videoUrl);
-      }
-    } catch (err) {
-      console.warn("❌ No se pudo eliminar el video de Vimeo:", err);
-    }
-
-    // Informamos al padre que se borre SOLO este idioma
-    const videoPartial = {
-      _id: video._id,
-      url: { [activeLang]: "" },
-      title: { [activeLang]: "" },
-      description: { [activeLang]: "" },
-    };
-
-    onUploadSuccess?.(videoPartial);
-    setVideoUrl("");
-    setTitle("");
-    setDescription("");
-    setVideoFile(null);
-    setUploadProgress(0);
   };
 
   return (
@@ -145,11 +217,7 @@ const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
               {description || "Sin descripción"}
             </p>
           </div>
-          <button
-            type="button"
-            className="delete-button"
-            onClick={handleDelete}
-          >
+          <button type="button" className="delete-button" onClick={onDelete}>
             <FaTrashAlt />
           </button>
         </div>
@@ -159,5 +227,3 @@ const UploadVideoField = ({ activeLang = "es", video, onUploadSuccess }) => {
     </div>
   );
 };
-
-export default UploadVideoField;

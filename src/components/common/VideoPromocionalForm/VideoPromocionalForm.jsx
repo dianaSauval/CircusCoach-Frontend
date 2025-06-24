@@ -101,6 +101,8 @@ const VideoPromocionalForm = ({
         [activeTab]: url,
       },
     }));
+
+    onAddTempVideo?.(url); 
   };
 
   const handleRemove = async () => {

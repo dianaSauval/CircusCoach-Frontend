@@ -38,21 +38,17 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
 
   // Inicializar campos por si vienen incompletos
   useEffect(() => {
-    if (!isClass) {
+    if (isClass && initialData?.videos?.length > 0) {
       setFormData((prev) => {
-        const fixed = { ...prev };
-        ["es", "en", "fr"].forEach((lang) => {
-          if (typeof fixed.pdf?.[lang] === "object") {
-            fixed.pdf[lang] = fixed.pdf[lang]?.url || "";
-          }
-          if (typeof fixed.video?.[lang] === "object") {
-            fixed.video[lang] = fixed.video[lang]?.url || "";
-          }
-        });
-        return fixed;
+        const ids = initialData.videos.map((v) => v._id);
+        return {
+          ...prev,
+          videos: initialData.videos,
+          videoIds: ids,
+        };
       });
     }
-  }, [isClass]);
+  }, [isClass, initialData]);
 
   const handleCancel = async () => {
     // Eliminar PDFs nuevos
@@ -78,17 +74,17 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
   if (isClass) {
     return (
       <>
-      <CourseClassForm
-        formData={formData}
-        setFormData={setFormData}
-        initialData={initialData}
-        activeTab={activeTab}
-        onCancel={handleCancel}
-        tempUploads={tempUploads}
-        setTempUploads={setTempUploads}
-        onSave={() => onSave({ ...initialData, ...formData })}
-        // ✅ asegurás que se pase el `formData` que llega desde adentro
-      />
+        <CourseClassForm
+          formData={formData}
+          setFormData={setFormData}
+          initialData={initialData}
+          activeTab={activeTab}
+          onCancel={handleCancel}
+          tempUploads={tempUploads}
+          setTempUploads={setTempUploads}
+          onSave={() => onSave({ ...initialData, ...formData })}
+          // ✅ asegurás que se pase el `formData` que llega desde adentro
+        />
       </>
     );
   }
