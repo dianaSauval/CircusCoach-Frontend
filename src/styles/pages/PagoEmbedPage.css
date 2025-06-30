@@ -1,0 +1,134 @@
+/* Estilos generales */
+.pago-page-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: var(--color-verde-claro);
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(20, 50, 81, 0.1);
+}
+
+.pago-page-container h1 {
+  font-family: var(--font-titulo);
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-petroleo);
+  text-align: center;
+}
+
+/* Lista de productos */
+.cart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: var(--color-blanco);
+  border: 2px solid var(--color-menta);
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.cart-item-img {
+  width: 100px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid var(--color-azul-profundo);
+}
+
+.cart-item-info {
+  flex-grow: 1;
+}
+
+.cart-item-info h3 {
+  font-family: var(--font-titulo);
+  margin: 0 0 0.3rem;
+  font-size: 1.4rem;
+  color: var(--color-azul-profundo);
+}
+
+.cart-item-info p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Botón para eliminar item */
+.btn-clear.small {
+  margin-top: 0.5rem;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  background-color: var(--color-petroleo);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-clear.small:hover {
+  background-color: var(--color-azul-profundo);
+}
+
+/* Resumen */
+.cart-summary {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  font-weight: bold;
+}
+
+.total-label {
+  font-family: var(--font-titulo);
+}
+
+.total-amount {
+  color: var(--color-azul-profundo);
+}
+
+/* Botones */
+.cart-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1.5rem;
+  gap: 1rem;
+}
+
+.btn-clear {
+  padding: 10px 16px;
+  background-color: var(--color-petroleo);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-titulo);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-clear:hover {
+  background-color: var(--color-azul-profundo);
+}
+
+/* Sección de pago */
+.payment-form-section {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--color-blanco);
+  border: 2px dashed var(--color-petroleo);
+  border-radius: 12px;
+}
+
+/* Mensaje de advertencia */
+.terms-warning {
+  color: crimson;
+  font-weight: bold;
+  margin-top: 0.5rem;
+}

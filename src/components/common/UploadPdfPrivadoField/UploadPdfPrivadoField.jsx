@@ -76,15 +76,36 @@ const UploadPdfPrivadoField = ({
     }
   };
 
-  const eliminarPdf = async (pdfId) => {
-    const pdf = existingPdfs.find((p) => p._id === pdfId);
-    const publicId = pdf?.public_id?.[activeTab];
-    if (publicId) await eliminarArchivoDesdeFrontend(publicId);
-    setPdfs((prev) => {
-      if (!Array.isArray(prev)) return [];
-      return prev.filter((p) => p._id !== pdfId);
+ const eliminarPdf = async (pdfId) => {
+  const pdf = existingPdfs.find((p) => p._id === pdfId);
+  const publicId = pdf?.public_id?.[activeTab];
+
+  if (publicId) {
+    try {
+      await eliminarArchivoDesdeFrontend(publicId);
+    } catch (error) {
+      console.warn("⚠️ Error al eliminar archivo desde Cloudinary:", error);
+    }
+  }
+
+  setPdfs((prev) => {
+    const listaActual = Array.isArray(prev) ? prev : [];
+
+    return listaActual.map((p) => {
+      if (p._id !== pdfId) return p;
+
+      const newPdf = { ...p };
+
+      newPdf.url = { ...newPdf.url, [activeTab]: "" };
+      newPdf.public_id = { ...newPdf.public_id, [activeTab]: "" };
+      newPdf.title = { ...newPdf.title, [activeTab]: "" };
+      newPdf.description = { ...newPdf.description, [activeTab]: "" };
+
+      return newPdf;
     });
-  };
+  });
+};
+
 
   return (
     <div>

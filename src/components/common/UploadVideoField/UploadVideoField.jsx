@@ -50,31 +50,31 @@ const UploadVideoField = ({
     onChange(updated);
   };
 
-const addNewVideo = () => {
-  const newId = uuidv4();
-  const nuevo = {
-    _id: newId,
-    url: { [activeLang]: "" },
-    title: { [activeLang]: "" },
-    description: { [activeLang]: "" },
+  const addNewVideo = () => {
+    const newId = uuidv4();
+    const nuevo = {
+      _id: newId,
+      url: { [activeLang]: "" },
+      title: { [activeLang]: "" },
+      description: { [activeLang]: "" },
+    };
+    const updated = [...localVideos, nuevo];
+    setLocalVideos(updated);
+    onChange(updated);
+    setAddedIds((prev) => [...prev, newId]); // para que lo veas aunque aún esté vacío
   };
-  const updated = [...localVideos, nuevo];
-  setLocalVideos(updated);
-  onChange(updated);
-  setAddedIds((prev) => [...prev, newId]); // para que lo veas aunque aún esté vacío
-};
 
   const videosToShow = localVideos.filter(
-  (video) =>
-    addedIds.includes(video._id) ||
-    video.url?.[activeLang] ||
-    video.title?.[activeLang] ||
-    video.description?.[activeLang]
-);
+    (video) =>
+      addedIds.includes(video._id) ||
+      video.url?.[activeLang] ||
+      video.title?.[activeLang] ||
+      video.description?.[activeLang]
+  );
 
   return (
     <div className="upload-video-field-multiple">
-     {videosToShow.map((video) => (
+      {videosToShow.map((video) => (
         <SingleVideoUploader
           key={video._id}
           video={video}
@@ -150,8 +150,8 @@ const SingleVideoUploader = ({
       };
 
       onUploadSuccess(videoPartial);
-      if (publicUrl) {
-        onTempUpload(publicUrl); // << Notifica al padre que se subió este video
+      if (publicUrl && !video.url?.[activeLang]) {
+        onTempUpload(publicUrl);
       }
 
       setVideoUrl(publicUrl);

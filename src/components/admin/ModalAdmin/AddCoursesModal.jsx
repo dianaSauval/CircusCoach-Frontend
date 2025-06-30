@@ -36,7 +36,7 @@ const [formDataClass, setFormDataClass] = useState({
   subtitle: { es: "", en: "", fr: "" },
   content: { es: "", en: "", fr: "" },
   secondaryContent: { es: "", en: "", fr: "" },
-  visible: { es: true, en: false, fr: false },
+  visible: { es: false, en: false, fr: false },
   videoIds: [], // 👈 nuevo campo
 });
 

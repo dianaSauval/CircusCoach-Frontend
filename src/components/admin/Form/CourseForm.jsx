@@ -16,6 +16,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       secondaryContent: { es: "", en: "", fr: "" },
       pdfs: [],
       videos: [],
+      imagen: null,
     };
 
     const baseCourseData = {
@@ -67,6 +68,16 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         console.error("Error al eliminar video temporal:", err);
       }
     }
+    // Eliminar imagen nueva (si hay)
+    if (tempUploads.imagen) {
+      try {
+        await eliminarArchivoDesdeFrontend(tempUploads.imagen, "image");
+        console.log("🗑️ Imagen temporal eliminada:", tempUploads.imagen);
+      } catch (err) {
+        console.warn("⚠️ No se pudo eliminar la imagen:", err.message);
+      }
+    }
+
     onCancel();
   };
 
@@ -185,12 +196,16 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         <UploadImagenField
           activeLang={activeTab}
           value={formData.image?.[activeTab] || ""}
-          onChange={(url) =>
+          onChange={(url, publicId) => {
             setFormData((prev) => ({
               ...prev,
               image: { ...prev.image, [activeTab]: url },
-            }))
-          }
+            }));
+            setTempUploads((prev) => ({
+              ...prev,
+              imagen: publicId, // ✅ guardamos temporalmente el ID para eliminarlo si se cancela
+            }));
+          }}
         />
 
         <div className="form-section">

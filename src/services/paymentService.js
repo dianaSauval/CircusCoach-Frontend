@@ -19,3 +19,17 @@ export const crearSesionStripe = async (items) => {
   const res = await api.post("/stripe/crear-sesion", { items });
   return res.data; // devuelve { id }
 };
+
+// Crear PaymentIntent y obtener clientSecret (para PaymentElement)
+export const crearPaymentIntent = async (items) => {
+  const res = await api.post("/stripe/crear-payment-intent", { items });
+  return res.data; // devuelve { clientSecret }
+};
+
+// Confirmar compra con PaymentIntent (Stripe Elements)
+export const confirmarCompraConPaymentIntent = async (paymentIntentId) => {
+  const res = await api.post("/stripe/confirmar-compra-payment-intent", {
+    paymentIntentId,
+  });
+  return res.data;
+};

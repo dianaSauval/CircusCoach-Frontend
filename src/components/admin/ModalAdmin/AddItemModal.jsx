@@ -5,9 +5,22 @@ import {
   createFormation,
   createModule,
 } from "../../../services/formationService";
+import UploadImagenField from "../../common/UploadImagenField/UploadImagenField";
+import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
+import UploadPdfPublicoField from "../../common/UploadPdfPublicoField/UploadPdfPublicoField";
+import VideoPromocionalForm from "../../common/VideoPromocionalForm/VideoPromocionalForm";
+import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
+import UploadPdfPrivadoField from "../../common/UploadPdfPrivadoField/UploadPdfPrivadoField";
+import UploadVideoField from "../../common/UploadVideoField/UploadVideoField";
 
 const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
   const [activeTab, setActiveTab] = useState("es");
+  const [pdfUrl, setPdfUrl] = useState({ es: null, en: null, fr: null });
+  const [pdfPublicId, setPdfPublicId] = useState({ es: "", en: "", fr: "" });
+  const [tempPdfPublicIds, setTempPdfPublicIds] = useState([]);
+  const [tempVideoUrls, setTempVideoUrls] = useState([]);
+  const [tempPdfPrivadosPublicIds, setTempPdfPrivadosPublicIds] = useState([]);
+
   const isFormation = type === "formation";
   const isClass = type === "class";
 
@@ -17,6 +30,7 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
     ...(isFormation && {
       price: "",
       image: { es: "", en: "", fr: "" },
+      image_public_id: { es: "", en: "", fr: "" },
       pdf: { es: "", en: "", fr: "" },
       video: { es: "", en: "", fr: "" },
     }),
@@ -29,14 +43,31 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
         fr: [{ url: "", title: "", description: "" }],
       },
       videos: {
-        es: [{ url: "", title: "", description: "" }],
-        en: [{ url: "", title: "", description: "" }],
-        fr: [{ url: "", title: "", description: "" }],
+        es: [],
+        en: [],
+        fr: [],
       },
     }),
   };
 
-  const [formData, setFormData] = useState(initialState);
+  const [formData, setFormData] = useState(initialState); // para formations y módulos
+  const [formDataClass, setFormDataClass] = useState({
+    title: { es: "", en: "", fr: "" },
+    subtitle: { es: "", en: "", fr: "" },
+    content: { es: "", en: "", fr: "" },
+    secondaryContent: { es: "", en: "", fr: "" },
+    visible: { es: false, en: false, fr: false },
+    pdfs: {
+      es: [],
+      en: [],
+      fr: [],
+    },
+    videos: {
+      es: [],
+      en: [],
+      fr: [],
+    },
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -57,7 +88,11 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
           description: formData.description,
           price: formData.price,
           image: formData.image,
-          pdf: formData.pdf,
+          pdf: {
+            es: pdfUrl.es?.url || "",
+            en: pdfUrl.en?.url || "",
+            fr: pdfUrl.fr?.url || "",
+          },
           video: formData.video,
         };
       } else if (type === "module") {
@@ -68,25 +103,77 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
         };
       } else if (type === "class") {
         // 🔧 Transformar PDF y Video para que tengan estructura multilanguage
-        const transformToMultiLang = (items) =>
-          items.map((item) => ({
-            url: { es: "", en: "", fr: "", [activeTab]: item.url },
-            title: { es: "", en: "", fr: "", [activeTab]: item.title },
-            description: {
-              es: "",
-              en: "",
-              fr: "",
-              [activeTab]: item.description,
-            },
-          }));
+        // Garantiza que las propiedades estén definidas como arrays vacíos
+        ["es", "en", "fr"].forEach((lang) => {
+          if (!Array.isArray(formDataClass.pdfs?.[lang])) {
+            formDataClass.pdfs[lang] = [];
+          }
+          if (!Array.isArray(formDataClass.videos?.[lang])) {
+            formDataClass.videos[lang] = [];
+          }
+        });
+
+        const pdfs = [];
+        const videos = [];
+
+        ["es", "en", "fr"].forEach((lang) => {
+          (formDataClass.pdfs?.[lang] || []).forEach((pdf) => {
+            let existing = pdfs.find((p) => p._id === pdf._id);
+            if (!existing) {
+              existing = {
+                _id: pdf._id,
+                url: { es: "", en: "", fr: "" },
+                title: { es: "", en: "", fr: "" },
+                description: { es: "", en: "", fr: "" },
+              };
+              pdfs.push(existing);
+            }
+            existing.url[lang] =
+              typeof pdf.url === "string" ? pdf.url : pdf.url?.[lang] || "";
+            existing.title[lang] =
+              typeof pdf.title === "string"
+                ? pdf.title
+                : pdf.title?.[lang] || "";
+            existing.description[lang] =
+              typeof pdf.description === "string"
+                ? pdf.description
+                : pdf.description?.[lang] || "";
+          });
+
+          (formDataClass.videos?.[lang] || []).forEach((video) => {
+            let existing = videos.find((v) => v._id === video._id);
+            if (!existing) {
+              existing = {
+                _id: video._id,
+                url: { es: "", en: "", fr: "" },
+                title: { es: "", en: "", fr: "" },
+                description: { es: "", en: "", fr: "" },
+              };
+              videos.push(existing);
+            }
+            existing.url[lang] =
+              typeof video.url === "string"
+                ? video.url
+                : video.url?.[lang] || "";
+            existing.title[lang] =
+              typeof video.title === "string"
+                ? video.title
+                : video.title?.[lang] || "";
+            existing.description[lang] =
+              typeof video.description === "string"
+                ? video.description
+                : video.description?.[lang] || "";
+          });
+        });
 
         payload = {
-          title: formData.title,
-          subtitle: formData.subtitle,
-          content: formData.description,
-          secondaryContent: formData.secondaryContent,
-          pdfs: transformToMultiLang(formData.pdfs[activeTab]),
-          videos: transformToMultiLang(formData.videos[activeTab]),
+          title: formDataClass.title,
+          subtitle: formDataClass.subtitle,
+          content: formDataClass.content,
+          secondaryContent: formDataClass.secondaryContent,
+          visible: formDataClass.visible,
+          pdfs,
+          videos,
           moduleId: parentId,
         };
       }
@@ -108,67 +195,6 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
     }
   };
 
-  const handlePdfChange = (index, e) => {
-    const updated = [...formData.pdfs[activeTab]];
-    updated[index][e.target.name] = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      pdfs: { ...prev.pdfs, [activeTab]: updated },
-    }));
-  };
-
-  const addPdf = () => {
-    setFormData((prev) => ({
-      ...prev,
-      pdfs: {
-        ...prev.pdfs,
-        [activeTab]: [
-          ...prev.pdfs[activeTab],
-          { url: "", title: "", description: "" },
-        ],
-      },
-    }));
-  };
-
-  const removePdf = (index) => {
-    const updated = [...formData.pdfs[activeTab]];
-    updated.splice(index, 1);
-    setFormData((prev) => ({
-      ...prev,
-      pdfs: { ...prev.pdfs, [activeTab]: updated },
-    }));
-  };
-
-  const handleVideoChange = (index, e) => {
-    const updated = [...formData.videos[activeTab]];
-    updated[index][e.target.name] = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      videos: { ...prev.videos, [activeTab]: updated },
-    }));
-  };
-
-  const addVideo = () => {
-    setFormData((prev) => ({
-      ...prev,
-      videos: {
-        ...prev.videos,
-        [activeTab]: [
-          ...prev.videos[activeTab],
-          { url: "", title: "", description: "" },
-        ],
-      },
-    }));
-  };
-
-  const removeVideo = (index) => {
-    const updated = [...formData.videos[activeTab]];
-    updated.splice(index, 1);
-    setFormData((prev) => ({
-      ...prev,
-      videos: { ...prev.videos, [activeTab]: updated },
-    }));
-  };
   return (
     <div className="modal">
       <div className="modal-content">
@@ -193,104 +219,148 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
             </button>
           ))}
         </div>
-
         <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            name="title"
-            value={formData.title[activeTab]}
-            onChange={handleChange}
-            placeholder={`Título (${activeTab.toUpperCase()})`}
-            required
-          />
-          <textarea
-            name="description"
-            value={formData.description[activeTab]}
-            onChange={handleChange}
-            placeholder={`Descripción (${activeTab.toUpperCase()})`}
-          />
-
-          {type === "class" && (
+          {/* Título y descripción general SOLO si no es una clase */}
+          {(type === "formation" || type === "module") && (
             <>
               <input
                 type="text"
-                name="subtitle"
-                value={formData.subtitle[activeTab]}
+                name="title"
+                value={formData.title[activeTab]}
                 onChange={handleChange}
-                placeholder={`Subtítulo (${activeTab.toUpperCase()})`}
+                placeholder={`Título (${activeTab.toUpperCase()})`}
+                required
               />
               <textarea
-                name="secondaryContent"
-                value={formData.secondaryContent[activeTab]}
+                name="description"
+                value={formData.description[activeTab]}
                 onChange={handleChange}
-                placeholder={`Contenido Secundario (${activeTab.toUpperCase()})`}
+                placeholder={`Descripción (${activeTab.toUpperCase()})`}
+              />
+            </>
+          )}
+
+          {type === "class" && (
+            <>
+              {/* Input de título solo para clases (no duplicado) */}
+              <input
+                type="text"
+                name="title"
+                value={formDataClass.title[activeTab]}
+                onChange={(e) =>
+                  setFormDataClass((prev) => ({
+                    ...prev,
+                    title: { ...prev.title, [activeTab]: e.target.value },
+                  }))
+                }
+                placeholder={`Título (${activeTab.toUpperCase()})`}
+                required
+              />
+
+              <textarea
+                name="content"
+                value={formDataClass.content[activeTab]}
+                placeholder={`Contenido principal (${activeTab.toUpperCase()})`}
+                onChange={(e) =>
+                  setFormDataClass((prev) => ({
+                    ...prev,
+                    content: {
+                      ...prev.content,
+                      [activeTab]: e.target.value,
+                    },
+                  }))
+                }
+              />
+
+              <input
+                type="text"
+                name="subtitle"
+                value={formDataClass.subtitle[activeTab]}
+                placeholder={`Subtítulo (${activeTab.toUpperCase()})`}
+                onChange={(e) =>
+                  setFormDataClass((prev) => ({
+                    ...prev,
+                    subtitle: { ...prev.subtitle, [activeTab]: e.target.value },
+                  }))
+                }
+              />
+
+              <textarea
+                name="secondaryContent"
+                value={formDataClass.secondaryContent[activeTab]}
+                placeholder={`Descripción (${activeTab.toUpperCase()})`}
+                onChange={(e) =>
+                  setFormDataClass((prev) => ({
+                    ...prev,
+                    secondaryContent: {
+                      ...prev.secondaryContent,
+                      [activeTab]: e.target.value,
+                    },
+                  }))
+                }
               />
 
               <h3>📄 PDFs</h3>
-              {formData.pdfs[activeTab].map((pdf, index) => (
-                <div key={index} className="pdf-block">
-                  <input
-                    type="text"
-                    name="url"
-                    value={pdf.url}
-                    onChange={(e) => handlePdfChange(index, e)}
-                    placeholder="URL del PDF"
-                  />
-                  <input
-                    type="text"
-                    name="title"
-                    value={pdf.title}
-                    onChange={(e) => handlePdfChange(index, e)}
-                    placeholder="Título del PDF"
-                  />
-                  <input
-                    type="text"
-                    name="description"
-                    value={pdf.description}
-                    onChange={(e) => handlePdfChange(index, e)}
-                    placeholder="Descripción del PDF"
-                  />
-                  <button type="button" onClick={() => removePdf(index)}>
-                    ❌ Eliminar PDF
-                  </button>
-                </div>
-              ))}
-              <button type="button" onClick={addPdf}>
-                ➕ Agregar PDF
-              </button>
+              <UploadPdfPrivadoField
+                activeTab={activeTab}
+                existingPdfs={formDataClass.pdfs?.[activeTab] || []}
+                setPdfs={(list) =>
+                  setFormDataClass((prev) => {
+                    const pdfsSeguros = {
+                      es: prev.pdfs?.es || [],
+                      en: prev.pdfs?.en || [],
+                      fr: prev.pdfs?.fr || [],
+                    };
+
+                    return {
+                      ...prev,
+                      pdfs: {
+                        ...pdfsSeguros,
+                        [activeTab]: list,
+                      },
+                    };
+                  })
+                }
+                onPdfUploaded={(pdf) =>
+                  setFormDataClass((prev) => {
+                    const currentPdfs = prev.pdfs?.[activeTab];
+                    const safeArray = Array.isArray(currentPdfs)
+                      ? currentPdfs
+                      : [];
+
+                    return {
+                      ...prev,
+                      pdfs: {
+                        ...prev.pdfs,
+                        [activeTab]: [...safeArray, pdf],
+                      },
+                    };
+                  })
+                }
+                onTempPublicId={(id) =>
+                  setTempPdfPrivadosPublicIds((prev) => [...prev, id])
+                }
+              />
 
               <h3>🎥 Videos</h3>
-              {formData.videos[activeTab].map((video, index) => (
-                <div key={index} className="video-block">
-                  <input
-                    type="text"
-                    name="url"
-                    value={video.url}
-                    onChange={(e) => handleVideoChange(index, e)}
-                    placeholder="URL del Video"
-                  />
-                  <input
-                    type="text"
-                    name="title"
-                    value={video.title}
-                    onChange={(e) => handleVideoChange(index, e)}
-                    placeholder="Título del Video"
-                  />
-                  <input
-                    type="text"
-                    name="description"
-                    value={video.description}
-                    onChange={(e) => handleVideoChange(index, e)}
-                    placeholder="Descripción del Video"
-                  />
-                  <button type="button" onClick={() => removeVideo(index)}>
-                    ❌ Eliminar Video
-                  </button>
-                </div>
-              ))}
-              <button type="button" onClick={addVideo}>
-                ➕ Agregar Video
-              </button>
+              <UploadVideoField
+                activeLang={activeTab}
+                videos={formDataClass.videos?.[activeTab] || []}
+                onChange={(list) =>
+                  setFormDataClass((prev) => ({
+                    ...prev,
+                    videos: {
+                      ...prev.videos,
+                      [activeTab]: list,
+                    },
+                  }))
+                }
+                onTempUpload={(url) =>
+                  setTempVideoUrls((prev) =>
+                    prev.includes(url) ? prev : [...prev, url]
+                  )
+                }
+              />
             </>
           )}
 
@@ -307,51 +377,106 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                 required
               />
               <label>📷 URL de imagen</label>
-              <input
-                type="text"
-                name="image"
+              <UploadImagenField
+                activeLang={activeTab}
                 value={formData.image[activeTab]}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    image: { ...formData.image, [activeTab]: e.target.value },
-                  })
+                onChange={(url, publicId) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    image: { ...prev.image, [activeTab]: url },
+                    image_public_id: {
+                      ...prev.image_public_id,
+                      [activeTab]: publicId,
+                    },
+                  }))
                 }
-                placeholder={`URL de imagen (${activeTab.toUpperCase()})`}
               />
 
               <h3>📄 PDF</h3>
-              <input
-                type="text"
-                name="pdf"
-                value={formData.pdf[activeTab]}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    pdf: { ...formData.pdf, [activeTab]: e.target.value },
-                  })
+              <UploadPdfPublicoField
+                activeLang={activeTab}
+                pdfUrl={pdfUrl}
+                setPdfUrl={setPdfUrl}
+                publicId={pdfPublicId}
+                setPublicId={setPdfPublicId}
+                onTempUpload={(id) =>
+                  setTempPdfPublicIds((prev) => [...prev, id])
                 }
-                placeholder={`URL del PDF (${activeTab.toUpperCase()})`}
               />
 
               <h3>🎥 Video</h3>
-              <input
-                type="text"
-                name="video"
-                value={formData.video[activeTab]}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    video: { ...formData.video, [activeTab]: e.target.value },
-                  })
-                }
-                placeholder={`URL del Video (${activeTab.toUpperCase()})`}
+              <VideoPromocionalForm
+                formData={formData}
+                setFormData={setFormData}
+                activeTab={activeTab}
+                onAddTempVideo={(url) => {
+                  if (!tempVideoUrls.includes(url)) {
+                    setTempVideoUrls((prev) => [...prev, url]);
+                  }
+                }}
               />
             </>
           )}
+
           <div className="content-button-modal">
             <button type="submit">✅ Agregar</button>
-            <button type="button" onClick={closeModal}>
+            <button
+              type="button"
+              onClick={async () => {
+                const imageId = formData.image_public_id?.[activeTab];
+                if (imageId) {
+                  try {
+                    await eliminarArchivoDesdeFrontend(imageId, "image");
+                    console.log("🗑 Imagen eliminada de Cloudinary al cancelar");
+                  } catch (err) {
+                    console.warn(
+                      "⚠️ No se pudo eliminar la imagen al cancelar:",
+                      err.message
+                    );
+                  }
+                }
+
+                for (const id of tempPdfPublicIds) {
+                  try {
+                    await eliminarArchivoDesdeFrontend(id, "raw");
+                    console.log(
+                      `🗑 PDF con public_id ${id} eliminado correctamente`
+                    );
+                  } catch (err) {
+                    console.warn(
+                      `⚠️ No se pudo eliminar el PDF ${id}:`,
+                      err.message
+                    );
+                  }
+                }
+
+                for (const id of tempPdfPrivadosPublicIds) {
+                  try {
+                    await eliminarArchivoDesdeFrontend(id, "raw");
+                    console.log(`🗑 PDF privado ${id} eliminado correctamente`);
+                  } catch (err) {
+                    console.warn(
+                      `⚠️ No se pudo eliminar el PDF privado ${id}:`,
+                      err.message
+                    );
+                  }
+                }
+
+                for (const url of tempVideoUrls) {
+                  try {
+                    await eliminarVideoDeVimeo(url);
+                    console.log("🗑 Video temporal eliminado de Vimeo:", url);
+                  } catch (err) {
+                    console.warn(
+                      "⚠️ No se pudo eliminar el video temporal:",
+                      err.message
+                    );
+                  }
+                }
+
+                closeModal();
+              }}
+            >
               ❌ Cancelar
             </button>
           </div>

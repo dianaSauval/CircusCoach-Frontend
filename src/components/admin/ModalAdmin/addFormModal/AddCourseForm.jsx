@@ -5,6 +5,9 @@ import { createCourse } from "../../../../services/courseService";
 import UploadPdfPublicoField from "../../../common/UploadPdfPublicoField/UploadPdfPublicoField";
 import VideoPromocionalForm from "../../../common/VideoPromocionalForm/VideoPromocionalForm";
 import UploadImagenField from "../../../common/UploadImagenField/UploadImagenField";
+import { eliminarVideoDeVimeo } from "../../../../services/uploadVimeoService";
+import "./AddCourseForm.css";
+
 
 const AddCourseForm = ({
   activeTab,
@@ -27,6 +30,7 @@ const AddCourseForm = ({
   });
 
   const [tempPublicIds, setTempPublicIds] = useState([]);
+  const [tempVideoUrls, setTempVideoUrls] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,15 +86,30 @@ const AddCourseForm = ({
       }
     }
 
-const publicIdImagen = formData.image_public_id?.[activeTab];
-if (publicIdImagen) {
-  try {
-    await eliminarArchivoDesdeFrontend(publicIdImagen, "image"); // sin prefijo doble
-    console.log(`🗑️ Imagen temporal eliminada: ${publicIdImagen}`);
-  } catch (err) {
-    console.warn(`⚠️ No se pudo eliminar la imagen temporal:`, err.message);
-  }
-}
+    const publicIdImagen = formData.image_public_id?.[activeTab];
+    if (publicIdImagen) {
+      try {
+        await eliminarArchivoDesdeFrontend(publicIdImagen, "image"); // sin prefijo doble
+        console.log(`🗑️ Imagen temporal eliminada: ${publicIdImagen}`);
+      } catch (err) {
+        console.warn(`⚠️ No se pudo eliminar la imagen temporal:`, err.message);
+      }
+    }
+
+    // Eliminamos los videos subidos a Vimeo
+    for (const videoUrl of tempVideoUrls) {
+      if (videoUrl?.includes("vimeo.com")) {
+        try {
+          await eliminarVideoDeVimeo(videoUrl);
+          console.log(`🗑️ Video eliminado de Vimeo: ${videoUrl}`);
+        } catch (err) {
+          console.warn(
+            `⚠️ No se pudo eliminar el video: ${videoUrl}`,
+            err.message
+          );
+        }
+      }
+    }
 
     onClose();
   };
@@ -166,7 +185,6 @@ if (publicIdImagen) {
         onTempUpload={(id) => setTempPublicIds((prev) => [...prev, id])}
       />
 
-      <label>Video promocional del curso ({activeTab})</label>
       <VideoPromocionalForm
         formData={formData}
         setFormData={setFormData}
@@ -174,6 +192,7 @@ if (publicIdImagen) {
         onAddTempVideo={
           (url) => setTempPublicIds((prev) => [...prev, url]) // si querés tener control para eliminarlos luego
         }
+        onAddTempVideo={(url) => setTempVideoUrls((prev) => [...prev, url])}
       />
 
       <div className="modal-buttons">

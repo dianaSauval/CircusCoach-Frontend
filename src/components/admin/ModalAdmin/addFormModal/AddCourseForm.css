@@ -1,0 +1,74 @@
+.add-course-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  text-align: left;
+}
+
+.add-course-form input[type="text"],
+.add-course-form input[type="number"],
+.add-course-form textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--color-verde-claro);
+  border-radius: 12px;
+  font-family: var(--font-texto);
+  transition: border-color 0.3s ease;
+}
+
+.add-course-form input:focus,
+.add-course-form textarea:focus {
+  border-color: var(--color-petroleo);
+  outline: none;
+}
+
+.add-course-form label {
+  font-weight: bold;
+  font-size: 1rem;
+  color: var(--color-petroleo);
+  margin-top: 0.5rem;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-buttons .btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: var(--font-texto);
+  transition: background-color 0.3s ease;
+}
+
+.modal-buttons .btn.red {
+  background-color: #d72638;
+  color: var(--color-blanco);
+}
+
+.modal-buttons .btn.red:hover {
+  background-color: #aa1d2c;
+}
+
+.modal-buttons .btn.green {
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+}
+
+.modal-buttons .btn.green:hover {
+  background-color: #5cc8b2;
+}
+
+.field-error {
+  color: #d72638;
+  font-size: 0.85rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+  padding-left: 0.3rem;
+}

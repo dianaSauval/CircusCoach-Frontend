@@ -1,12 +1,13 @@
 // services/uploadCloudinary.js
 import api from "./api";
+import { v4 as uuidv4 } from "uuid";
 
 // Subida de PDF público (cursos)
 export const subirPdfPublico = async (archivo, titulo) => {
   const data = new FormData();
   data.append("pdf", archivo);
 
-  // 🧼 Normalizamos el nombre para usarlo como public_id
+  const extension = archivo.name.split(".").pop(); // pdf
   const nombreNormalizado = titulo
     .toLowerCase()
     .trim()
@@ -14,9 +15,10 @@ export const subirPdfPublico = async (archivo, titulo) => {
     .normalize("NFD") // elimina acentos
     .replace(/[\u0300-\u036f]/g, ""); // elimina tildes
 
-  data.append("public_id", nombreNormalizado);
+  const publicId = `${nombreNormalizado}-${uuidv4()}.${extension}`;
+  data.append("public_id", publicId);
 
-  console.log("📤 Subiendo PDF público:", archivo.name, "como", nombreNormalizado);
+  console.log("📤 Subiendo PDF público:", archivo.name, "como", publicId);
 
   try {
     const res = await api.post("/cloudinary/upload-pdf-publico", data, {
@@ -28,25 +30,29 @@ export const subirPdfPublico = async (archivo, titulo) => {
       public_id: res.data.public_id,
     };
   } catch (error) {
-    console.error("❌ Error al subir PDF público:", error.response?.data || error.message);
+    console.error(
+      "❌ Error al subir PDF público:",
+      error.response?.data || error.message
+    );
     throw new Error("No se pudo subir el PDF público");
   }
 };
-
 
 // Subida de PDF privado (clases)
 export const subirPdfPrivado = async (archivo, titulo) => {
   const data = new FormData();
   data.append("pdf", archivo);
 
+  const extension = archivo.name.split(".").pop(); // pdf
   const nombreNormalizado = titulo
     .toLowerCase()
     .trim()
     .replace(/\s+/g, "_")
-    .normalize("NFD") // Elimina acentos
+    .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-  data.append("public_id", nombreNormalizado); // ✅ Acá lo mandás al backend
+  const publicId = `${nombreNormalizado}-${uuidv4()}.${extension}`;
+  data.append("public_id", publicId);
 
   console.log("📤 Subiendo PDF privado:", archivo);
 
@@ -60,25 +66,32 @@ export const subirPdfPrivado = async (archivo, titulo) => {
       public_id: res.data.public_id,
     };
   } catch (error) {
-    console.error("❌ Error al subir PDF privado:", error.response?.data || error.message);
+    console.error(
+      "❌ Error al subir PDF privado:",
+      error.response?.data || error.message
+    );
     throw new Error("No se pudo subir el PDF privado");
   }
 };
 
-
 // 🗑 Eliminar archivo (cualquier tipo)
-export const eliminarArchivoDesdeFrontend = async (public_id, resource_type = "raw") => {
+export const eliminarArchivoDesdeFrontend = async (
+  public_id,
+  resource_type = "raw"
+) => {
   try {
     const res = await api.delete("/cloudinary/delete", {
       data: { public_id, resource_type },
     });
     return res.data;
   } catch (error) {
-    console.error("❌ Error al eliminar archivo:", error.response?.data || error.message);
+    console.error(
+      "❌ Error al eliminar archivo:",
+      error.response?.data || error.message
+    );
     throw new Error("No se pudo eliminar el archivo");
   }
 };
-
 
 // 📸 Subida de imagen de curso (flyer)
 export const subirImagenCurso = async (archivo, titulo) => {
@@ -94,7 +107,12 @@ export const subirImagenCurso = async (archivo, titulo) => {
 
   data.append("public_id", nombreNormalizado);
 
-  console.log("📤 Subiendo imagen de curso:", archivo.name, "como", nombreNormalizado);
+  console.log(
+    "📤 Subiendo imagen de curso:",
+    archivo.name,
+    "como",
+    nombreNormalizado
+  );
 
   try {
     const res = await api.post("/cloudinary/upload-imagen-curso", data, {
@@ -106,7 +124,15 @@ export const subirImagenCurso = async (archivo, titulo) => {
       public_id: res.data.public_id,
     };
   } catch (error) {
-    console.error("❌ Error al subir imagen de curso:", error.response?.data || error.message);
+    console.error(
+      "❌ Error al subir imagen de curso:",
+      error.response?.data || error.message
+    );
     throw new Error("No se pudo subir la imagen del curso");
   }
+};
+
+export const obtenerUrlPdfPrivado = async (classId, index, lang) => {
+ const response = await api.get(`/cloudinary/privado/${classId}/${index}/${lang}`);
+return response.data.url; // ✅ ahora te devuelve la URL directa del PDF
 };

@@ -52,3 +52,18 @@ export const consultarEstadoVideoVimeo = async (videoId) => {
   const response = await api.get(`/upload/video-status/${videoId}`);
   return response.data.status;
 };
+
+
+// 🔒 Obtener URL del video privado si el usuario tiene acceso
+export const obtenerUrlVideoPrivado = async (classId, index, lang) => {
+  try {
+    const response = await api.get(`/upload/video/${classId}/${index}/${lang}`);
+    return response.data.url;
+  } catch (error) {
+    console.error(
+      "❌ Error al obtener video privado:",
+      error.response?.data || error.message
+    );
+    throw new Error("No se pudo obtener el video privado");
+  }
+};

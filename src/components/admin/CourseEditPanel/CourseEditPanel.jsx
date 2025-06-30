@@ -125,9 +125,11 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const renderVideos = () => {
     if (isClass) {
       const videos = data.videos || [];
-      const videosEnIdioma = videos.filter(
-        (video) => video?.url?.[activeTab]?.trim() !== ""
-      );
+
+      const videosEnIdioma = videos.filter((video) => {
+        const url = video?.url?.[activeTab]?.trim();
+        return url && (url.startsWith("http") || url.startsWith("www"));
+      });
 
       if (videosEnIdioma.length === 0) {
         return (
@@ -148,7 +150,11 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
         const title = video.title?.[activeTab];
         const description = video.description?.[activeTab];
 
-        if (!embedUrl) {
+        const videoId = embedUrl?.split("/").pop();
+        const isVimeo = embedUrl?.includes("vimeo.com");
+        const status = isVimeo ? videoStatus[videoId] : "ready";
+
+        if (!embedUrl || !embedUrl.startsWith("https://")) {
           return (
             <p key={i} className="no-material">
               ❌{" "}
@@ -160,10 +166,6 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
             </p>
           );
         }
-
-        const videoId = embedUrl.split("/").pop();
-        const isVimeo = embedUrl.includes("vimeo.com");
-        const status = isVimeo ? videoStatus[videoId] : "ready";
 
         if (isVimeo && (!status || status === "processing")) {
           return (
@@ -234,9 +236,8 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
       const embedUrl = getVideoEmbedUrl(rawUrl);
       const videoId = embedUrl?.split("/").pop();
-    const isVimeo = embedUrl.includes("vimeo.com");
-const status = isVimeo ? videoStatus[videoId] : "ready";
-
+      const isVimeo = embedUrl.includes("vimeo.com");
+      const status = isVimeo ? videoStatus[videoId] : "ready";
 
       if (!embedUrl || !videoId) {
         return (
@@ -294,7 +295,7 @@ const status = isVimeo ? videoStatus[videoId] : "ready";
   };
 
   const handleSave = async (updatedData) => {
-     console.log("🔄 handleSave recibió:", updatedData);
+    console.log("🔄 handleSave recibió:", updatedData);
     try {
       if (selectedClass) {
         await updateCourseClass(selectedClass._id, updatedData);

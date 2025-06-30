@@ -7,10 +7,14 @@ import EmptyState from "../components/EmptyState/EmptyState";
 import "../styles/pages/CartPage.css";
 import { loadStripe } from "@stripe/stripe-js";
 import { crearSesionStripe } from "../services/paymentService";
+import TermsCheckbox from "../components/common/TermsCheckbox/TermsCheckbox";
+import { useState } from "react";
+
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 export default function CartPage() {
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const { cart, cartCount, setCart } = useCart();
   const { language } = useLanguage();
   const { isAuthenticated } = useAuth();
@@ -72,18 +76,23 @@ export default function CartPage() {
             <p className="total-label">{t.total}:</p>
             <p className="total-amount">USD {totalPrice.toFixed(2)}</p>
           </div>
-
+<TermsCheckbox
+  checked={termsAccepted}
+  onChange={(e) => setTermsAccepted(e.target.checked)}
+  termsUrl="https://docs.google.com/document/d/1FSbvt75QDQxrmPJVhnGuCZPLCp7vkE3Zi341OFJtLWw/edit"
+/>
           <div className="cart-buttons">
             <button onClick={handleClearCart} className="btn-clear">
               {t.clear}
             </button>
-            <button
-              onClick={handleCheckout}
-              className="btn-buy"
-              disabled={cartCount === 0}
-            >
-              {t.buy}
-            </button>
+<button
+  onClick={handleCheckout}
+ className={`btn-buy ${!termsAccepted ? "disabled" : ""}`}
+
+  disabled={cartCount === 0 || !termsAccepted}
+>
+  {t.buy}
+</button>
           </div>
         </>
       )}

@@ -1,0 +1,29 @@
+.terms-container {
+  margin: 1.5rem 0;
+}
+
+.terms-box {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.terms-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.terms-checkbox input[type="checkbox"] {
+  margin-top: 3px;
+}
+
+.terms-checkbox label {
+  font-size: 0.95rem;
+}

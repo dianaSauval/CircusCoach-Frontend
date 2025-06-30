@@ -30,13 +30,6 @@
   font-size: 20px;
 }
 
-.delete-button {
-  background: none;
-  border: none;
-  color: red;
-  cursor: pointer;
-  font-size: 18px;
-}
 
 .progress-bar-container {
   margin-top: 10px;
@@ -80,6 +73,8 @@
   padding: 1rem;
   border-radius: 10px;
 }
+
+
 
 @keyframes fadeIn {
   from {

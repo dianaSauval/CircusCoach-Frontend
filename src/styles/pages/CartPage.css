@@ -112,14 +112,7 @@
   background-color: #b71c2d;
 }
 
-.btn-buy {
-  background-color: var(--color-menta);
-  color: var(--color-azul-profundo);
-}
 
-.btn-buy:hover {
-  background-color: #4ec7b6;
-}
 
 .empty-text {
   margin-top: 30px;
@@ -127,4 +120,24 @@
   font-style: italic;
   text-align: center;
   font-size: 1.1rem;
+}
+
+.btn-buy {
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-buy:hover {
+  background-color: #4ec7b6;
+}
+
+.btn-buy.disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
 }

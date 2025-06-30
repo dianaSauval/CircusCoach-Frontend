@@ -95,15 +95,34 @@ const CourseClassForm = ({
             ...(Array.isArray(formData.videos) ? formData.videos : []),
           ]}
           onChange={(updatedList) =>
-            setFormData((prev) => ({
-              ...prev,
-              [activeTab]: {
-                ...(prev[activeTab] || {}),
-                videos: updatedList,
-              },
-              // Limpieza opcional: si querés eliminar los viejos una vez que se edite algo
-              videos: [],
-            }))
+            setFormData((prev) => {
+              const updatedVideos = [...(prev.videos || [])];
+
+              updatedList.forEach((newVideo) => {
+                const index = updatedVideos.findIndex(
+                  (v) => v._id === newVideo._id
+                );
+                if (index !== -1) {
+                  // fusionamos info por idioma
+                  updatedVideos[index] = {
+                    ...updatedVideos[index],
+                    url: { ...updatedVideos[index].url, ...newVideo.url },
+                    title: { ...updatedVideos[index].title, ...newVideo.title },
+                    description: {
+                      ...updatedVideos[index].description,
+                      ...newVideo.description,
+                    },
+                  };
+                } else {
+                  updatedVideos.push(newVideo);
+                }
+              });
+
+              return {
+                ...prev,
+                videos: updatedVideos,
+              };
+            })
           }
           onTempUpload={(url) =>
             setTempUploads((prev) => ({

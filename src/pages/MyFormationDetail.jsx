@@ -15,6 +15,9 @@ import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import EmptyState from "../components/EmptyState/EmptyState";
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
+import PdfPrivadoViewer from "../components/common/PdfPrivadoViewer/PdfPrivadoViewer";
+import VideoPrivadoViewer from "../components/common/VideoPrivadoViewer/VideoPrivadoViewer";
+
 
 function MyFormationDetail() {
   const { id } = useParams();
@@ -228,18 +231,26 @@ function MyFormationDetail() {
             {claseCompleta.pdfs?.length > 0 && (
               <div className="pdf-list">
                 <h4>{t.pdfsTitle}</h4>
+
                 <ul>
-                  {claseCompleta.pdfs.map((pdf, index) => (
-                    <li key={index}>
-                      <a
-                        href={pdf.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {getLocalizedText(pdf.title) || `PDF ${index + 1}`}
-                      </a>
-                    </li>
-                  ))}
+                  {claseCompleta.pdfs?.length > 0 && (
+                    <div className="pdf-list">
+                      <h4>{t.pdfsTitle}</h4>
+                      {claseCompleta.pdfs
+                        .map((pdf, index) => ({ pdf, index }))
+                        .filter(({ pdf }) => pdf.url?.[language])
+                        .map(({ pdf, index }) => (
+                          <div key={index}>
+                            <p>{pdf.title?.[language] || `PDF ${index + 1}`}</p>
+                            <PdfPrivadoViewer
+                              classId={claseCompleta._id}
+                              index={index}
+                              language={language}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  )}
                 </ul>
               </div>
             )}
@@ -247,19 +258,19 @@ function MyFormationDetail() {
             {claseCompleta.videos?.length > 0 && (
               <div className="video-list">
                 <h4>{t.videosTitle}</h4>
-                <ul>
-                  {claseCompleta.videos.map((video, index) => (
-                    <li key={index}>
-                      <a
-                        href={video.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {getLocalizedText(video.title) || `Video ${index + 1}`}
-                      </a>
-                    </li>
+                {claseCompleta.videos
+                  .map((video, index) => ({ video, index }))
+                  .filter(({ video }) => video.url?.[language])
+                  .map(({ video, index }) => (
+                    <div key={index}>
+                      <p>{video.title?.[language] || `Video ${index + 1}`}</p>
+                      <VideoPrivadoViewer
+                        classId={claseCompleta._id}
+                        index={index}
+                        language={language}
+                      />
+                    </div>
                   ))}
-                </ul>
               </div>
             )}
 

@@ -28,6 +28,7 @@ import RequireAdmin from "./components/routes/RequireAdmin/RequireAdmin";
 import CartPage from "./pages/CartPage";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import PagoExitoso from "./pages/pago-exitoso";
+import PagoEmbedPage from "./pages/PagoEmbedPage";
 
 function App() {
   return (
@@ -54,6 +55,8 @@ function App() {
           <Route path="/nosotros" element={<BioRocioGarrote />} />
           <Route path="/carrito" element={<CartPage />} />
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
+
+          <Route path="/pago-embed" element={<PagoEmbedPage />} />
           <Route path="/formaciones/:id/:slug" element={<FormationDetails />} />
           <Route path="/courses/:id/:slug" element={<CourseDetail />} />
 

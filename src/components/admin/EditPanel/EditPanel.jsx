@@ -5,8 +5,12 @@ import LanguageTabs from "../LanguageTabs/LanguageTabs";
 import ClassForm from "../Form/ClassForm";
 import FormationForm from "../Form/FormationForm";
 import ModuleForm from "../Form/ModuleForm";
-import { getYoutubeEmbedUrl } from "../../../utils/youtube";
 import { getClassByIdAdmin } from "../../../services/formationService";
+import { getVideoEmbedUrl } from "../../../utils/videoEmbed";
+import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
+import VideoEmbedPreview from "../VideoEmbedPreview/VideoEmbedPreview";
+import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
+import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
 
 const EditPanel = ({
   selectedFormation,
@@ -17,6 +21,8 @@ const EditPanel = ({
   const [activeTab, setActiveTab] = useState("es");
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
+  const [videoStatus, setVideoStatus] = useState({});
+  const [tempUploads, setTempUploads] = useState({ pdfs: [] });
 
   const modeLabels = {
     presencial: {
@@ -63,6 +69,49 @@ const EditPanel = ({
     }
   }, [selectedClass, selectedModule, selectedFormation]);
 
+  useEffect(() => {
+    if (!formData?.videos?.length) return;
+
+    const checkAllVideos = async () => {
+      const newStatus = {};
+
+      for (const video of formData.videos) {
+        const rawUrl = video?.url?.[activeTab];
+        const embedUrl = getVideoEmbedUrl(rawUrl);
+
+        if (embedUrl?.includes("vimeo.com")) {
+          const videoId = embedUrl.split("/").pop();
+          const status = await checkVimeoAvailability(videoId);
+          newStatus[videoId] = status;
+        }
+      }
+
+      setVideoStatus(newStatus);
+    };
+
+    checkAllVideos();
+    const interval = setInterval(checkAllVideos, 15000);
+    return () => clearInterval(interval);
+  }, [formData, activeTab]);
+  const prepareFormationDataForSave = (data) => ({
+    title: data.title,
+    description: data.description,
+    price: Number(data.price),
+    image: data.image,
+    visible: data.visible,
+    video: data.video,
+    // 👇 Esta es la parte importante: convertimos el objeto { url, title } a string
+    pdf: {
+      es:
+        typeof data.pdf?.es === "object" ? data.pdf.es.url : data.pdf?.es || "",
+      en:
+        typeof data.pdf?.en === "object" ? data.pdf.en.url : data.pdf?.en || "",
+      fr:
+        typeof data.pdf?.fr === "object" ? data.pdf.fr.url : data.pdf?.fr || "",
+    },
+    pdf_public_id: data.pdf_public_id || { es: "", en: "", fr: "" },
+  });
+
   const handleSave = async () => {
     const selectedItem = selectedClass || selectedModule || selectedFormation;
     if (!selectedItem) return;
@@ -82,7 +131,8 @@ const EditPanel = ({
         const { updateFormation } = await import(
           "../../../services/formationService"
         );
-        await updateFormation(selectedFormation._id, formData);
+        const cleanedData = prepareFormationDataForSave(formData);
+        await updateFormation(selectedFormation._id, cleanedData);
       }
 
       if (onUpdate) onUpdate();
@@ -141,6 +191,73 @@ const EditPanel = ({
     ? "Ocultar en este idioma"
     : "Hacer visible en este idioma";
 
+  const handleCancel = async () => {
+    // 🗑️ Eliminamos los PDFs temporales
+    if (tempUploads.pdfs?.length) {
+      for (const id of tempUploads.pdfs) {
+        try {
+          await eliminarArchivoDesdeFrontend(id, "raw");
+          console.log(`🗑️ PDF temporal eliminado: ${id}`);
+        } catch (err) {
+          console.warn(`⚠️ No se pudo eliminar el PDF ${id}:`, err.message);
+        }
+      }
+    }
+
+    // 🗑️ Eliminamos los videos temporales
+    if (tempUploads.videos?.length) {
+      for (const vimeoId of tempUploads.videos) {
+        try {
+          await eliminarVideoDeVimeo(vimeoId);
+          console.log(`🗑️ Video temporal eliminado de Vimeo: ${vimeoId}`);
+        } catch (err) {
+          console.warn(
+            `⚠️ No se pudo eliminar el video ${vimeoId}:`,
+            err.message
+          );
+        }
+      }
+    }
+
+    // ♻️ Recargamos la clase original si estamos editando una clase
+    if (selectedClass) {
+      try {
+        const classData = await getClassByIdAdmin(selectedClass._id);
+        setFormData({
+          ...classData,
+          pdfs: classData.pdfs || [],
+          videos: classData.videos || [],
+        });
+      } catch (error) {
+        console.error(
+          "❌ Error al recargar clase tras cancelar:",
+          error.message
+        );
+      }
+    }
+
+    if (selectedFormation) {
+      const cleanVideo = { ...formData.video };
+      for (const lang of Object.keys(cleanVideo)) {
+        // 🧼 Eliminamos solo si es una URL de Vimeo
+        if (cleanVideo[lang]?.includes("vimeo.com")) {
+          delete cleanVideo[lang];
+        }
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        video: cleanVideo,
+      }));
+    }
+
+    // 🚪 Salimos del modo edición
+    setIsEditing(false);
+
+    // 🔁 Resetamos archivos temporales por si vuelven a editar
+    setTempUploads({ pdfs: [], videos: [] });
+  };
+
   return (
     <div className={isEditing ? "edit-panel is-editing" : "edit-panel"}>
       <LanguageTabs activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -197,20 +314,29 @@ const EditPanel = ({
                   <p>
                     <strong>📄 PDF de presentación:</strong>
                   </p>
-                  {formData.pdf?.[activeTab] ? (
-                    <a
-                      href={formData.pdf[activeTab]}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="view-pdf-button"
-                    >
-                      🔗 Ver PDF
-                    </a>
-                  ) : (
-                    <p style={{ color: "#777", fontStyle: "italic" }}>
-                      PDF aún no cargado
-                    </p>
-                  )}
+                  {(() => {
+                    const raw = formData.pdf?.[activeTab];
+                    const url = typeof raw === "string" ? raw : raw?.url;
+
+                    if (!url) {
+                      return (
+                        <p style={{ color: "#777", fontStyle: "italic" }}>
+                          PDF aún no cargado
+                        </p>
+                      );
+                    }
+
+                    return (
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="view-pdf-button"
+                      >
+                        🔗 Ver PDF
+                      </a>
+                    );
+                  })()}
                 </div>
 
                 <div style={{ marginTop: "1rem" }}>
@@ -218,19 +344,55 @@ const EditPanel = ({
                     <strong>🎥 Video de presentación:</strong>
                   </p>
                   {formData.video?.[activeTab] ? (
-                    <div className="video-container">
-                      <iframe
-                        width="100%"
-                        height="250"
-                        src={getYoutubeEmbedUrl(formData.video[activeTab])}
-                        title="Video de presentación"
-                        frameBorder="0"
-                        allowFullScreen
-                      ></iframe>
-                    </div>
+                    (() => {
+                      const embedUrl = getVideoEmbedUrl(
+                        formData.video[activeTab]
+                      );
+                      const isVimeo = embedUrl.includes("vimeo.com");
+
+                      if (!embedUrl || !embedUrl.startsWith("https://")) {
+                        return (
+                          <p style={{ color: "#777", fontStyle: "italic" }}>
+                            ❌ El enlace no es válido o no se puede mostrar como
+                            video embebido.
+                          </p>
+                        );
+                      }
+
+                      if (isVimeo && videoStatus === "processing") {
+                        return (
+                          <p style={{ color: "#777", fontStyle: "italic" }}>
+                            ⏳ El video está siendo procesado por Vimeo. Pronto
+                            estará disponible.
+                          </p>
+                        );
+                      }
+
+                      if (isVimeo && videoStatus === "error") {
+                        return (
+                          <p style={{ color: "#777", fontStyle: "italic" }}>
+                            ❌ Hubo un error al cargar el video desde Vimeo.
+                            Intentalo más tarde.
+                          </p>
+                        );
+                      }
+
+                      return (
+                        <div className="video-container">
+                          <iframe
+                            width="100%"
+                            height="250"
+                            src={embedUrl}
+                            title="Video de presentación"
+                            frameBorder="0"
+                            allowFullScreen
+                          ></iframe>
+                        </div>
+                      );
+                    })()
                   ) : (
                     <p style={{ color: "#777", fontStyle: "italic" }}>
-                      Video aún no cargado
+                      📭 Video aún no cargado
                     </p>
                   )}
                 </div>
@@ -246,91 +408,150 @@ const EditPanel = ({
                 </p>
 
                 <div className="pdf-preview-container">
-                  <h3>📄 Documentos cargados</h3>
-                  {formData?.pdfs?.length > 0 ? (
-                    formData.pdfs.map((pdf, i) => (
-                      <div key={i} className="pdf-preview">
+                  <h3>📄 PDFs cargados</h3>
+                  {(() => {
+                    const visibles = Array.isArray(formData?.pdfs)
+                      ? formData.pdfs.filter((pdf) => pdf?.url?.[activeTab])
+                      : [];
+
+                    if (visibles.length === 0) {
+                      return (
+                        <p className="no-material">
+                          📭{" "}
+                          {activeTab === "es"
+                            ? "Aún no se ha cargado ningún documento en este idioma."
+                            : activeTab === "en"
+                            ? "No PDF uploaded in this language yet."
+                            : "Aucun PDF disponible dans cette langue."}
+                        </p>
+                      );
+                    }
+
+                    return visibles.map((pdf, i) => (
+                      <div key={i} className="pdf-preview-item">
                         <p>
                           <strong>📌 Título:</strong>{" "}
-                          {pdf.title?.[activeTab] || "Sin título"}
+                          {pdf.title?.[activeTab] || "(sin título)"}
                         </p>
-                        <p>
-                          <strong>📝 Descripción:</strong>{" "}
-                          {pdf.description?.[activeTab] || "Sin descripción"}
-                        </p>
-                        {pdf.url?.[activeTab] ? (
-                          <a
-                            href={pdf.url[activeTab]}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            🔗 Ver PDF
-                          </a>
-                        ) : (
-                          <p style={{ color: "#777", fontStyle: "italic" }}>
-                            PDF aún no cargado
+                        {pdf.description?.[activeTab] && (
+                          <p>
+                            <strong>📝 Descripción:</strong>{" "}
+                            {pdf.description[activeTab]}
                           </p>
                         )}
+                        <a
+                          href={pdf.url[activeTab]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          🔗 Ver PDF
+                        </a>
                       </div>
-                    ))
-                  ) : (
-                    <p className="no-material">
-                      📭 Aún no se ha cargado ningún PDF.
-                    </p>
-                  )}
+                    ));
+                  })()}
                 </div>
 
                 <div className="video-preview-container">
                   <h3>🎥 Videos cargados</h3>
-                  {formData?.videos?.length > 0 ? (
-                    formData.videos.map((video, i) => {
-                      const embedUrl = getYoutubeEmbedUrl(
-                        video.url?.[activeTab]
-                      );
+                  {(() => {
+                    const videos = formData?.videos || [];
+
+                    const videosEnIdioma = videos.filter((video) => {
+                      const url = video?.url?.[activeTab]?.trim();
                       return (
-                        <div key={i} className="video-preview">
-                          <p>
-                            <strong>📌 Título:</strong>{" "}
-                            {video.title?.[activeTab] || "Sin título"}
+                        url && (url.startsWith("http") || url.startsWith("www"))
+                      );
+                    });
+
+                    if (videosEnIdioma.length === 0) {
+                      return (
+                        <p className="no-material">
+                          📭{" "}
+                          {activeTab === "es"
+                            ? "Aún no se ha cargado un video en este idioma."
+                            : activeTab === "en"
+                            ? "No video has been uploaded in this language yet."
+                            : "Aucune vidéo n’a été ajoutée dans cette langue."}
+                        </p>
+                      );
+                    }
+
+                    return videosEnIdioma.map((video, i) => {
+                      const rawUrl = video.url?.[activeTab];
+                      const embedUrl = getVideoEmbedUrl(rawUrl);
+                      const title = video.title?.[activeTab];
+                      const description = video.description?.[activeTab];
+
+                      const videoId = embedUrl?.split("/").pop();
+                      const isVimeo = embedUrl?.includes("vimeo.com");
+                      const status = isVimeo ? videoStatus[videoId] : "ready";
+
+                      if (!embedUrl || !embedUrl.startsWith("https://")) {
+                        return (
+                          <p key={i} className="no-material">
+                            ❌{" "}
+                            {activeTab === "es"
+                              ? "El enlace no es válido o no se puede mostrar como video embebido."
+                              : activeTab === "en"
+                              ? "The link is invalid or cannot be embedded."
+                              : "Le lien est invalide ou ne peut pas être intégré."}
                           </p>
-                          <p>
-                            <strong>📝 Descripción:</strong>{" "}
-                            {video.description?.[activeTab] ||
-                              "Sin descripción"}
+                        );
+                      }
+
+                      if (isVimeo && (!status || status === "processing")) {
+                        return (
+                          <p key={i} className="no-material">
+                            ⏳{" "}
+                            {activeTab === "es"
+                              ? "El video está siendo procesado por Vimeo. Pronto estará disponible."
+                              : activeTab === "en"
+                              ? "The video is still being processed by Vimeo."
+                              : "La vidéo est encore en cours de traitement par Vimeo."}
                           </p>
-                          {video.url?.[activeTab] ? (
-                            <div className="video-container">
-                              <iframe
-                                width="100%"
-                                height="200"
-                                src={embedUrl}
-                                frameBorder="0"
-                                allow="autoplay; fullscreen"
-                                allowFullScreen
-                                title={`Video ${i + 1}`}
-                                onError={(e) => {
-                                  e.target.style.display = "none"; // oculta el iframe
-                                  const msg = document.createElement("p");
-                                  msg.innerText =
-                                    "🎥 El video se está procesando. Espera unos minutos y vuelve a intentarlo.";
-                                  msg.className = "processing-message";
-                                  e.target.parentNode.appendChild(msg);
-                                }}
-                              ></iframe>
-                            </div>
-                          ) : (
-                            <p style={{ color: "#777", fontStyle: "italic" }}>
-                              🎥 Video aún no cargado
+                        );
+                      }
+
+                      if (status === "error") {
+                        return (
+                          <p key={i} className="no-material">
+                            ❌{" "}
+                            {activeTab === "es"
+                              ? "Hubo un error al cargar el video desde Vimeo. Intentalo más tarde."
+                              : activeTab === "en"
+                              ? "There was an error loading the video from Vimeo. Please try again later."
+                              : "Une erreur s’est produite lors du chargement de la vidéo depuis Vimeo."}
+                          </p>
+                        );
+                      }
+
+                      return (
+                        <div key={i} className="video-preview-item">
+                          {title && (
+                            <p>
+                              <strong>📌 Título:</strong> {title}
                             </p>
                           )}
+                          {description && (
+                            <p>
+                              <strong>📝 Descripción:</strong> {description}
+                            </p>
+                          )}
+                          <div className="video-container">
+                            <iframe
+                              src={embedUrl}
+                              width="100%"
+                              height="360"
+                              frameBorder="0"
+                              allow="autoplay; fullscreen"
+                              allowFullScreen
+                              title={`video-${i}`}
+                            />
+                          </div>
                         </div>
                       );
-                    })
-                  ) : (
-                    <p className="no-material">
-                      📭 Aún no se ha cargado ningún video.
-                    </p>
-                  )}
+                    });
+                  })()}
                 </div>
               </>
             )}
@@ -366,6 +587,7 @@ const EditPanel = ({
               setFormData={setFormData}
               activeTab={activeTab}
               modeLabels={modeLabels}
+              setTempUploads={setTempUploads}
             />
           )}
 
@@ -382,6 +604,7 @@ const EditPanel = ({
               formData={formData}
               setFormData={setFormData}
               activeTab={activeTab}
+              setTempUploads={setTempUploads}
             />
           )}
 
@@ -389,7 +612,7 @@ const EditPanel = ({
             <button className="save" onClick={handleSave}>
               💾 Guardar Cambios
             </button>
-            <button className="cancel" onClick={() => setIsEditing(false)}>
+            <button className="cancel" onClick={handleCancel}>
               ❌ Cancelar
             </button>
             <button className="toggle-visibility" onClick={toggleVisibility}>
