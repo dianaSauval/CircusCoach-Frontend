@@ -15,21 +15,21 @@ export default function Home() {
     <>
     <section className="home-hero">
       <div className="home-content">
-        <h1>
+        <h1 className="titulo-principal">
         {t.heroTitle}
         </h1>
 
-        <button onClick={() => navigate('/formaciones')}>{t.heroButton}</button>
+        <button className="boton-principal" onClick={() => navigate('/formaciones')}>{t.heroButton}</button>
 
         <div className="home-description">
-          <p>
+          <p className="texto">
           {t.paragraph1}
           </p>
-          <p> {t.paragraph2}</p>
-          <p>
+          <p className="texto"> {t.paragraph2}</p>
+          <p className="texto">
           {t.paragraph3}
           </p>
-          <p>{t.paragraph4}</p>
+          <p className="texto">{t.paragraph4}</p>
         </div>
       </div>
     </section>

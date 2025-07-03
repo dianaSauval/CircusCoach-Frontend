@@ -65,6 +65,7 @@
   @media (max-width: 768px) {
     .biografia-content {
       padding: 2rem 1.5rem;
+      width: 100%;
     }
   
     .biografia-texto {

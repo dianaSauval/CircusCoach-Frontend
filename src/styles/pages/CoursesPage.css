@@ -67,3 +67,37 @@
     font-size: 2.2rem;
   }
 }
+
+@media (max-width: 1024px) {
+  .courses-title {
+    font-size: 2.4rem;
+    margin-bottom: 2rem;
+  }
+
+  .courses-subtitle {
+    font-size: 1.1rem;
+    padding: 0 1rem;
+  }
+
+  .courses-grid {
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .courses-title {
+    margin-top: 5px;
+    font-size: 1.8rem;
+  }
+
+  .courses-subtitle {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .no-courses {
+    font-size: 1rem;
+    padding: 1.5rem;
+  }
+}

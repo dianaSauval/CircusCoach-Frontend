@@ -1,13 +1,15 @@
 .my-course-detail {
-  padding: 2rem;
-  max-width: 1000px;
+  padding: 2rem 1rem;
+  width: 80%;
   margin: 0 auto;
   color: var(--color-azul-profundo);
   font-family: var(--font-texto);
+  background-color: var(--color-blanco);
 }
 
 .formation-title {
   font-size: 2.5rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
   color: var(--color-petroleo);
   font-family: var(--font-titulo);
@@ -18,6 +20,14 @@
   font-size: 1.15rem;
   margin-bottom: 2rem;
   line-height: 1.6;
+  color: var(--color-azul-profundo);
+}
+
+.progress-title {
+  margin-top: 2rem;
+  font-family: var(--font-titulo);
+  font-size: 1.8rem;
+  text-align: center;
   color: var(--color-azul-profundo);
 }
 
@@ -44,7 +54,7 @@
   font-size: 2rem;
   margin: 0 auto 0.5rem;
   background-color: #e0e0e0;
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   transition: background 0.3s ease;
 }
 
@@ -70,6 +80,13 @@
   transition: all 0.2s ease-in-out;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  min-width: 60px;
+}
+
+.module-pill:hover,
+.class-pill:hover {
+  background-color: var(--color-menta);
 }
 
 .module-pill.active,
@@ -84,20 +101,22 @@
   background: var(--color-blanco);
   padding: 2rem;
   border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease-in-out;
+  border-top: 5px solid var(--color-verde-claro);
+  margin-top: 2rem;
 }
 
 .class-content h2 {
   font-family: var(--font-titulo);
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin-bottom: 0.5rem;
   color: var(--color-petroleo);
 }
 
 .class-content h3 {
   font-family: var(--font-titulo);
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   margin-bottom: 1rem;
   color: var(--color-azul-profundo);
 }
@@ -105,7 +124,16 @@
 .class-content p {
   font-size: 1.1rem;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.class-content h4 {
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  font-size: 2rem;
 }
 
 .secondary-content {
@@ -124,7 +152,7 @@
   cursor: pointer;
   margin-top: 1rem;
   transition: background 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .mark-done-button:hover {
@@ -142,14 +170,20 @@
   color: white;
 }
 
-.pdf-list, .video-list {
-  margin-top: 1rem;
+.pdf-list,
+.video-list {
+  background-color: var(--color-verde-claro);
+  border-radius: 0.75rem;
+  padding: 1rem 1.5rem;
+  margin-top: 2rem;
 }
 
 .pdf-list h4,
 .video-list h4 {
   font-family: var(--font-titulo);
   color: var(--color-azul-profundo);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
 }
 
 .pdf-list ul,
@@ -178,7 +212,7 @@
 }
 
 .volver-button {
-    display: flex;
+  display: flex;
   justify-content: flex-end;
   align-items: flex-end;
   text-align: end;
@@ -186,15 +220,190 @@
   border: none;
   color: var(--color-azul-profundo);
   font-family: var(--font-titulo);
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 100;
   cursor: pointer;
   margin-bottom: 1.5rem;
-  text-decoration: underline;
   transition: color 0.2s;
-
 }
 
 .volver-button:hover {
   color: var(--color-menta);
+}
+
+.resource-card {
+  background-color: var(--color-blanco);
+  border-radius: 1rem;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  transition: box-shadow 0.3s ease;
+}
+
+.resource-card:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.resource-card h4 {
+  font-family: var(--font-titulo);
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--color-petroleo);
+}
+
+.resource-card p {
+  font-family: var(--font-texto);
+  font-size: 1.2rem;
+  color: var(--color-azul-profundo);
+  margin-bottom: 1rem;
+}
+
+.pdf-list,
+.video-list {
+  margin-top: 2rem;
+}
+
+.pdf-list h3,
+.video-list h3 {
+  font-family: var(--font-titulo);
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-azul-profundo);
+  text-align: center;
+}
+
+
+
+
+@media (max-width: 600px) {
+  .progress-section {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .module-pill,
+  .class-pill {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .mark-done-button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+
+/* Tablets y pantallas medianas */
+@media (max-width: 1024px) {
+  .my-course-detail {
+    width: 90%;
+    padding: 2rem 1rem;
+  }
+
+  .formation-title {
+    font-size: 2rem;
+    text-align: center;
+  }
+
+  .formation-description {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .progress-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 1.8rem;
+  }
+
+  .class-content {
+    padding: 1.5rem;
+  }
+
+  .class-content h2 {
+    font-size: 1.5rem;
+  }
+
+  .class-content h3 {
+    font-size: 1.2rem;
+  }
+
+  .class-content h4 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Teléfonos móviles */
+@media (max-width: 600px) {
+  .my-course-detail {
+    width: 100%;
+    padding: 1rem 0.5rem;
+  }
+
+  .formation-title {
+    font-size: 1.6rem;
+    text-align: center;
+  }
+
+  .formation-description {
+    font-size: 0.95rem;
+    text-align: center;
+  }
+
+  .progress-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .module-pill,
+  .class-pill {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+
+  .class-content {
+    padding: 1rem;
+  }
+
+  .class-content h2 {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  .class-content h3 {
+    font-size: 1.1rem;
+    text-align: center;
+  }
+
+  .class-content p {
+    font-size: 0.95rem;
+  }
+
+  .class-content h4 {
+    font-size: 1.3rem;
+    text-align: center;
+  }
+
+  .mark-done-button {
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .volver-button {
+    justify-content: center;
+    font-size: 1rem;
+  }
+
+  .pdf-list,
+  .video-list {
+    padding: 1rem;
+  }
+
+  .pdf-list h4,
+  .video-list h4 {
+    font-size: 1rem;
+  }
 }

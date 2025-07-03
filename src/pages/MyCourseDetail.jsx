@@ -10,7 +10,9 @@ import {
 } from "../services/userService";
 import { getCourseById } from "../services/courseService";
 import translations from "../i18n/translations";
-import "../styles/pages/MyCourseDetail.css";
+import "../styles/pages/MyFormationDetail.css";
+import VideoPrivadoViewer from "../components/common/VideoPrivadoViewer/VideoPrivadoViewer";
+import PdfPrivadoViewer from "../components/common/PdfPrivadoViewer/PdfPrivadoViewer";
 
 function MyCourseDetail() {
   const { id } = useParams();
@@ -35,7 +37,7 @@ function MyCourseDetail() {
         const user = await getUserProfile();
         setUserId(user._id);
 
-        const progreso = user.progresoCursos?.find(p => p.courseId === id);
+        const progreso = user.progresoCursos?.find((p) => p.courseId === id);
         if (progreso) {
           setClasesCompletadas(progreso.clasesCompletadas);
         }
@@ -63,15 +65,18 @@ function MyCourseDetail() {
 
   const handleMarcarClase = async () => {
     await marcarClaseCurso(userId, id, claseCompleta._id);
-    setClasesCompletadas(prev => [...prev, claseCompleta._id]);
+    setClasesCompletadas((prev) => [...prev, claseCompleta._id]);
   };
 
   const handleDesmarcarClase = async () => {
     await desmarcarClaseCurso(userId, id, claseCompleta._id);
-    setClasesCompletadas(prev => prev.filter(cid => cid !== claseCompleta._id));
+    setClasesCompletadas((prev) =>
+      prev.filter((cid) => cid !== claseCompleta._id)
+    );
   };
 
-  const getText = (obj) => (obj && typeof obj === "object" ? obj[language] || "" : obj || "");
+  const getText = (obj) =>
+    obj && typeof obj === "object" ? obj[language] || "" : obj || "";
 
   const claseCompleta = clases?.[claseSeleccionada] || null;
 
@@ -91,7 +96,9 @@ function MyCourseDetail() {
 
   return (
     <div className="my-course-detail">
-      <button className="volver-button" onClick={() => navigate("/mis-cursos")}>{t.back}</button>
+      <button className="volver-button" onClick={() => navigate("/mis-cursos")}>
+        {t.back}
+      </button>
       <h1 className="formation-title">{getText(course.title)}</h1>
       <p className="formation-description">{getText(course.description)}</p>
 
@@ -103,8 +110,13 @@ function MyCourseDetail() {
             style={{
               background: `conic-gradient(var(--color-petroleo) ${porcentaje}%, #e0e0e0 ${porcentaje}%)`,
             }}
-          >📘</div>
-          <p>{porcentaje}%<br />{t.content}</p>
+          >
+            📘
+          </div>
+          <p>
+            {porcentaje}%<br />
+            {t.content}
+          </p>
         </div>
       </div>
 
@@ -124,44 +136,71 @@ function MyCourseDetail() {
         {claseCompleta ? (
           <>
             <h2>{getText(claseCompleta.title)}</h2>
-            {claseCompleta.subtitle && <h3>{getText(claseCompleta.subtitle)}</h3>}
+            {claseCompleta.subtitle && (
+              <h3>{getText(claseCompleta.subtitle)}</h3>
+            )}
             {claseCompleta.content && <p>{getText(claseCompleta.content)}</p>}
-            {claseCompleta.secondaryContent && <p className="secondary-content">{getText(claseCompleta.secondaryContent)}</p>}
+            {claseCompleta.secondaryContent && (
+              <p className="secondary-content">
+                {getText(claseCompleta.secondaryContent)}
+              </p>
+            )}
 
             {claseCompleta.pdfs?.length > 0 && (
               <div className="pdf-list">
                 <h4>{t.pdfsTitle}</h4>
-                <ul>
-                  {claseCompleta.pdfs.map((pdf, index) => (
-                    <li key={index}>
-                      <a href={getText(pdf.url)} target="_blank" rel="noopener noreferrer">
-                        {getText(pdf.title) || `PDF ${index + 1}`}
-                      </a>
-                    </li>
+                {claseCompleta.pdfs
+                  .map((pdf, index) => ({ pdf, index }))
+                  .filter(({ pdf }) => pdf.url?.[language])
+                  .map(({ pdf, index }) => (
+                    <div key={index} className="resource-card">
+                      <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
+                      {pdf.description?.[language] && (
+                        <p>{pdf.description[language]}</p>
+                      )}
+                      <PdfPrivadoViewer
+                        classId={claseCompleta._id}
+                        index={index}
+                        language={language}
+                      />
+                    </div>
                   ))}
-                </ul>
               </div>
             )}
 
             {claseCompleta.videos?.length > 0 && (
               <div className="video-list">
                 <h4>{t.videosTitle}</h4>
-                <ul>
-                  {claseCompleta.videos.map((video, index) => (
-                    <li key={index}>
-                      <a href={getText(video.url)} target="_blank" rel="noopener noreferrer">
-                        {getText(video.title) || `Video ${index + 1}`}
-                      </a>
-                    </li>
+                {claseCompleta.videos
+                  .map((video, index) => ({ video, index }))
+                  .filter(({ video }) => video.url?.[language])
+                  .map(({ video, index }) => (
+                    <div key={index} className="resource-card">
+                      <h4>{video.title?.[language] || `Video ${index + 1}`}</h4>
+                      {video.description?.[language] && (
+                        <p>{video.description[language]}</p>
+                      )}
+                      <VideoPrivadoViewer
+                        classId={claseCompleta._id}
+                        index={index}
+                        language={language}
+                      />
+                    </div>
                   ))}
-                </ul>
               </div>
             )}
 
             {clasesCompletadas.includes(claseCompleta._id) ? (
-              <button className="mark-done-button unmark" onClick={handleDesmarcarClase}>{t.unmark}</button>
+              <button
+                className="mark-done-button unmark"
+                onClick={handleDesmarcarClase}
+              >
+                {t.unmark}
+              </button>
             ) : (
-              <button className="mark-done-button" onClick={handleMarcarClase}>{t.markAsDone}</button>
+              <button className="mark-done-button" onClick={handleMarcarClase}>
+                {t.markAsDone}
+              </button>
             )}
           </>
         ) : (

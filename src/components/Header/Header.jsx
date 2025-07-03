@@ -87,7 +87,34 @@ export default function Header() {
             )}
           </>
         )}
+        {menuOpen && (
+          <div className="header-icons">
+            <div className="language-selector">
+              <button
+                className="language-button"
+                onClick={() => setLanguageMenuOpen(!languageMenuOpen)}
+              >
+                <FaGlobe className="globe-icon" />
+                <span>{t.language}</span>
+                {languageMenuOpen ? <FaChevronUp /> : <FaChevronDown />}
+              </button>
 
+              {languageMenuOpen && (
+                <ul className="language-dropdown">
+                  <li className="texto" onClick={() => changeLanguage("es")}>🇪🇸 Español</li>
+                  <li onClick={() => changeLanguage("en")}>🇬🇧 English</li>
+                  <li onClick={() => changeLanguage("fr")}>🇫🇷 Français</li>
+                </ul>
+              )}
+            </div>
+
+            <FaSearch className="header-icon" />
+            <NavLink to="/carrito" className="cart-icon-container">
+              <FaShoppingBag className="header-icon" />
+              {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+            </NavLink>
+          </div>
+        )}
         {isAuthenticated ? (
           <NavLink to="/" className="nav-link mobile-only" onClick={logout}>
             {t.logout}
@@ -98,8 +125,8 @@ export default function Header() {
           </NavLink>
         )}
       </nav>
-
-      <div className="header-icons">
+  {!menuOpen && (
+      <div className="header-icons outside-menu">
         <div className="language-selector">
           <button
             className="language-button"
@@ -135,6 +162,7 @@ export default function Header() {
           </NavLink>
         )}
       </div>
+             )}
     </header>
   );
 }

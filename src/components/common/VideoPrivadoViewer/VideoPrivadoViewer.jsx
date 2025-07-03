@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { obtenerUrlVideoPrivado } from "../../../services/uploadVimeoService";
+import "./VideoPrivadoViewer.css";
+import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner";
 
 const VideoPrivadoViewer = ({ classId, index, language }) => {
   const [videoUrl, setVideoUrl] = useState(null);
@@ -29,8 +31,9 @@ const VideoPrivadoViewer = ({ classId, index, language }) => {
     };
   }, [classId, index, language]);
 
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (!videoUrl) return <p>Cargando video...</p>;
+if (error) return <p className="video-error">{error}</p>;
+if (!videoUrl) return <LoadingSpinner />;
+
 
   const embedUrl = videoUrl.replace("vimeo.com", "player.vimeo.com/video");
 

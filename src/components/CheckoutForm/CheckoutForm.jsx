@@ -35,7 +35,7 @@ const CheckoutForm = () => {
       if (paymentIntent.status === "succeeded") {
         await confirmarCompraConPaymentIntent(paymentIntent.id);
         setCart([]);
-        navigate("/pago-exitoso");
+       navigate(`/pago-exitoso?payment_intent=${paymentIntent.id}`);
       } else {
         setError("El pago no se completó correctamente.");
       }

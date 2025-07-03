@@ -228,51 +228,46 @@ function MyFormationDetail() {
               </p>
             )}
 
-            {claseCompleta.pdfs?.length > 0 && (
-              <div className="pdf-list">
-                <h4>{t.pdfsTitle}</h4>
+        {claseCompleta.pdfs?.length > 0 && (
+  <div className="pdf-list">
+    <h3>{t.pdfsTitle}</h3>
+    {claseCompleta.pdfs
+      .map((pdf, index) => ({ pdf, index }))
+      .filter(({ pdf }) => pdf.url?.[language])
+      .map(({ pdf, index }) => (
+        <div className="resource-card" key={index}>
+          <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
+          <p>{pdf.description?.[language] || ""}</p>
+          <PdfPrivadoViewer
+            classId={claseCompleta._id}
+            index={index}
+            language={language}
+          />
+        </div>
+      ))}
+  </div>
+)}
 
-                <ul>
-                  {claseCompleta.pdfs?.length > 0 && (
-                    <div className="pdf-list">
-                      <h4>{t.pdfsTitle}</h4>
-                      {claseCompleta.pdfs
-                        .map((pdf, index) => ({ pdf, index }))
-                        .filter(({ pdf }) => pdf.url?.[language])
-                        .map(({ pdf, index }) => (
-                          <div key={index}>
-                            <p>{pdf.title?.[language] || `PDF ${index + 1}`}</p>
-                            <PdfPrivadoViewer
-                              classId={claseCompleta._id}
-                              index={index}
-                              language={language}
-                            />
-                          </div>
-                        ))}
-                    </div>
-                  )}
-                </ul>
-              </div>
-            )}
 
-            {claseCompleta.videos?.length > 0 && (
-              <div className="video-list">
-                <h4>{t.videosTitle}</h4>
-                {claseCompleta.videos
-                  .map((video, index) => ({ video, index }))
-                  .filter(({ video }) => video.url?.[language])
-                  .map(({ video, index }) => (
-                    <div key={index}>
-                      <p>{video.title?.[language] || `Video ${index + 1}`}</p>
-                      <VideoPrivadoViewer
-                        classId={claseCompleta._id}
-                        index={index}
-                        language={language}
-                      />
-                    </div>
-                  ))}
-              </div>
-            )}
+         {claseCompleta.videos?.length > 0 && (
+  <div className="video-list">
+    <h3>{t.videosTitle}</h3>
+    {claseCompleta.videos
+      .map((video, index) => ({ video, index }))
+      .filter(({ video }) => video.url?.[language])
+      .map(({ video, index }) => (
+        <div className="resource-card" key={index}>
+          <h4>{video.title?.[language] || `Video ${index + 1}`}</h4>
+          <p>{video.description?.[language] || ""}</p>
+          <VideoPrivadoViewer
+            classId={claseCompleta._id}
+            index={index}
+            language={language}
+          />
+        </div>
+      ))}
+  </div>
+)}
 
             {clasesCompletadas.includes(claseCompleta._id) ? (
               <button

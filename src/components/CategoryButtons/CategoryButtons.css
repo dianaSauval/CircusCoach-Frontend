@@ -66,3 +66,16 @@
     z-index: 1;
   }
   
+  @media (max-width: 768px) {
+  .category-buttons {
+    gap: 1rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .category-button {
+    width: 100%;
+    max-width: 280px;
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+  }
+}

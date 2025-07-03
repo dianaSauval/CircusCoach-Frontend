@@ -36,24 +36,6 @@
     max-width: 400px;
   }
   
-  .formation-buttons button {
-    background-color: var(--color-menta);
-    color: var(--color-azul-profundo);
-    font-family: var(--font-titulo);    
-    font-size: 1.3rem;
-    letter-spacing: 1px;
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .formation-buttons button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-  }
 
   .section {
     padding: 15px 20px;

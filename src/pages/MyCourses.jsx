@@ -50,7 +50,7 @@ function MyCourses() {
 
   return (
     <div className="my-courses-page">
-      <h2 className="section-title">{t.titleFormations}</h2>
+      <h2 className="titulo-principal">{t.titleFormations}</h2>
       <div className="formaciones-grid">
         {formations.length > 0 ? (
           formations.map((formacion) => (
@@ -82,7 +82,7 @@ function MyCourses() {
         )}
       </div>
 
-      <h2 className="section-title">{t.titleCourses}</h2>
+      <h2 className="titulo-principal">{t.titleCourses}</h2>
       <div className="formaciones-grid">
         {courses.length > 0 ? (
           courses.map((course) => (

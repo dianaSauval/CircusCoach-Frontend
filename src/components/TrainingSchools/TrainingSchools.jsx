@@ -9,22 +9,22 @@ const TrainingSchools = () => {
   return (
     <section className="escuelas-section">
       <div className="escuelas-content">
-        <h1 className="escuelas-title">{t.title}</h1>
-        <p>
+        <h1 className="titulo-principal">{t.title}</h1>
+        <p className="texto">
         {t.paragraph1}
         </p>
-        <p>
+        <p className="texto">
         {t.paragraph2}
         </p>
-        <p>
+        <p className="texto">
         {t.paragraph3}
         </p>
-        <p>
+        <p className="texto">
         {t.paragraph4}
         </p>
         <div className="destacado">
           <span className="icono">💡</span>
-          <p>
+          <p className="texto">
           {t.highlight}
           </p>
         </div>

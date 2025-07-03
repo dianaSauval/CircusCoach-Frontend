@@ -1,38 +1,128 @@
 @font-face {
-  font-family: 'Bebas Neue Cyrillic';
-  src: url('/fonts/BebasNeueCyrillicRegular.ttf') format('truetype');
+  font-family: "Bebas Neue Cyrillic";
+  src: url("/fonts/BebasNeueCyrillicRegular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Amsterdam Three';
-  src: url('/fonts/Amsterdam.ttf') format('truetype');
+  font-family: "Amsterdam Three";
+  src: url("/fonts/Amsterdam.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
-  
-  :root {
-    /* 🎨 Colores */
-    --color-petroleo: #44838F;
-    --color-menta: #68D0BD;
-    --color-verde-claro: #BBDFDB;
-    --color-azul-profundo: #143251;
-    --color-negro: #000000;
-    --color-blanco: #ffffff;
-  
-    /* 🖋️ Tipografías */
-    --font-titulo: 'Bebas Neue Cyrillic', sans-serif;
-    --font-mano: 'Amsterdam Three', cursive;
-    --font-texto: 'Lato', sans-serif;
+:root {
+  /* 🎨 Colores */
+  --color-petroleo: #44838f;
+  --color-menta: #68d0bd;
+  --color-verde-claro: #bbdfdb;
+  --color-azul-profundo: #143251;
+  --color-negro: #000000;
+  --color-blanco: #ffffff;
+
+  /* 🖋️ Tipografías */
+  --font-titulo: "Bebas Neue Cyrillic", sans-serif;
+  --font-mano: "Amsterdam Three", cursive;
+  --font-texto: "Lato", sans-serif;
+}
+
+body {
+  font-family: var(--font-texto);
+  background-color: var(--color-blanco);
+  color: var(--color-azul-profundo);
+  margin: 0;
+  padding: 0;
+}
+
+.titulo-principal {
+  font-family: var(--font-titulo); /* Bebas Neue Cyrillic */
+  text-transform: uppercase;
+  font-size: 2.2rem;
+  line-height: 1.3;
+  color: var(--color-azul-profundo);
+  letter-spacing: 1px;
+  margin: 0;
+  text-align: center;
+}
+
+.subtitulo {
+  font-family: var(--font-texto); /* Lato */
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--color-azul-profundo);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+}
+
+.texto {
+  font-family: var(--font-texto); /* Lato */
+  font-size: 1.1rem;
+  font-weight: bold;
+  line-height: 1.8;
+  color: var(--color-azul-profundo);
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0 1rem;
+}
+
+.firma {
+  font-family: var(--font-mano);
+  font-size: 1.2rem;
+  color: var(--color-petroleo);
+}
+
+.boton-principal {
+  background-color: var(--color-menta); /* verde menta */
+  color: var(--color-azul-profundo); /* texto azul oscuro */
+  font-family: var(--font-texto); /* Lato */
+  font-weight: 700; /* Semi-bold */
+  text-transform: uppercase;
+  font-size: 1rem;
+  padding: 0.9rem 2rem;
+  border: none;
+  border-radius: 999px; /* estilo pastilla */
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.boton-principal:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .titulo-principal {
+    font-size: 1.6rem;
+    line-height: 1.4;
+    padding: 0 1rem;
   }
-  
-  body {
-    font-family: var(--font-texto);
-    background-color: var(--color-blanco);
-    color: var(--color-azul-profundo);
-    margin: 0;
-    padding: 0;
+
+  .subtitulo {
+    font-size: 1rem;
+    line-height: 1.5;
+    padding: 0 1rem;
   }
-  
+
+  .texto {
+    font-size: 0.95rem;
+    padding: 0 1.5rem;
+  }
+
+  .firma {
+    font-size: 1rem;
+    text-align: left;
+    padding: 0 1.5rem;
+  }
+
+  .boton-principal {
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    width: 100%;
+    max-width: 280px;
+  }
+}

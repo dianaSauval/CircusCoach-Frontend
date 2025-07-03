@@ -1,6 +1,7 @@
 /* Login.css */
 
 .login-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -13,6 +14,7 @@
   width: 100%;
   margin: 5rem auto;
 }
+
 
 .login-title {
   font-family: var(--font-titulo);
@@ -135,22 +137,58 @@
 
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .login-container {
     padding: 2rem 1.5rem;
     margin: 3rem 1rem;
+    border-radius: 1rem;
   }
 
   .login-title {
-    font-size: 1.8rem;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .login-form {
+    gap: 1rem;
   }
 
   .login-form input,
   .login-form button[type="submit"] {
     font-size: 0.95rem;
+    padding: 0.8rem;
   }
 
   .link-button {
     font-size: 0.9rem;
+  }
+}
+
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  .login-container {
+    padding: 3rem 2rem;
+    margin: 4rem auto;
+    border-radius: 1.25rem;
+    max-width: 500px; /* un poco más ancho que en mobile */
+  }
+
+  .login-title {
+    font-size: 2.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .login-form {
+    gap: 1.2rem;
+  }
+
+  .login-form input,
+  .login-form button[type="submit"] {
+    font-size: 1rem;
+    padding: 0.9rem;
+  }
+
+  .link-button {
+    font-size: 1rem;
   }
 }

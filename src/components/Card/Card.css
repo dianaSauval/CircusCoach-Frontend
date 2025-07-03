@@ -25,13 +25,14 @@
 }
 
 .custom-card-description {
+    font-family: var(--font-texto); /* Lato */
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.8;
   background-color: var(--color-azul-profundo);
   color: var(--color-blanco);
   padding: 1rem;
-  font-size: 1rem;
-  font-family: var(--font-texto);
   text-align: left;
-  line-height: 1.5;
   height: 100%;
 }
 

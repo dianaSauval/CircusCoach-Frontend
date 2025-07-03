@@ -39,8 +39,8 @@ const FormacionesGrid = () => {
     <div className="formaciones-section">
       <h2 className="formaciones-title">{t.fullTrainings}</h2>
       <div className="formaciones-subtitle">
-        <p>{t.deepenProfession}</p>
-        <p>{t.improveSkills}</p>
+        <p className="subtitulo">{t.deepenProfession}</p>
+        <p className="subtitulo">{t.improveSkills}</p>
       </div>
 
       {formaciones.length === 0 ? (

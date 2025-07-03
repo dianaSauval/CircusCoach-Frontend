@@ -6,23 +6,32 @@
 }
 
 /* 🔹 Estructura base */
-html, body {
+html,
+body {
   max-width: 100vw;
   overflow-x: hidden;
   margin: 0;
   padding: 0;
-  font-family: 'Lato', sans-serif; /* Estética de Ro */
+  font-family: "Lato", sans-serif; /* Estética de Ro */
   background-color: var(--color-blanco, #f5f7fa);
   color: var(--color-azul-profundo, #143251);
   scroll-behavior: smooth;
 }
 
+html, body {
+  height: 100%; /* ⬅️ Muy importante para layout vertical */
+}
+
+.app-container {
+  min-height: 80vh; /* ⬅️ Esto asegura que siempre llegue al borde inferior */
+}
+
 /* 🔹 Contenedor principal */
 .app-container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
   padding-top: 80px;
   width: 100%;
 }
@@ -51,8 +60,8 @@ html, body {
   .main-content {
     padding: 20px 30px;
   }
-  .app-container{
-    min-height: auto;
+  .app-container {
+    min-height: 60vh;
   }
 }
 

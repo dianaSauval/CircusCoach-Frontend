@@ -7,9 +7,11 @@ import { TbMoonStars } from 'react-icons/tb';
 
 const EmptyState = ({ title, subtitle }) => {
   return (
+    <div className="empty-wrapper">
     <div className="empty-state-container">
       <h2 className="empty-title">{title}</h2>
       <p className="empty-subtitle">{subtitle}</p>
+    </div>
     </div>
   );
 };

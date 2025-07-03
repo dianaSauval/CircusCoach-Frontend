@@ -12,9 +12,9 @@ const BioRocioGarrote = () => {
     <section className="biografia-section">
       <div className="biografia-content">
         <div className="biografia-texto">
-          <p>{t.paragraph1}</p>
-          <p>{t.paragraph2} </p>
-          <p>{t.paragraph3}</p>
+          <p className="texto">{t.paragraph1}</p>
+          <p className="texto">{t.paragraph2} </p>
+          <p className="texto">{t.paragraph3}</p>
 
          
 

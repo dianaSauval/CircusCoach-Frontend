@@ -17,7 +17,7 @@ function Footer() {
               href="https://www.instagram.com/circuscoachbyrociogarrote"
               target="_blank"
               rel="noopener noreferrer"
-              className="circle-icon"
+              className="circle-icon-footer"
             >
               <FaInstagram />
             </a>
@@ -26,7 +26,7 @@ function Footer() {
               href="mailto:circuscoachbyrociogarrote@gmail.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="circle-icon"
+              className="circle-icon-footer"
             >
               <FaEnvelope />
             </a>
@@ -34,7 +34,7 @@ function Footer() {
               href="https://wa.me/32455113039"
               target="_blank"
               rel="noopener noreferrer"
-              className="circle-icon"
+              className="circle-icon-footer"
             >
               <FaWhatsapp />
             </a>

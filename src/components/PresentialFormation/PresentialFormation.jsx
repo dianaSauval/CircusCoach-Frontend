@@ -5,9 +5,9 @@ import { useLanguage } from "../../context/LanguageContext";
 import translations from "../../i18n/translations";
 import { getPresentialFormationsByLang } from "../../services/presentialService";
 
-
 const PresentialFormationCard = ({ formation }) => {
-  const { title, location, dateType, singleDate, dateRange, registrationLink } = formation;
+  const { title, location, dateType, singleDate, dateRange, registrationLink } =
+    formation;
 
   const formatFecha = (date, incluirAño = true) => {
     const fecha = new Date(date);
@@ -42,10 +42,14 @@ const PresentialFormationCard = ({ formation }) => {
 
       <div className="formation-text">
         <div className="line-top">
-          <FaRegCalendarAlt className="icon" />
-          <span>{dateDisplay}</span>
-          <FaMapMarkerAlt className="icon location-icon" />
-          <span>{location}</span>
+          <div>
+            <FaRegCalendarAlt className="icon" />
+            <span>{dateDisplay}</span>
+          </div>
+          <div>
+            <FaMapMarkerAlt className="icon location-icon" />
+            <span>{location}</span>
+          </div>
         </div>
 
         <div className="line-bottom">
@@ -66,7 +70,6 @@ const PresentialFormationCard = ({ formation }) => {
     </div>
   );
 };
-
 
 const PresentialFormationsList = () => {
   const [formations, setFormations] = useState([]);
@@ -92,12 +95,8 @@ const PresentialFormationsList = () => {
 
       {formations.length === 0 ? (
         <div className="no-formations-message">
-          <p className="no-formations-title">
-          {t.noPresentialTitle}
-          </p>
-          <p className="no-formations-text">
-          {t.noPresentialText}
-          </p>
+          <p className="no-formations-title">{t.noPresentialTitle}</p>
+          <p className="no-formations-text">{t.noPresentialText}</p>
         </div>
       ) : (
         formations.map((formation) => (

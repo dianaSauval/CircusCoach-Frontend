@@ -26,9 +26,9 @@ export default function FormationPage() {
     <>
     <div className="formation-hero">
       <div className="formation-buttons">
-        <button onClick={() => scrollToSection(onlineRef)}> {t.online}</button>
-        <button onClick={() => scrollToSection(presencialRef)}>{t.presential}</button>
-        <button onClick={() => scrollToSection(escuelasRef)}>{t.schools}</button>
+        <button className="boton-principal" onClick={() => scrollToSection(onlineRef)}> {t.online}</button>
+        <button className="boton-principal" onClick={() => scrollToSection(presencialRef)}>{t.presential}</button>
+        <button className="boton-principal" onClick={() => scrollToSection(escuelasRef)}>{t.schools}</button>
       </div>
     </div>
       {/* 🔹 ONLINE */}
