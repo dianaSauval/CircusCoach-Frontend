@@ -1,4 +1,8 @@
-import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
@@ -23,8 +27,10 @@ const CheckoutForm = () => {
     try {
       const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
-        confirmParams: {}, // ❌ NO usamos return_url
-        redirect: "if_required", // ✅ Manejamos todo desde frontend
+        confirmParams: {
+          return_url: `${window.location.origin}/pago-exitoso`,
+        },
+        redirect: "if_required",
       });
 
       if (error) {
@@ -35,7 +41,7 @@ const CheckoutForm = () => {
       if (paymentIntent.status === "succeeded") {
         await confirmarCompraConPaymentIntent(paymentIntent.id);
         setCart([]);
-       navigate(`/pago-exitoso?payment_intent=${paymentIntent.id}`);
+        navigate(`/pago-exitoso?payment_intent=${paymentIntent.id}`);
       } else {
         setError("El pago no se completó correctamente.");
       }

@@ -122,3 +122,17 @@
     }
   }
   
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+  .formation-hero {
+    height: 60vh; /* Reduce el alto para que no se vea enorme en tablet */
+    padding: 3rem 2rem;
+  }
+
+
+
+  .formation-card {
+    width: 45%;
+    height: 320px;
+  }
+}

@@ -21,14 +21,13 @@
 }
 
 .formaciones-grid {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 2.5rem;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  justify-items: center;     /* Centra los ítems dentro de cada celda */
-  justify-content: center;   /* Centra las columnas cuando hay menos que el total */
 }
 
 .formaciones-empty-message {
@@ -57,8 +56,8 @@
   color: var(--color-azul-profundo);
   line-height: 1.5;
 }
-
-@media (max-width: 768px) {
+/* 🟢 RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
   .formaciones-title {
     font-size: 2.2rem;
   }
@@ -74,5 +73,17 @@
 
   .formaciones-empty-message p {
     font-size: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .formaciones-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .custom-card {
+    width: 100%;
+    max-width: 350px;
   }
 }
