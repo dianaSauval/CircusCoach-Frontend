@@ -1,7 +1,7 @@
 // components/common/UploadPdfPrivadoField.jsx
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaFilePdf, FaTrashAlt } from "react-icons/fa";
 import {
   subirPdfPrivado,
   eliminarArchivoDesdeFrontend,
@@ -76,81 +76,88 @@ const UploadPdfPrivadoField = ({
     }
   };
 
- const eliminarPdf = async (pdfId) => {
-  const pdf = existingPdfs.find((p) => p._id === pdfId);
-  const publicId = pdf?.public_id?.[activeTab];
+  const eliminarPdf = async (pdfId) => {
+    const pdf = existingPdfs.find((p) => p._id === pdfId);
+    const publicId = pdf?.public_id?.[activeTab];
 
-  if (publicId) {
-    try {
-      await eliminarArchivoDesdeFrontend(publicId);
-    } catch (error) {
-      console.warn("⚠️ Error al eliminar archivo desde Cloudinary:", error);
+    if (publicId) {
+      try {
+        await eliminarArchivoDesdeFrontend(publicId);
+      } catch (error) {
+        console.warn("⚠️ Error al eliminar archivo desde Cloudinary:", error);
+      }
     }
-  }
 
-  setPdfs((prev) => {
-    const listaActual = Array.isArray(prev) ? prev : [];
+    setPdfs((prev) => {
+      const listaActual = Array.isArray(prev) ? prev : [];
 
-    return listaActual.map((p) => {
-      if (p._id !== pdfId) return p;
+      return listaActual.map((p) => {
+        if (p._id !== pdfId) return p;
 
-      const newPdf = { ...p };
+        const newPdf = { ...p };
 
-      newPdf.url = { ...newPdf.url, [activeTab]: "" };
-      newPdf.public_id = { ...newPdf.public_id, [activeTab]: "" };
-      newPdf.title = { ...newPdf.title, [activeTab]: "" };
-      newPdf.description = { ...newPdf.description, [activeTab]: "" };
+        newPdf.url = { ...newPdf.url, [activeTab]: "" };
+        newPdf.public_id = { ...newPdf.public_id, [activeTab]: "" };
+        newPdf.title = { ...newPdf.title, [activeTab]: "" };
+        newPdf.description = { ...newPdf.description, [activeTab]: "" };
 
-      return newPdf;
+        return newPdf;
+      });
     });
-  });
-};
-
+  };
 
   return (
     <div>
-      {Array.isArray(existingPdfs) &&
-        existingPdfs
-          .filter((pdf) => pdf?.url?.[activeTab])
-          .map((pdf) => (
-            <div key={pdf._id} className="video-preview-item">
-              <p>
-                <strong>{pdf.title?.[activeTab] || "Sin título"}</strong>
-              </p>
-              <p style={{ fontStyle: "italic" }}>
-                {pdf.description?.[activeTab] || "Sin descripción"}
-              </p>
-              <button
-                type="button"
-                className="delete-button"
-                onClick={() => eliminarPdf(pdf._id)}
-              >
-                <FaTrashAlt />
-              </button>
-            </div>
-          ))}
+{Array.isArray(existingPdfs) &&
+  existingPdfs
+    .filter((pdf) => pdf?.url?.[activeTab])
+    .map((pdf) => (
+      <div key={pdf._id} className="pdf-file-card cargado">
+        <FaFilePdf className="file-icon" />
+        <div className="file-info">
+          <span className="file-name">{pdf.title?.[activeTab] || "Sin título"}</span>
+          <a
+            href={pdf.url?.[activeTab]}
+            target="_blank"
+            rel="noreferrer"
+            className="boton-secundario ver-link"
+          >
+            📄 Ver PDF
+          </a>
+        </div>
+        <button
+          className="boton-eliminar"
+          onClick={() => eliminarPdf(pdf._id)}
+        >
+          <FaTrashAlt />
+        </button>
+      </div>
+    ))}
+
 
       {pdfInputs.map((pdf, i) => (
         <div key={pdf._id} className="pdf-entry">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={(e) => handleFileChange(i, e.target.files[0])}
-          />
-          <input
-            type="text"
-            placeholder="Título"
-            value={pdf.title[activeTab]}
-            onChange={(e) => handleInputChange(i, "title", e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Descripción"
-            value={pdf.description[activeTab]}
-            onChange={(e) =>
-              handleInputChange(i, "description", e.target.value)
-            }
-          />
+          <div>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) => handleFileChange(i, e.target.files[0])}
+            />
+            <input
+              type="text"
+              placeholder="Título"
+              value={pdf.title[activeTab]}
+              onChange={(e) => handleInputChange(i, "title", e.target.value)}
+            />
+            <input
+              type="text"
+              placeholder="Descripción"
+              value={pdf.description[activeTab]}
+              onChange={(e) =>
+                handleInputChange(i, "description", e.target.value)
+              }
+            />
+          </div>
           <button
             type="button"
             onClick={() => subirPDF(i)}
@@ -161,7 +168,7 @@ const UploadPdfPrivadoField = ({
         </div>
       ))}
 
-      <button type="button" onClick={addNewPDF}>
+      <button type="button" className="boton-secundario" onClick={addNewPDF}>
         ➕ Agregar PDF
       </button>
     </div>

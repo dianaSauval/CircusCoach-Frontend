@@ -81,7 +81,7 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
           }))
         }
       />
-      <h3>🎥 Videos</h3>
+      <h3 className="subtitulo">🎥 Videos</h3>
       <UploadVideoField
         activeLang={activeTab}
         videos={formData.videos || []}

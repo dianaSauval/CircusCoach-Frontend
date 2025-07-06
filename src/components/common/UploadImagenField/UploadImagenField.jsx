@@ -45,11 +45,11 @@ const UploadImagenField = ({ activeLang, value, onChange }) => {
 
   return (
     <div className="upload-imagen-field">
-      <label>Imagen ({activeLang})</label>
+      <label className="subtitulo">Imagen ({activeLang})</label>
       {value ? (
         <div className="uploaded-image-preview">
           <img src={value} alt="Imagen subida" style={{ maxWidth: "200px", borderRadius: "8px" }} />
-          <button className="btn red" onClick={handleDelete}>
+          <button className="boton-eliminar" onClick={handleDelete}>
             <FaTrashAlt /> Eliminar
           </button>
         </div>
@@ -69,7 +69,7 @@ const UploadImagenField = ({ activeLang, value, onChange }) => {
             style={{ marginTop: "0.5rem", width: "100%" }}
           />
           {file && (
-            <button className="btn blue" onClick={handleUpload} disabled={uploading}>
+            <button className="boton-secundario" onClick={handleUpload} disabled={uploading}>
               {uploading ? "Subiendo..." : "Subir Imagen"}
             </button>
           )}

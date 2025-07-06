@@ -24,9 +24,7 @@
 }
 
 .add-course-form label {
-  font-weight: bold;
   font-size: 1rem;
-  color: var(--color-petroleo);
   margin-top: 0.5rem;
 }
 
@@ -64,6 +62,8 @@
 .modal-buttons .btn.green:hover {
   background-color: #5cc8b2;
 }
+
+
 
 .field-error {
   color: #d72638;

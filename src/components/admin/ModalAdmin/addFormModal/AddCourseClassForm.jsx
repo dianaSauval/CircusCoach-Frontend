@@ -94,7 +94,7 @@ const AddCourseClassForm = ({
         placeholder={`Contenido secundario (${activeTab})`}
       />
 
-      <h3>📄 PDFs</h3>
+      <h3 className="subtitulo">📄 PDFs</h3>
       <UploadPdfPrivadoField
         activeTab={activeTab}
         existingPdfs={formData[activeTab]?.pdfs || []}
@@ -121,7 +121,7 @@ const AddCourseClassForm = ({
         }
       />
 
-      <h3>🎥 Videos</h3>
+      <h3 className="subtitulo">🎥 Videos</h3>
 
       <UploadVideoField
         activeLang={activeTab}
@@ -143,10 +143,10 @@ const AddCourseClassForm = ({
       />
 
       <div className="content-button-modal">
-        <button type="button" onClick={onSubmit}>
+        <button type="button" className="boton-agregar" onClick={onSubmit}>
           ✅ Crear Clase
         </button>
-        <button type="button" onClick={handleCancel}>
+        <button type="button" className="boton-eliminar" onClick={handleCancel}>
           ❌ Cancelar
         </button>
       </div>

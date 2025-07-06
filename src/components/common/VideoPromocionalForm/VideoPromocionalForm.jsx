@@ -1,17 +1,24 @@
 import { useState, useEffect } from "react";
-import { subirVideoPromocional, eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
-import { FaCheckCircle, FaTrashAlt } from "react-icons/fa";
+import {
+  subirVideoPromocional,
+  eliminarVideoDeVimeo,
+} from "../../../services/uploadVimeoService";
+import { FaCheckCircle, FaTrashAlt, FaVideo } from "react-icons/fa";
 import "./VideoPromocionalForm.css";
 
 const VideoPromocionalForm = ({
   formData = { video: {} },
   setFormData,
   activeTab,
-  onAddTempVideo
+  onAddTempVideo,
 }) => {
   const videoUrl = formData?.video?.[activeTab] || "";
 
-  const [uploadModes, setUploadModes] = useState({ es: null, en: null, fr: null });
+  const [uploadModes, setUploadModes] = useState({
+    es: null,
+    en: null,
+    fr: null,
+  });
   const uploadMode = uploadModes[activeTab];
 
   const [videoFile, setVideoFile] = useState(null);
@@ -20,7 +27,6 @@ const VideoPromocionalForm = ({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
-  
 
   useEffect(() => {
     return () => {
@@ -103,7 +109,7 @@ const VideoPromocionalForm = ({
       },
     }));
 
-    onAddTempVideo?.(url); 
+    onAddTempVideo?.(url);
   };
 
   const handleRemove = async () => {
@@ -134,12 +140,24 @@ const VideoPromocionalForm = ({
 
   return (
     <div className="video-promocional-form">
-      <label>Video promocional:</label>
+      <label className="subtitulo">Video promocional:</label>
 
       {!videoUrl && !uploading && !uploadMode && (
         <div className="video-mode-buttons">
-          <button type="button" onClick={() => setUploadModeForLang(activeTab, "file")}>📤 Subir video</button>
-          <button type="button" onClick={() => setUploadModeForLang(activeTab, "link")}>🔗 Pegar enlace</button>
+          <button
+            className="boton-secundario"
+            type="button"
+            onClick={() => setUploadModeForLang(activeTab, "file")}
+          >
+            📤 Subir video
+          </button>
+          <button
+            className="boton-secundario"
+            type="button"
+            onClick={() => setUploadModeForLang(activeTab, "link")}
+          >
+            🔗 Pegar enlace
+          </button>
         </div>
       )}
 
@@ -195,16 +213,33 @@ const VideoPromocionalForm = ({
       )}
 
       {videoUrl && !uploading && (
-        <div className="video-cargado">
-          <p>
-            ✅ Video cargado:
-            <a href={videoUrl} target="_blank" rel="noreferrer">
-              Ver video
-            </a>
-          </p>
-          <button type="button" className="remove-btn" onClick={handleRemove}>
-            ❌ Eliminar video
-          </button>
+        <div className="video-card">
+          <div className="video-card-info">
+            <FaVideo className="video-icon" />
+            <div className="video-card-info-url">
+              <span className="video-title">
+                {titles[activeTab] || "Video cargado"}
+              </span>
+
+              <a
+                href={videoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="boton-secundario ver-link"
+              >
+                ▶️ Ver video
+              </a>
+            </div>
+          </div>
+          <div className="video-card-actions">
+            <button
+              type="button"
+              className="boton-eliminar btn-eliminar"
+              onClick={handleRemove}
+            >
+              <FaTrashAlt />
+            </button>
+          </div>
         </div>
       )}
 

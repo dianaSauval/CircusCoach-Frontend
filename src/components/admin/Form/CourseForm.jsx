@@ -165,7 +165,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
   return (
     <form className="course-form" onSubmit={handleSubmit}>
       <div className="form-section">
-        <label>Título:</label>
+        <label className="label-formulario">Título:</label>
         <input
           type="text"
           value={formData.title?.[activeTab] || ""}
@@ -176,7 +176,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
 
       <>
         <div className="form-section">
-          <label>Descripción:</label>
+          <label className="label-formulario">Descripción:</label>
           <textarea
             value={formData.description?.[activeTab] || ""}
             onChange={(e) => handleChange(e, "description", activeTab)}
@@ -184,7 +184,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         </div>
 
         <div className="form-section">
-          <label>Precio:</label>
+          <label className="label-formulario">Precio:</label>
           <input
             type="number"
             name="price"
@@ -210,7 +210,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
 
         <div className="form-section">
           <div className="form-section">
-            <label>PDF de presentación del curso ({activeTab})</label>
+            <label className="subtitulo">PDF de presentación del curso ({activeTab})</label>
             <UploadPdfPublicoField
               activeLang={activeTab}
               pdfUrl={formData.pdf}
@@ -241,7 +241,6 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
           </div>
 
           <div className="form-section">
-            <label style={{ fontWeight: "bold" }}>🎞️ Video promocional:</label>
             <VideoPromocionalForm
               formData={formData}
               setFormData={setFormData}
@@ -259,7 +258,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
 
       <div className="form-buttons">
         <button type="submit">💾 Guardar</button>
-        <button type="button" onClick={handleCancel}>
+        <button type="boton-eliminar" onClick={handleCancel}>
           ❌ Cancelar
         </button>
       </div>

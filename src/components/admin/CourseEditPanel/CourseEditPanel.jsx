@@ -10,6 +10,7 @@ import {
 } from "../../../services/courseService";
 import { getVideoEmbedUrl } from "../../../utils/videoEmbed";
 import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
+import { FaDollarSign } from "react-icons/fa";
 
 const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const [activeTab, setActiveTab] = useState("es");
@@ -93,12 +94,11 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
     } else {
       // 📄 CURSO: un solo PDF (público)
       const url = data.pdf?.[activeTab];
-      const title = data?.pdfTitle?.[activeTab];
-      const description = data?.pdfDescription?.[activeTab];
 
       if (!url) {
         return (
-          <p className="no-material">
+          <> <h3>{labelByLang[activeTab].pdf}</h3>
+          <p className="texto no-material">
             📭{" "}
             {activeTab === "es"
               ? "Aún no se ha cargado ningún PDF en este idioma."
@@ -106,6 +106,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
               ? "No PDF uploaded in this language yet."
               : "Aucun PDF disponible dans cette langue."}
           </p>
+          </>
         );
       }
 
@@ -156,7 +157,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
         if (!embedUrl || !embedUrl.startsWith("https://")) {
           return (
-            <p key={i} className="no-material">
+            <p key={i} className="texto no-material">
               ❌{" "}
               {activeTab === "es"
                 ? "El enlace no es válido o no se puede mostrar como video embebido."
@@ -182,7 +183,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
         if (status === "error") {
           return (
-            <p key={i} className="no-material">
+            <p key={i} className="texto no-material">
               ❌{" "}
               {activeTab === "es"
                 ? "Hubo un error al cargar el video desde Vimeo. Intentalo más tarde."
@@ -223,7 +224,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
       if (!rawUrl) {
         return (
-          <p className="no-material">
+          <p className="texto no-material">
             📭{" "}
             {activeTab === "es"
               ? "Aún no se ha cargado un video en este idioma."
@@ -370,34 +371,36 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
       {!isEditing ? (
         <div className="informationCourse">
-          <h2>
+          <h2 className="titulo-principal">
             {isClass
               ? labelByLang[activeTab].class
               : labelByLang[activeTab].course}
           </h2>
-          <h3>{data.title?.[activeTab] || "Sin título"}</h3>
+          <h3 className="subtitulo">{data.title?.[activeTab] || "Sin título"}</h3>
 
           {!isClass && (
             <>
-              <p>
+              <p className="texto">
                 {data.description?.[activeTab] ||
                   "No hay descripción disponible."}
               </p>
-              <p>
-                <strong>Precio:</strong> {data.price || "No especificado"}
+              <p className="texto">
+                <strong>Precio:</strong> $ {data.price || "No especificado"}
               </p>
               <div>
-                <p>
+                <h4 className="subtitulo">
                   <strong>Imagen de presentación:</strong>
-                </p>
+                </h4>
                 {data.image?.[activeTab] ? (
+                  <div className="div-image">
                   <img
                     src={data.image[activeTab]}
                     alt="Imagen del curso"
                     className="course-image"
                   />
+                  </div>
                 ) : (
-                  <p style={{ color: "#777", fontStyle: "italic" }}>
+                  <p className="texto no-image">
                     Imagen aún no cargada
                   </p>
                 )}
@@ -426,11 +429,11 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
           </div>
 
           <div className="button-group">
-            <button className="edit" onClick={() => setIsEditing(true)}>
+            <button className="boton-secundario edit" onClick={() => setIsEditing(true)}>
               ✏️ Editar
             </button>
             <button
-              className={`toggle-visibility ${
+              className={`boton-secundario toggle-visibility ${
                 data.visible?.[activeTab] ? "visible" : "hidden"
               }`}
               onClick={handleToggleVisibility}

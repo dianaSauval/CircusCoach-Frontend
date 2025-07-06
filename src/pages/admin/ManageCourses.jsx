@@ -9,6 +9,7 @@ import {
   getAllCourses,
 } from "../../services/courseService";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { FaTrashAlt } from "react-icons/fa";
 
 const ManageCourses = () => {
   const [courses, setCourses] = useState([]);
@@ -124,7 +125,7 @@ const ManageCourses = () => {
           </button>
           {!isCollapsed && (
             <>
-              <h2>📌 Cursos disponibles</h2>
+              <h2 className="titulo-principal">Cursos disponibles</h2>
               <button className="btn green" onClick={handleOpenAddCourseModal}>
                 ➕ Agregar curso
               </button>
@@ -143,7 +144,7 @@ const ManageCourses = () => {
                   </div>
 
                   <div
-                    className={`course-title ${
+                    className={`titulo-principal course-title ${
                       selectedCourse?._id === course._id ? "selected" : ""
                     }`}
                     onClick={() => handleSelectCourse(course)}
@@ -153,16 +154,16 @@ const ManageCourses = () => {
 
                   <div className="course-actions">
                     <button
-                      className="btn green"
+                      className="boton-agregar"
                       onClick={() => handleOpenModal(course._id)}
                     >
                       ➕ Agregar clase
                     </button>
                     <button
-                      className="btn red"
+                      className="boton-eliminar"
                       onClick={() => handleDeleteCourse(course._id)}
                     >
-                      🗑 Eliminar Curso
+                      <FaTrashAlt /> Eliminar Curso
                     </button>
                     <button
                       className="btn icon"

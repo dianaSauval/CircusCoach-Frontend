@@ -210,8 +210,8 @@ textarea {
 
 .pdf-preview-container p,
 .video-preview-container p {
-  font-size: 0.95rem;
-  color: #333;
+
+  color: var(--color-azul-profundo);
   margin: 5px 0;
 }
 

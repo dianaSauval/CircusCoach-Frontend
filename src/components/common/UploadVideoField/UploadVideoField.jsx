@@ -85,7 +85,7 @@ const UploadVideoField = ({
         />
       ))}
 
-      <button type="button" onClick={addNewVideo} style={{ marginTop: 8 }}>
+      <button type="button" className="boton-secundario" onClick={addNewVideo} style={{ marginTop: 8 }}>
         ➕ Agregar Video
       </button>
     </div>

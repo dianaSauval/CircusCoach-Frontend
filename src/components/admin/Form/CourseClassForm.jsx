@@ -136,7 +136,7 @@ const CourseClassForm = ({
       {/* Botones */}
       <div className="form-buttons">
         <button type="submit">💾 Guardar</button>
-        <button type="button" onClick={onCancel}>
+        <button type="boton-eliminar" onClick={onCancel}>
           ❌ Cancelar
         </button>
       </div>

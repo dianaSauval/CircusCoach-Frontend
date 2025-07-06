@@ -95,6 +95,97 @@ body {
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
 }
 
+.boton-secundario {
+  background-color: var(--color-azul-profundo); /* azul profundo oscuro */
+  color: var(--color-blanco); /* texto blanco */
+  font-family: var(--font-texto);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.90rem;
+  padding: 0.5rem 1.2rem;
+  border: 2px solid var(--color-azul-profundo);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.5px;
+  max-width: 200px;
+  width: 100%;
+}
+
+.boton-secundario:hover {
+  background-color: var(--color-blanco); /* fondo blanco */
+  color: var(--color-azul-profundo); /* texto azul profundo */
+  border: 2px solid var(--color-azul-profundo);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+.boton-eliminar {
+  background-color: #e74c3c; /* rojo intenso */
+  color: var(--color-blanco); /* texto blanco */
+  font-family: var(--font-texto); /* Lato */
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #e74c3c;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.5px;
+  max-width: 200px;
+  width: 100%;
+}
+
+.boton-eliminar:hover {
+  background-color: var(--color-blanco); /* fondo blanco */
+  color: #e74c3c; /* texto rojo */
+  border: 2px solid #e74c3c;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+.boton-agregar {
+  background-color: #2ecc71; /* verde vibrante */
+  color: var(--color-blanco); /* texto blanco */
+  font-family: var(--font-texto); /* Lato */
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  border: 2px solid #2ecc71;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  letter-spacing: 0.5px;
+  max-width: 200px;
+  width: 100%;
+}
+
+.boton-agregar:hover {
+  background-color: var(--color-blanco); /* fondo blanco */
+  color: #2ecc71; /* texto verde */
+  border: 2px solid #2ecc71;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+}
+
+
+.label-formulario {
+  font-family: var(--font-texto); /* Lato */
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-azul-profundo);
+  margin-bottom: 0.4rem;
+  display: block;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+
 @media (max-width: 768px) {
   .titulo-principal {
     font-size: 1.6rem;
@@ -124,5 +215,18 @@ body {
     padding: 0.75rem 1.5rem;
     width: 100%;
     max-width: 280px;
+  }
+
+  .boton-secundario, .boton-agregar, .boton-eliminar {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    max-width: 280px;
+    margin: 0 auto;
+    display: block;
+  }
+
+  .label-formulario {
+    font-size: 0.9rem;
+    letter-spacing: 0.3px;
   }
 }

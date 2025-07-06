@@ -27,10 +27,8 @@
 }
 
 .modal-content h2 {
-  font-family: var(--font-titulo);
   font-size: 1.8rem;
   margin-bottom: 1.2rem;
-  color: var(--color-azul-profundo);
 }
 
 .language-tabs {
@@ -75,49 +73,24 @@
 }
 
 .modal-content h3 {
-  font-size: 1.2rem;
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
-  color: var(--color-petroleo);
-  text-align: left;
-  font-weight: bold;
 }
 .content-button-modal{
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 5px;
+  margin-top: 2rem;
 }
 
-.modal-content button {
-  padding: 0.75rem 1.5rem;
-  margin-top: 1rem;
-  margin-right: 0.5rem;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  border-radius: 30px;
-  font-weight: bold;
-  transition: all 0.3s ease-in-out;
-  font-family: var(--font-texto);
-}
 
-.modal-content button[type="submit"] {
-  background: var(--color-menta);
-  color: var(--color-azul-profundo);
-}
 
 .modal-content button[type="submit"]:hover {
   background: #5cc8b2;
 }
 
-.modal-content button[type="button"] {
-  background: var(--color-petroleo);
-  color: var(--color-blanco);
-}
 
-.modal-content button[type="button"]:hover {
-  background: var(--color-azul-profundo);
-}
 
 .modal-content select {
   width: 100%;
@@ -245,6 +218,11 @@
   gap: 0.5rem;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.pdf-entry div{
+  display: flex;
+  flex-direction: column;
 }
 
 .pdf-entry input {

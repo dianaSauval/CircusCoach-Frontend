@@ -152,7 +152,7 @@ const handleClose = () => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h2>{isAddingCourse ? "Agregar Curso" : "Agregar Clase"}</h2>
+        <h2 className="titulo-principal">{isAddingCourse ? "Agregar Curso" : "Agregar Clase"}</h2>
 
         <div className="language-tabs">
           {["es", "en", "fr"].map((lang) => (

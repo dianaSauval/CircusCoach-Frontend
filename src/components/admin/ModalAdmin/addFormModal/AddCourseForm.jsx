@@ -159,7 +159,7 @@ const AddCourseForm = ({
         }
       />
 
-      <label>PDF de presentación del curso ({activeTab})</label>
+      <label className="subtitulo">PDF de presentación del curso ({activeTab})</label>
       <UploadPdfPublicoField
         activeLang={activeTab}
         pdfUrl={formData.pdf}
@@ -196,11 +196,11 @@ const AddCourseForm = ({
       />
 
       <div className="modal-buttons">
-        <button className="btn red" onClick={handleCancel}>
+        <button className="boton-eliminar" onClick={handleCancel}>
           Cancelar
         </button>
 
-        <button className="btn green" onClick={handleSubmit}>
+        <button className="boton-agregar" onClick={handleSubmit}>
           Agregar Curso
         </button>
       </div>

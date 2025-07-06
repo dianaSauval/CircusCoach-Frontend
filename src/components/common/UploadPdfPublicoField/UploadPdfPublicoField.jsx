@@ -93,12 +93,12 @@ const UploadPdfPublicoField = ({
               href={currentUrl}
               target="_blank"
               rel="noreferrer"
-              className="ver-link"
+              className="boton-secundario ver-link"
             >
               📄 Ver PDF
             </a>
           </div>
-          <button className="delete-btn" onClick={handleDelete}>
+          <button className="boton-eliminar" onClick={handleDelete}>
             <FaTrashAlt />
           </button>
         </div>
@@ -120,6 +120,7 @@ const UploadPdfPublicoField = ({
           <button
             type="button"
             onClick={handleUpload}
+            className="boton-secundario"
             disabled={uploading || !file || !titulo.trim()}
           >
             {uploading ? "Subiendo..." : "📤 Subir PDF"}
