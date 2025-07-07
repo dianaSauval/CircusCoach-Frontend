@@ -10,6 +10,7 @@ import {
   getAllFormations,
 } from "../../services/formationService";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import { FaTrashAlt } from "react-icons/fa";
 
 const ManageFormations = () => {
   const [formations, setFormations] = useState([]);
@@ -120,9 +121,9 @@ const ManageFormations = () => {
         >
           {!isListCollapsed && (
             <>
-              <h2>📌 Formaciones</h2>
+              <h2 className="titulo-principal">Formaciones</h2>
               <button
-                className="add-button"
+                className="boton-agregar add-formation"
                 onClick={() =>
                   setShowModal({ type: "formation", parentId: null })
                 }
@@ -150,7 +151,7 @@ const ManageFormations = () => {
 
                       <div className="formation-header">
                         <span
-                          className={`formationEdit-title ${
+                          className={`titulo-principal formationEdit-title ${
                             selectedFormation?._id === formation._id
                               ? "selected"
                               : ""
@@ -173,7 +174,7 @@ const ManageFormations = () => {
 
                       <div className="formation-actions">
                         <button
-                          className="small-btn"
+                          className="boton-agregar small-btn"
                           onClick={() =>
                             setShowModal({
                               type: "module",
@@ -184,10 +185,10 @@ const ManageFormations = () => {
                           ➕ Agregar módulo
                         </button>
                         <button
-                          className="delete-btn"
+                          className="boton-eliminar delete-formation"
                           onClick={() => setFormationToDelete(formation)}
                         >
-                          🗑️ Eliminar Formación
+                            <FaTrashAlt /> Eliminar Formación
                         </button>
                       </div>
                     </div>

@@ -28,19 +28,17 @@ const AddCoursesModal = ({
   });
 
   // 👉 Para CLASES
-const [formDataClass, setFormDataClass] = useState({
-  es: { pdfs: [], videos: [] },
-  en: { pdfs: [], videos: [] },
-  fr: { pdfs: [], videos: [] },
-  title: { es: "", en: "", fr: "" },
-  subtitle: { es: "", en: "", fr: "" },
-  content: { es: "", en: "", fr: "" },
-  secondaryContent: { es: "", en: "", fr: "" },
-  visible: { es: false, en: false, fr: false },
-  videoIds: [], // 👈 nuevo campo
-});
-
-
+  const [formDataClass, setFormDataClass] = useState({
+    es: { pdfs: [], videos: [] },
+    en: { pdfs: [], videos: [] },
+    fr: { pdfs: [], videos: [] },
+    title: { es: "", en: "", fr: "" },
+    subtitle: { es: "", en: "", fr: "" },
+    content: { es: "", en: "", fr: "" },
+    secondaryContent: { es: "", en: "", fr: "" },
+    visible: { es: false, en: false, fr: false },
+    videoIds: [], // 👈 nuevo campo
+  });
 
   const handleChangeCourse = (e) => {
     const { name, value } = e.target;
@@ -57,20 +55,22 @@ const [formDataClass, setFormDataClass] = useState({
     errors[fieldName] ? "input error" : "input";
 
   const handleCreateClass = async () => {
-  if (!formDataClass.title?.[activeTab]) {
-    setErrors({ title: "El título en español es obligatorio." });
-    return;
-  }
+    if (!formDataClass.title?.[activeTab]) {
+      setErrors({ title: "El título en español es obligatorio." });
+      return;
+    }
 
-  try {
-    // Extraer los arrays multilenguaje correctamente
-    const pdfs = [];
-    const videos = [];
+    try {
+      // Extraer los arrays multilenguaje correctamente
+      const pdfs = [];
+      const videos = [];
 
-    ["es", "en", "fr"].forEach((lang) => {
-      if (formDataClass[lang]?.pdfs?.length) {
-        formDataClass[lang].pdfs.forEach((pdf) => {
-          // Buscamos si ya existe un pdf con ese _id
+      ["es", "en", "fr"].forEach((lang) => {
+        const pdfList = Array.isArray(formDataClass[lang]?.pdfs)
+          ? formDataClass[lang].pdfs
+          : [];
+
+        pdfList.forEach((pdf) => {
           let existing = pdfs.find((p) => p._id === pdf._id);
           if (!existing) {
             existing = {
@@ -86,10 +86,12 @@ const [formDataClass, setFormDataClass] = useState({
           existing.title[lang] = pdf.title?.[lang] || "";
           existing.description[lang] = pdf.description?.[lang] || "";
         });
-      }
 
-      if (formDataClass[lang]?.videos?.length) {
-        formDataClass[lang].videos.forEach((video) => {
+        const videoList = Array.isArray(formDataClass[lang]?.videos)
+          ? formDataClass[lang].videos
+          : [];
+
+        videoList.forEach((video) => {
           let existing = videos.find((v) => v._id === video._id);
           if (!existing) {
             existing = {
@@ -105,54 +107,52 @@ const [formDataClass, setFormDataClass] = useState({
           existing.title[lang] = video.title?.[lang] || "";
           existing.description[lang] = video.description?.[lang] || "";
         });
-      }
-    });
-
-    const payload = {
-      title: formDataClass.title,
-      subtitle: formDataClass.subtitle,
-      content: formDataClass.content,
-      secondaryContent: formDataClass.secondaryContent,
-      visible: formDataClass.visible,
-      pdfs,
-      videos,
-      course: courseId,
-    };
-
-    const nuevaClase = await createCourseClass(courseId, payload);
-    onClassAdded?.(nuevaClase);
-    onClose();
-  } catch (error) {
-    console.error("❌ Error al crear la clase:", error);
-    setErrors({
-      global:
-        error.response?.data?.error || "Error inesperado al crear la clase.",
-    });
-  }
-};
-
-
-const handleClose = () => {
-  if (!isAddingCourse && formDataClass.pdfs?.length > 0) {
-    formDataClass.pdfs.forEach((pdf) => {
-      ["es", "en", "fr"].forEach((lang) => {
-        const publicId = pdf?.public_id?.[lang];
-        if (publicId) {
-          eliminarArchivoDesdeFrontend(publicId);
-        }
       });
-    });
-  }
 
-  onClose();
-};
+      const payload = {
+        title: formDataClass.title,
+        subtitle: formDataClass.subtitle,
+        content: formDataClass.content,
+        secondaryContent: formDataClass.secondaryContent,
+        visible: formDataClass.visible,
+        pdfs,
+        videos,
+        course: courseId,
+      };
 
+      const nuevaClase = await createCourseClass(courseId, payload);
+      onClassAdded?.(nuevaClase);
+      onClose();
+    } catch (error) {
+      console.error("❌ Error al crear la clase:", error);
+      setErrors({
+        global:
+          error.response?.data?.error || "Error inesperado al crear la clase.",
+      });
+    }
+  };
 
+  const handleClose = () => {
+    if (!isAddingCourse && formDataClass.pdfs?.length > 0) {
+      formDataClass.pdfs.forEach((pdf) => {
+        ["es", "en", "fr"].forEach((lang) => {
+          const publicId = pdf?.public_id?.[lang];
+          if (publicId) {
+            eliminarArchivoDesdeFrontend(publicId);
+          }
+        });
+      });
+    }
+
+    onClose();
+  };
 
   return (
     <div className="modal">
       <div className="modal-content">
-        <h2 className="titulo-principal">{isAddingCourse ? "Agregar Curso" : "Agregar Clase"}</h2>
+        <h2 className="titulo-principal">
+          {isAddingCourse ? "Agregar Curso" : "Agregar Clase"}
+        </h2>
 
         <div className="language-tabs">
           {["es", "en", "fr"].map((lang) => (

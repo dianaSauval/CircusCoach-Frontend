@@ -108,32 +108,38 @@ const UploadPdfPrivadoField = ({
 
   return (
     <div>
-{Array.isArray(existingPdfs) &&
-  existingPdfs
-    .filter((pdf) => pdf?.url?.[activeTab])
-    .map((pdf) => (
-      <div key={pdf._id} className="pdf-file-card cargado">
-        <FaFilePdf className="file-icon" />
-        <div className="file-info">
-          <span className="file-name">{pdf.title?.[activeTab] || "Sin título"}</span>
-          <a
-            href={pdf.url?.[activeTab]}
-            target="_blank"
-            rel="noreferrer"
-            className="boton-secundario ver-link"
-          >
-            📄 Ver PDF
-          </a>
-        </div>
-        <button
-          className="boton-eliminar"
-          onClick={() => eliminarPdf(pdf._id)}
-        >
-          <FaTrashAlt />
-        </button>
-      </div>
-    ))}
-
+      {Array.isArray(existingPdfs) &&
+        existingPdfs
+          .filter((pdf) => pdf?.url?.[activeTab])
+          .map((pdf) => (
+            <>
+              <div className="upload-pdf-field">
+                <div className="pdf-file-card cargado">
+                  <FaFilePdf className="file-icon" />
+                  <div className="file-info">
+                    <span className="file-name">
+                      {" "}
+                      {pdf.title?.[activeTab] || "Sin título"}
+                    </span>
+                    <a
+                      href={pdf.url?.[activeTab]}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="boton-secundario ver-link"
+                    >
+                      📄 Ver PDF
+                    </a>
+                  </div>
+                  <button
+                    className="boton-eliminar"
+                    onClick={() => eliminarPdf(pdf._id)}
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </div>
+              </div>
+            </>
+          ))}
 
       {pdfInputs.map((pdf, i) => (
         <div key={pdf._id} className="pdf-entry">
@@ -158,13 +164,24 @@ const UploadPdfPrivadoField = ({
               }
             />
           </div>
-          <button
-            type="button"
-            onClick={() => subirPDF(i)}
-            disabled={pdf.uploading}
-          >
-            {pdf.uploading ? "Subiendo..." : "📤 Subir PDF"}
-          </button>
+          <div className="buttons">
+            <button
+              type="button"
+              onClick={() => subirPDF(i)}
+              disabled={pdf.uploading}
+            >
+              {pdf.uploading ? "Subiendo..." : "📤 Subir PDF"}
+            </button>
+            <button
+              type="button"
+              className="boton-eliminar"
+              onClick={() =>
+                setPdfInputs((prev) => prev.filter((_, idx) => idx !== i))
+              }
+            >
+              ❌ Quitar
+            </button>
+          </div>
         </div>
       ))}
 

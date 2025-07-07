@@ -55,7 +55,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
       if (visibles.length === 0) {
         return (
-          <p className="no-material">
+          <p className="texto no-material">
             📭{" "}
             {activeTab === "es"
               ? "Aún no se ha cargado ningún documento en este idioma."
@@ -376,7 +376,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
               ? labelByLang[activeTab].class
               : labelByLang[activeTab].course}
           </h2>
-          <h3 className="subtitulo">{data.title?.[activeTab] || "Sin título"}</h3>
+          <h3 className="titulo-principal">{data.title?.[activeTab] || "Sin título"}</h3>
 
           {!isClass && (
             <>
@@ -410,11 +410,11 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
           {isClass && (
             <>
-              <p>
+              <p className="texto">
                 {data.content?.[activeTab] || "No hay contenido disponible."}
               </p>
-              <h4>{data.subtitle?.[activeTab] || "Sin subtítulo"}</h4>
-              <p>
+              <h4 className="subtitulo">{data.subtitle?.[activeTab] || "Sin subtítulo"}</h4>
+              <p className="texto">
                 {data.secondaryContent?.[activeTab] ||
                   "No hay contenido secundario."}
               </p>

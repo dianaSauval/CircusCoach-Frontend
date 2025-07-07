@@ -223,6 +223,14 @@
 .pdf-entry div{
   display: flex;
   flex-direction: column;
+  width: 100%;
+}
+
+.buttons{
+  display: flex;
+  flex-direction: row !important;
+  width: 100%;
+  gap: 15px;
 }
 
 .pdf-entry input {

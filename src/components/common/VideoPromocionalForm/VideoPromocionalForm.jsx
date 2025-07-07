@@ -178,6 +178,7 @@ const VideoPromocionalForm = ({
           />
           <button
             type="button"
+            className="upload"
             onClick={handleUpload}
             disabled={uploading || !videoFile || !titles[activeTab]}
           >

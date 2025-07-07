@@ -2,7 +2,7 @@
 
 .pdf-entry {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.5rem;
   align-items: center;
   margin-bottom: 1rem;
@@ -28,11 +28,9 @@
   font-weight: bold;
   font-family: var(--font-texto);
   transition: background-color 0.3s ease;
+  max-width: 150px;
 }
 
-.pdf-entry button:hover {
-  background-color: #5cc8b2;
-}
 
 .video-preview-item {
   background-color: #f9f9f9;
@@ -76,3 +74,49 @@
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
 }
+
+.pdf-private-file-card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-self: center;
+  gap: 12px;
+  background-color: var(--color-verde-claro);
+  padding: 20px 14px;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  max-width: 100%;
+}
+
+.pdf-private-file-card div{
+  display: flex;
+}
+
+
+.upload-pdf-field button {
+  width: fit-content;
+}
+
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* ya lo tenías */
+  text-align: left;     /* asegura que el texto se alinee */
+}
+
+.file-name {
+  width: 100%;
+  display: block;
+  text-align: left;
+  margin-bottom: 0.5rem; /* para separar del botón */
+  padding-left: 15px;
+}
+
+.boton-secundario.ver-link {
+  align-self: flex-start; /* asegura que se alinee igual que el texto */
+}
+

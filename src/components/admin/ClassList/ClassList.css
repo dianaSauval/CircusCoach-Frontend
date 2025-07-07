@@ -28,6 +28,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 8px;
   gap: 1rem;
 }
 
@@ -69,19 +70,11 @@
 
 /* 🔹 Botón eliminar */
 .delete-btn {
-  background-color: #DC3545;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  font-size: 0.85rem;
+  max-width: 180px;
 }
 
-.delete-btn:hover {
-  background-color: #c1303f;
-}
+
 
 /* 🔹 Sin clases */
 .no-classes {

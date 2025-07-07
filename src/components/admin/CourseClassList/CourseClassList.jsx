@@ -1,3 +1,4 @@
+import { FaTrashAlt } from "react-icons/fa";
 import { deleteCourseClass } from "../../../services/courseService";
 import ConfirmModal from "../../common/ConfirmModal";
 import "./CourseClassList.css";
@@ -80,10 +81,10 @@ const CourseClassList = ({
               </span>
 
               <button
-                className="delete-btn"
+                className="boton-eliminar delete-btn"
                 onClick={() => requestDelete(cls._id)}
               >
-                🗑️ Eliminar clase
+                 <FaTrashAlt /> Eliminar clase
               </button>
             </div>
           );

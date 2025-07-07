@@ -100,12 +100,10 @@
 .class-content,
 .module-content {
   background: var(--color-blanco);
-  padding: 2rem;
+  padding: 5px;
   border-radius: 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease-in-out;
-  border-top: 5px solid var(--color-verde-claro);
-  margin-top: 2rem;
 }
 
 .class-content h2,

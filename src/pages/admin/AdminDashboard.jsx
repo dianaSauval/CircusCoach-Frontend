@@ -15,28 +15,28 @@ function AdminDashboard() {
 
   return (
     <div className="admin-dashboard">
-      <h1 className="admin-title">Panel de Administración</h1>
+      <h1 className="titulo-principal">Panel de Administración</h1>
 
       <div className="admin-sections">
         {/* Formaciones Online */}
         <div className="admin-card">
-          <h2 className="admin-card-title">Formaciones Online</h2>
-          <p className="admin-card-desc">Gestioná el contenido, módulos y clases de tus formaciones online.</p>
-          <Link to="/admin/formaciones-online" className="admin-card-button">Ver Formaciones</Link>
+          <h2 className="titulo-principal">Formaciones Online</h2>
+          <p className="texto">Gestioná el contenido, módulos y clases de tus formaciones online.</p>
+          <Link to="/admin/formaciones-online" className="boton-secundario">Ver Formaciones</Link>
         </div>
 
         {/* Formaciones Presenciales */}
         <div className="admin-card">
-          <h2 className="admin-card-title">Formaciones Presenciales</h2>
-          <p className="admin-card-desc">Agregá, editá o eliminá tus formaciones presenciales y workshops.</p>
-          <Link to="/admin/formaciones-presenciales" className="admin-card-button">Ver Presenciales</Link>
+          <h2 className="titulo-principal">Formaciones Presenciales</h2>
+          <p className="texto">Agregá, editá o eliminá tus formaciones presenciales y workshops.</p>
+          <Link to="/admin/formaciones-presenciales" className="boton-secundario">Ver Presenciales</Link>
         </div>
 
         {/* Cursos */}
         <div className="admin-card">
-          <h2 className="admin-card-title">Cursos Sueltos</h2>
-          <p className="admin-card-desc">Accedé a la gestión de cursos individuales disponibles para los alumnos.</p>
-          <Link to="/admin/cursos" className="admin-card-button">Ver Cursos</Link>
+          <h2 className="titulo-principal">Cursos Sueltos</h2>
+          <p className="texto">Accedé a la gestión de cursos individuales disponibles para los alumnos.</p>
+          <Link to="/admin/cursos" className="boton-secundario">Ver Cursos</Link>
         </div>
       </div>
     </div>

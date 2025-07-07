@@ -16,7 +16,7 @@ const FormationList = ({ formations, setSelectedFormation, setSelectedModule, se
 
   return (
     <div className="menu-list">
-      <button className="add-button">➕ Nueva Formación</button>
+      <button className="boton-agregar add-button">➕ Nueva Formación</button>
       {formations.map((formation) => (
         <div key={formation._id} className="menu-item">
           <div className="menu-header" onClick={() => toggleFormation(formation)}>

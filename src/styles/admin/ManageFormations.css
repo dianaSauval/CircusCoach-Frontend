@@ -36,11 +36,26 @@
 }
 
 .formations-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   background: var(--white);
   padding: 2rem;
   border-radius: 16px;
   overflow-y: hidden;
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.formations-list h2{
+  font-size: 2rem;
+}
+
+.add-formation{
+  padding: 10px 10px !important;  
+  min-width: 260px;
+  margin-top: 5px;
+  text-align: center;
 }
 
 .add-button {
@@ -115,9 +130,9 @@
 }
 
 .formationEdit-title {
+  font-size: 1.5rem !important;
   cursor: pointer;
   transition: color 0.3s ease;
-  color: var(--color-azul-profundo);
 }
 
 .formationEdit-title.selected {
@@ -143,17 +158,7 @@
   margin-top: 0.5rem;
 }
 
-.small-btn,
-.delete-btn {
-  padding: 8px 14px;
-  font-size: 0.95rem;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  font-family: var(--font-texto);
-  transition: all 0.3s;
-}
+
 
 .small-btn {
   background: var(--success);
@@ -164,14 +169,13 @@
   background: #5cc8b2;
 }
 
-.delete-btn {
-  background: var(--danger);
-  color: var(--white);
+.delete-formation{
+  font-size: 0.85rem !important;
+  padding: 6px 12px !important;
+  letter-spacing:0 !important;
 }
 
-.delete-btn:hover {
-  background: #a71d2a;
-}
+
 
 .formation-modules {
   margin-top: 1rem;
@@ -184,7 +188,7 @@
 .collapse-toggle {
   position: absolute;
   top: 9rem;
-  left: 42%;
+  left: 40%;
   background-color: var(--color-menta);
   color: var(--color-azul-profundo);
   border: none;

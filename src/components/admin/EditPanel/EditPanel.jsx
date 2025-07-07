@@ -266,7 +266,7 @@ const EditPanel = ({
       {!isEditing && (
         <div className="view-mode">
           <div className="information">
-            <h2>
+            <h2 className="titulo-principal">
               {selectedClass
                 ? "\ud83d\udcd6 Clase"
                 : selectedModule
@@ -274,10 +274,12 @@ const EditPanel = ({
                 : "\ud83d\udccc Formación"}
             </h2>
 
-            <h3>{formData.title?.[activeTab] || "Sin título"}</h3>
+            <h3 className="titulo-principal">
+              {formData.title?.[activeTab] || "Sin título"}
+            </h3>
 
             {selectedModule && !selectedClass && (
-              <p>
+              <p className="texto">
                 {formData.description?.[activeTab] ||
                   "No hay descripción disponible"}
               </p>
@@ -285,24 +287,27 @@ const EditPanel = ({
 
             {selectedFormation && !selectedClass && (
               <>
-                <p>
+                <p className="texto">
                   {formData.description?.[activeTab] ||
                     "No hay descripción disponible"}
                 </p>
-                <p>
-                  <strong>Precio:</strong> {formData.price || "No especificado"}
+                <p className="texto">
+                  <strong>Precio:</strong> ${" "}
+                  {formData.price || "No especificado"}
                 </p>
 
                 <div>
-                  <p>
+                  <h4 className="subtitulo">
                     <strong>Imagen de presentación:</strong>
-                  </p>
+                  </h4>
                   {formData.image?.[activeTab] ? (
-                    <img
-                      src={formData.image[activeTab]}
-                      alt="Imagen de la formación"
-                      className="formation-image"
-                    />
+                    <div className="div-image">
+                      <img
+                        src={formData.image[activeTab]}
+                        alt="Imagen de la formación"
+                        className="formation-image"
+                      />
+                    </div>
                   ) : (
                     <p style={{ color: "#777", fontStyle: "italic" }}>
                       Imagen aún no cargada
@@ -311,9 +316,9 @@ const EditPanel = ({
                 </div>
 
                 <div style={{ marginTop: "1rem" }}>
-                  <p>
+                  <h4 className="subtitulo">
                     <strong>📄 PDF de presentación:</strong>
-                  </p>
+                  </h4>
                   {(() => {
                     const raw = formData.pdf?.[activeTab];
                     const url = typeof raw === "string" ? raw : raw?.url;
@@ -340,15 +345,18 @@ const EditPanel = ({
                 </div>
 
                 <div style={{ marginTop: "1rem" }}>
-                  <p>
+                 <h4 className="subtitulo">
                     <strong>🎥 Video de presentación:</strong>
-                  </p>
+                  </h4>
                   {formData.video?.[activeTab] ? (
                     (() => {
-                      const embedUrl = getVideoEmbedUrl(
-                        formData.video[activeTab]
-                      );
-                      const isVimeo = embedUrl.includes("vimeo.com");
+                      const rawVideo = formData.video?.[activeTab];
+                      const rawUrl =
+                        typeof rawVideo === "string" ? rawVideo : rawVideo?.url;
+                      const embedUrl = getVideoEmbedUrl(rawUrl);
+                      const isVimeo =
+                        typeof embedUrl === "string" &&
+                        embedUrl.includes("vimeo.com");
 
                       if (!embedUrl || !embedUrl.startsWith("https://")) {
                         return (
@@ -401,9 +409,9 @@ const EditPanel = ({
 
             {selectedClass && (
               <>
-                <p>{formData.content?.[activeTab] || "No disponible"}</p>
-                <h4>{formData.subtitle?.[activeTab] || "No especificado"}</h4>
-                <p>
+                <p className="texto">{formData.content?.[activeTab] || "No disponible"}</p>
+                <h4 className="subtitulo">{formData.subtitle?.[activeTab] || "No especificado"}</h4>
+                <p className="texto">
                   {formData.secondaryContent?.[activeTab] || "No disponible"}
                 </p>
 
@@ -558,11 +566,11 @@ const EditPanel = ({
           </div>
 
           <div className="button-group">
-            <button className="edit" onClick={() => setIsEditing(true)}>
+            <button className="boton-secundario edit" onClick={() => setIsEditing(true)}>
               ✏️ Editar
             </button>
             <button
-              className={`toggle-visibility ${
+              className={`boton-eliminar toggle-visibility ${
                 formData.visible?.[activeTab] ? "visible" : "hidden"
               }`}
               onClick={toggleVisibility}

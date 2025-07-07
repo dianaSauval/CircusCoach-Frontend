@@ -31,7 +31,15 @@ const CourseClassForm = ({
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-section">
-        <label>Subtítulo:</label>
+        <label className="label-formulario">Titulo:</label>
+        <input
+          type="text"
+          value={formData.title?.[activeTab] || ""}
+          onChange={(e) => handleChange(e, "title", activeTab)}
+        />
+      </div>
+      <div className="form-section">
+        <label className="label-formulario">Subtítulo:</label>
         <input
           type="text"
           value={formData.subtitle?.[activeTab] || ""}
@@ -40,7 +48,7 @@ const CourseClassForm = ({
       </div>
 
       <div className="form-section">
-        <label>Contenido:</label>
+        <label className="label-formulario">Contenido:</label>
         <textarea
           value={formData.content?.[activeTab] || ""}
           onChange={(e) => handleChange(e, "content", activeTab)}
@@ -48,7 +56,7 @@ const CourseClassForm = ({
       </div>
 
       <div className="form-section">
-        <label>Contenido secundario:</label>
+        <label className="label-formulario">Contenido secundario:</label>
         <textarea
           value={formData.secondaryContent?.[activeTab] || ""}
           onChange={(e) => handleChange(e, "secondaryContent", activeTab)}
@@ -57,7 +65,7 @@ const CourseClassForm = ({
 
       {/* PDFs */}
       <div className="form-section">
-        <label>PDFs:</label>
+        <label className="label-formulario">PDFs:</label>
         <UploadPdfPrivadoField
           activeTab={activeTab}
           existingPdfs={formData.pdfs || []}
@@ -87,7 +95,7 @@ const CourseClassForm = ({
 
       {/* Videos */}
       <div className="form-section">
-        <label>Videos:</label>
+        <label className="label-formulario">Videos:</label>
         <UploadVideoField
           activeLang={activeTab}
           videos={[

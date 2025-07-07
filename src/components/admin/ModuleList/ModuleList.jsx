@@ -3,6 +3,7 @@ import api from "../../../services/api";
 import "./ModuleList.css";
 import ClassList from "../ClassList/ClassList"; // ✅ Importamos el nuevo componente
 import AddItemModal from "../ModalAdmin/AddItemModal";
+import { FaTrashAlt } from "react-icons/fa";
 
 const ModuleList = ({
   formation,
@@ -59,23 +60,27 @@ const ModuleList = ({
               <div className="module-content">
                 {/* 🔹 Indicadores de visibilidad */}
                 <div className="module-visibility">
-                  <>
-                    <span className={es ? "visible" : "not-visible"}>
-                      <p>Español</p> {es ? " ✅" : "✖"}
-                    </span>
-                    <span className={en ? "visible" : "not-visible"}>
-                      <p>Inglés</p> {en ? "✅" : "✖"}
-                    </span>
-                    <span className={fr ? "visible" : "not-visible"}>
-                      <p>Francés</p> {fr ? "✅" : "✖"}
-                    </span>
-                  </>
+                  <span
+                    className={`lang-status ${es ? "visible" : "not-visible"}`}
+                  >
+                    <strong>Español</strong> <span>{es ? "✅" : "✖"}</span>
+                  </span>
+                  <span
+                    className={`lang-status ${en ? "visible" : "not-visible"}`}
+                  >
+                    <strong>Inglés</strong> <span>{en ? "✅" : "✖"}</span>
+                  </span>
+                  <span
+                    className={`lang-status ${fr ? "visible" : "not-visible"}`}
+                  >
+                    <strong>Francés</strong> <span>{fr ? "✅" : "✖"}</span>
+                  </span>
                 </div>
 
                 {/* 🔹 Título del módulo y botón de desplegar */}
                 <div className="module-header">
                   <span
-                    className={`module-title ${
+                    className={`titulo-principal module-title ${
                       selectedModule?._id === module._id ? "selected" : ""
                     }`}
                     onClick={() => {
@@ -98,7 +103,7 @@ const ModuleList = ({
                 {/* 🔹 Acciones a la derecha */}
                 <div className="module-actions">
                   <button
-                    className="small-btn"
+                    className="boton-agregar small-btn"
                     onClick={
                       () =>
                         setShowModalInParent({
@@ -111,10 +116,10 @@ const ModuleList = ({
                   </button>
 
                   <button
-                    className="delete-btn"
+                    className="boton-eliminar delete-btn"
                     onClick={() => setModuleToDelete(module)}
                   >
-                    🗑️ Eliminar Módulo
+                    <FaTrashAlt /> Eliminar Módulo
                   </button>
                 </div>
               </div>

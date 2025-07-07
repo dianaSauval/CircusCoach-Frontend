@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import api from "../../../services/api";
 import "./ClassList.css";
+import { FaTrashAlt } from "react-icons/fa";
 
 const ClassList = ({
   module,
@@ -69,7 +70,7 @@ const ClassList = ({
                 <div className="class-header">
                   <div className="class-header">
                     <span
-                      className={`class-title ${
+                      className={`titulo-principal class-title ${
                         selectedClass?._id === cls._id ? "selected" : ""
                       }`}
                       onClick={() => setSelectedClass(cls)}
@@ -82,10 +83,10 @@ const ClassList = ({
                 {/* 🔹 Botón de eliminar */}
                 <div className="class-actions">
                   <button
-                    className="delete-btn"
+                     className="boton-eliminar delete-btn"
                     onClick={() => onDeleteClass(cls)} // Pasás el objeto clase completo
                   >
-                    🗑️ Eliminar Clase
+                     <FaTrashAlt /> Eliminar Clase
                   </button>
                 </div>
               </div>

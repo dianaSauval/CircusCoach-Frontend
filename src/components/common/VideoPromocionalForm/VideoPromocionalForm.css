@@ -7,17 +7,12 @@
   gap: 1rem;
 }
 
-
-
 .video-mode-buttons {
   display: flex;
   justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 0.5rem;
 }
-
-
-
 
 .upload-video-field {
   background-color: #f9f9f9;
@@ -41,19 +36,7 @@
 }
 
 .upload-video-field button {
-    background-color: var(--color-menta);
-    color: var(--color-azul-profundo);
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 30px;
-    cursor: pointer;
-    font-weight: bold;
-    font-family: var(--font-texto);
-    transition: background-color 0.3s ease;
-}
-
-.upload-video-field button:hover {
-  background-color: #5cc8b2;
+  width: fit-content;
 }
 
 .progress-bar-container {
@@ -140,16 +123,15 @@
   text-transform: uppercase;
 }
 
-.video-card-info-url{
+.video-card-info-url {
   display: flex;
   flex-direction: column;
-  gap:5px
+  gap: 5px;
 }
 
-
 .ver-link {
-    max-width: fit-content !important;
-    font-size: 0.85rem !important;
+  max-width: fit-content !important;
+  font-size: 0.85rem !important;
 }
 
 .video-icon {
@@ -162,8 +144,6 @@
   flex: 1;
   font-size: 1.2rem;
 }
-
-
 
 .video-card-actions {
   display: flex;

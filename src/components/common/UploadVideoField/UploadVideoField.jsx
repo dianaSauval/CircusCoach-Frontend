@@ -185,6 +185,7 @@ const SingleVideoUploader = ({
           />
           <button
             type="button"
+            className="upload"
             onClick={handleUpload}
             disabled={uploading || !videoFile}
           >
@@ -217,7 +218,7 @@ const SingleVideoUploader = ({
               {description || "Sin descripción"}
             </p>
           </div>
-          <button type="button" className="delete-button" onClick={onDelete}>
+          <button type="button" className="boton-eliminar delete-button" onClick={onDelete}>
             <FaTrashAlt />
           </button>
         </div>

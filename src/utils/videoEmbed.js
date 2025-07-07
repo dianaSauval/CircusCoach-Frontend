@@ -1,6 +1,6 @@
 // utils/videoEmbed.js
 export const getVideoEmbedUrl = (url) => {
-  if (!url) return null;
+  if (typeof url !== "string") return null;
 
   // Vimeo (normal o player)
   if (url.includes("vimeo.com")) {
