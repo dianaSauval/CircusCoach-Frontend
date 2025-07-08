@@ -52,7 +52,7 @@ function Login() {
           required
         />
 
-        <button type="submit">{t.loginButton}</button>
+        <button className="boton-secundario" type="submit">{t.loginButton}</button>
 
         <div className="login-links">
           <button type="button" className="link-button" onClick={() => navigate("/olvidaste-tu-contraseña")}>

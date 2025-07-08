@@ -144,7 +144,7 @@ function Register() {
           {errors.confirmPassword && <p className="field-error">{errors.confirmPassword}</p>}
         </div>
 
-        <button type="submit">{t.registerButton}</button>
+        <button className="boton-secundario" type="submit">{t.registerButton}</button>
       </form>
     </div>
   );

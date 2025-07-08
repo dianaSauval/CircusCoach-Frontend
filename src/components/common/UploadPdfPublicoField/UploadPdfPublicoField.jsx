@@ -84,6 +84,7 @@ const UploadPdfPublicoField = ({
 
   return (
     <div className="upload-pdf-field">
+         <label className="label-formulario">📄 PDF de presentación ({activeLang})</label>
       {current && !uploading ? (
         <div className="pdf-file-card cargado">
           <FaFilePdf className="file-icon" />

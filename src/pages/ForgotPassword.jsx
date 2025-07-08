@@ -40,7 +40,7 @@ function ForgotPassword() {
           onChange={(e) => setEmail(e.target.value)}
           required
         />
-        <button type="submit">{t.submitButton}</button>
+        <button className="boton-secundario" type="submit">{t.submitButton}</button>
       </form>
     </div>
   );

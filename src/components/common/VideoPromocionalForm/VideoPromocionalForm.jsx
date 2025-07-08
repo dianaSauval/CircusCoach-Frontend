@@ -3,7 +3,7 @@ import {
   subirVideoPromocional,
   eliminarVideoDeVimeo,
 } from "../../../services/uploadVimeoService";
-import { FaCheckCircle, FaTrashAlt, FaVideo } from "react-icons/fa";
+import { FaArrowLeft, FaCheckCircle, FaTrashAlt, FaVideo } from "react-icons/fa";
 import "./VideoPromocionalForm.css";
 
 const VideoPromocionalForm = ({
@@ -140,7 +140,9 @@ const VideoPromocionalForm = ({
 
   return (
     <div className="video-promocional-form">
-      <label className="subtitulo">Video promocional:</label>
+      <label className="label-formulario">
+        🎥 Video de presentación ({activeTab})
+      </label>
 
       {!videoUrl && !uploading && !uploadMode && (
         <div className="video-mode-buttons">
@@ -178,11 +180,19 @@ const VideoPromocionalForm = ({
           />
           <button
             type="button"
-            className="upload"
+            className="boton-secundario upload"
             onClick={handleUpload}
             disabled={uploading || !videoFile || !titles[activeTab]}
           >
             {uploading ? "Subiendo..." : "Subir Video"}
+          </button>
+          <button
+            type="button"
+            className="boton-secundario volver-boton"
+            onClick={() => setUploadModeForLang(activeTab, null)}
+            disabled={uploading}
+          >
+            <FaArrowLeft /> Volver
           </button>
         </div>
       )}
@@ -196,11 +206,20 @@ const VideoPromocionalForm = ({
             onChange={handleTempUrlChange}
           />
           <button
+            className="boton-secundario"
             type="button"
             onClick={handleLinkSubmit}
             disabled={!tempUrls[activeTab]}
           >
             Confirmar enlace
+          </button>
+          <button
+            type="button"
+            className="boton-secundario volver-boton"
+            onClick={() => setUploadModeForLang(activeTab, null)}
+            disabled={uploading}
+          >
+             <FaArrowLeft /> Volver
           </button>
         </div>
       )}

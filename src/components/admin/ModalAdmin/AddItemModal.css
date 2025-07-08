@@ -86,12 +86,6 @@
 
 
 
-.modal-content button[type="submit"]:hover {
-  background: #5cc8b2;
-}
-
-
-
 .modal-content select {
   width: 100%;
   padding: 0.75rem;

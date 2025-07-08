@@ -52,7 +52,7 @@
 }
 
 .view-mode {
-  max-height: 450px;
+  max-height: 700px;
 }
 
 
@@ -92,25 +92,10 @@ button.edit:hover {
   background: #f0b400;
 }
 
-button.cancel {
-  background: #fa7070;
-  color: white;
-  border: 2px solid #c0392b;
-}
 
-button.cancel:hover {
-  background: #c0392b;
-}
 
-button.save {
-  background: var(--color-petroleo);
-  color: white;
-  border: 2px solid #366c74;
-}
 
-button.save:hover {
-  background: #366c74;
-}
+
 
 button.toggle-visibility {
   color: white;
@@ -144,11 +129,7 @@ button.toggle-visibility.hidden:hover {
   margin-top: 15px;
 }
 
-.button-group button {
-  max-width: 180px;
-  text-align: center;
-  height: 50px;
-}
+
 
 input,
 textarea {
@@ -296,9 +277,9 @@ textarea {
 }
 
 .formation-image {
-  width: 100%;
-  max-height: 250px;
-  object-fit: cover;
+  width: auto;
+  max-height: 30vh;
+  object-fit: contain;
   border-radius: 8px;
   margin: 10px 0 20px 0;
   border: 1px solid #ccc;
@@ -335,6 +316,18 @@ textarea {
 
 .view-pdf-button:hover {
   background: #366c74;
+}
+
+.section-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-left: 5px solid var(--color-petroleo);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {

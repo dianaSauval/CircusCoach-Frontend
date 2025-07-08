@@ -381,9 +381,9 @@ const translations = {
       total: "Total",
       loginRequiredTitle: "🔐 Iniciá sesión para continuar",
       loginRequiredSubtitle:
-        "Necesitás una cuenta para poder comprar y acceder luego a tus cursos en 'Mis cursos'.",
+        "Necesitás una cuenta para poder comprar y acceder luego a tus cursos en 'Mis cursos'",
       emptyTitle: "🛒 Tu carrito está vacío",
-      emptySubtitle: "Agregá cursos o formaciones para comenzar tu viaje.",
+      emptySubtitle: "Agregá cursos o formaciones para comenzar tu viaje",
       course: "Curso",
       formation: "Formación",
       purchaseSuccess: "Compra registrada exitosamente",
@@ -397,9 +397,9 @@ const translations = {
       total: "Total",
       loginRequiredTitle: "🔐 Please log in",
       loginRequiredSubtitle:
-        "You need an account to purchase and later access your items in 'My Courses'.",
+        "You need an account to purchase and later access your items in 'My Courses'",
       emptyTitle: "🛒 Your cart is empty",
-      emptySubtitle: "Add courses or formations to start your journey.",
+      emptySubtitle: "Add courses or formations to start your journey",
       course: "Course",
       formation: "Formation",
       purchaseSuccess: "Purchase successfully registered",
@@ -413,7 +413,7 @@ const translations = {
       total: "Total",
       loginRequiredTitle: "🔐 Connectez-vous pour continuer",
       loginRequiredSubtitle:
-        "Vous devez avoir un compte pour acheter et accéder ensuite à vos cours dans 'Mes cours'.",
+        "Vous devez avoir un compte pour acheter et accéder ensuite à vos cours dans 'Mes cours'",
       emptyTitle: "🛒 Votre panier est vide",
       emptySubtitle:
         "Ajoutez des cours ou des formations pour commencer votre voyage.",

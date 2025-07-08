@@ -118,5 +118,6 @@
 
 .boton-secundario.ver-link {
   align-self: flex-start; /* asegura que se alinee igual que el texto */
+  text-decoration: none;
 }
 

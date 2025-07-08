@@ -57,7 +57,7 @@ const CheckoutForm = () => {
     <form onSubmit={handleSubmit}>
       <PaymentElement />
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <button type="submit" disabled={!stripe || isLoading}>
+      <button className="boton-secundario" type="submit" disabled={!stripe || isLoading}>
         {isLoading ? "Procesando..." : "Pagar"}
       </button>
     </form>

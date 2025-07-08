@@ -45,7 +45,7 @@ const UploadImagenField = ({ activeLang, value, onChange }) => {
 
   return (
     <div className="upload-imagen-field">
-      <label className="subtitulo">Imagen ({activeLang})</label>
+       <label className="label-formulario">Imagen de presentación ({activeLang})</label>
       {value ? (
         <div className="uploaded-image-preview">
           <img src={value} alt="Imagen subida" style={{ maxWidth: "200px", borderRadius: "8px" }} />

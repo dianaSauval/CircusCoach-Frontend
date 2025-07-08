@@ -138,7 +138,7 @@
 /* 🔹 Estilo por defecto */
 .module-title,
 .class-title {
-  font-size: 1.1rem !important;
+  font-size: 1.3rem !important;
   cursor: pointer;
   transition: color 0.3s ease;
   text-align: start !important;

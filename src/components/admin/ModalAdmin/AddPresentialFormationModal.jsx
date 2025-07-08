@@ -20,7 +20,7 @@ const AddPresentialFormationModal = ({ onClose, onAdded }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h2>➕ Agregar Formación Presencial</h2>
+        <h2 className="titulo-principal">Agregar Formación Presencial</h2>
         <PresentialFormationForm
           onSave={handleSave}
           onCancel={onClose}

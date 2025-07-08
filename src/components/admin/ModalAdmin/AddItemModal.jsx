@@ -198,7 +198,7 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h2>
+        <h2 className="titulo-principal">
           Agregar{" "}
           {type === "formation"
             ? "Formación"
@@ -376,7 +376,7 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                 placeholder="Precio"
                 required
               />
-              <label>📷 URL de imagen</label>
+             
               <UploadImagenField
                 activeLang={activeTab}
                 value={formData.image[activeTab]}
@@ -392,7 +392,7 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                 }
               />
 
-              <h3>📄 PDF</h3>
+           
               <UploadPdfPublicoField
                 activeLang={activeTab}
                 pdfUrl={pdfUrl}
@@ -403,8 +403,6 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                   setTempPdfPublicIds((prev) => [...prev, id])
                 }
               />
-
-              <h3>🎥 Video</h3>
               <VideoPromocionalForm
                 formData={formData}
                 setFormData={setFormData}
@@ -419,8 +417,9 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
           )}
 
           <div className="content-button-modal">
-            <button type="submit">✅ Agregar</button>
+            <button className="boton-agregar" type="submit">✅ Agregar</button>
             <button
+            className="boton-eliminar"
               type="button"
               onClick={async () => {
                 const imageId = formData.image_public_id?.[activeTab];

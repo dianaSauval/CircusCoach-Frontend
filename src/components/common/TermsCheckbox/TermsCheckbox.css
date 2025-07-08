@@ -17,13 +17,15 @@
 .terms-checkbox {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
+gap: 15px;
 }
 
 .terms-checkbox input[type="checkbox"] {
-  margin-top: 3px;
+  width: fit-content;
 }
 
 .terms-checkbox label {
+  width: 100%;
   font-size: 0.95rem;
+  max-width: 300px;
 }

@@ -75,10 +75,10 @@ const PagoEmbedPage = () => {
               className="cart-item-img"
             />
             <div className="cart-item-info">
-              <h3>{item.title?.[language] || item.title?.es}</h3>
+              <h3 className="titulo-principal">{item.title?.[language] || item.title?.es}</h3>
               <p>USD {item.price}</p>
               <button
-                className="btn-clear small"
+                className="boton-eliminar small"
                 onClick={() => handleRemoveItem(index)}
               >
                 🗑 Eliminar
@@ -89,8 +89,8 @@ const PagoEmbedPage = () => {
       </ul>
 
       <div className="cart-summary">
-        <p className="total-label">{t.total}:</p>
-        <p className="total-amount">USD {totalPrice.toFixed(2)}</p>
+        <p className="label-formulario">{t.total}:</p>
+        <p className="texto">USD {totalPrice.toFixed(2)}</p>
       </div>
 
       <TermsCheckbox
@@ -106,7 +106,7 @@ const PagoEmbedPage = () => {
       )}
 
       <div className="cart-buttons">
-        <button onClick={handleClearCart} className="btn-clear">
+        <button onClick={handleClearCart} className="boton-secundario">
           {t.clear || "Vaciar carrito"}
         </button>
       </div>

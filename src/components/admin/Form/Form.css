@@ -29,6 +29,7 @@
   
   /* 🔹 Grupos de entrada */
   .input-group {
+    width: 100%;
     margin-bottom: 15px;
   }
   
@@ -80,9 +81,9 @@
 }
 
 .formation-image {
-  width: 100%;
-  max-height: 250px;
-  object-fit: cover;
+  width: auto;
+  max-height: 30vh;
+  object-fit: contain;
   border-radius: 8px;
   margin-bottom: 15px;
 }
@@ -98,29 +99,8 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* 🔹 Botones de acción */
-.class-form-container button {
-  display: inline-block;
-  margin-top: 8px;
-  margin-right: 8px;
-  padding: 8px 12px;
-  background-color: #0A58CA;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
 
-.class-form-container button:hover {
-  background-color: #084298;
-}
 
-/* 🔹 Botón de eliminación más visual */
-.class-form-container button:hover:has(> svg) {
-  background-color: #dc3545;
-}
 
 /* 🔹 Espacio entre secciones de PDF y Video */
 .class-form-container h3 + .pdf-block,

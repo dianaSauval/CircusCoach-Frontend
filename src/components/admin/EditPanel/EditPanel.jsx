@@ -296,7 +296,7 @@ const EditPanel = ({
                   {formData.price || "No especificado"}
                 </p>
 
-                <div>
+                <div className="section-card">
                   <h4 className="subtitulo">
                     <strong>Imagen de presentación:</strong>
                   </h4>
@@ -315,7 +315,7 @@ const EditPanel = ({
                   )}
                 </div>
 
-                <div style={{ marginTop: "1rem" }}>
+               <div className="section-card">
                   <h4 className="subtitulo">
                     <strong>📄 PDF de presentación:</strong>
                   </h4>
@@ -344,7 +344,7 @@ const EditPanel = ({
                   })()}
                 </div>
 
-                <div style={{ marginTop: "1rem" }}>
+                <div className="section-card">
                  <h4 className="subtitulo">
                     <strong>🎥 Video de presentación:</strong>
                   </h4>
@@ -617,10 +617,10 @@ const EditPanel = ({
           )}
 
           <div className="button-group">
-            <button className="save" onClick={handleSave}>
-              💾 Guardar Cambios
+            <button className="boton-agregar" onClick={handleSave}>
+              💾 Guardar
             </button>
-            <button className="cancel" onClick={handleCancel}>
+            <button className="boton-eliminar" onClick={handleCancel}>
               ❌ Cancelar
             </button>
             <button className="toggle-visibility" onClick={toggleVisibility}>

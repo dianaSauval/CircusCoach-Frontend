@@ -185,3 +185,48 @@
   padding: 1rem;
   border-radius: 10px;
 }
+
+
+
+
+.campo-fechas {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.select-fechas {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #f9f9f9;
+}
+
+.campo-fecha-unica,
+.campo-rango-fechas {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-fecha {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fff;
+  max-width: 250px;
+}
+
+.rango-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guion-rango {
+  font-size: 1.5rem;
+  color: #555;
+}

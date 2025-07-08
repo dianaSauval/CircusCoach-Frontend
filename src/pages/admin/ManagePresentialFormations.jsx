@@ -10,6 +10,7 @@ import PresentialFormationForm from "../../components/admin/Form/PresentialForma
 import AddPresentialFormationModal from "../../components/admin/ModalAdmin/AddPresentialFormationModal";
 
 import "../../styles/admin/ManagePresentialFormations.css";
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 const ManagePresentialFormations = () => {
   const [formations, setFormations] = useState([]);
@@ -70,9 +71,9 @@ const ManagePresentialFormations = () => {
 
       <div className="courses-layout">
         <div className="courses-list">
-          <h2>📌 Formaciones disponibles</h2>
-          <button className="btn green" onClick={() => setShowAddModal(true)}>
-            ➕ Agregar formación
+          <h2 className="titulo-principal">Formaciones presenciales</h2>
+          <button className="boton-agregar" onClick={() => setShowAddModal(true)}>
+            <FaPlus/> Agregar formación
           </button>
 
           {formations.map((f) => (
@@ -81,15 +82,15 @@ const ManagePresentialFormations = () => {
             className={`course-card ${selected?._id === f._id ? "selected" : ""}`}
           >
           
-              <div className="course-title" onClick={() => setSelected(f)}>
+              <div className="titulo-principal course-title" onClick={() => setSelected(f)}>
                 {f.title?.es}
               </div>
               <div className="course-actions">
-                <button className="btn green" onClick={() => handleEdit(f)}>
+                <button className="boton-agregar editar" onClick={() => handleEdit(f)}>
                   ✏️ Editar
                 </button>
-                <button className="btn red" onClick={() => handleDelete(f._id)}>
-                  🗑 Eliminar
+                <button className="boton-eliminar" onClick={() => handleDelete(f._id)}>
+                  <FaTrash/> Eliminar
                 </button>
               </div>
             </div>
@@ -121,8 +122,9 @@ const ManagePresentialFormations = () => {
                   ))}
                 </div>
 
-                <h2>{selected.title?.[activeTab]}</h2>
-                <p>{selected.description?.[activeTab]}</p>
+                <h2 className="titulo-principal">{selected.title?.[activeTab]}</h2>
+                <p className="texto">{selected.description?.[activeTab]}</p>
+                    <div className="informationPresential">
                 <p>
                   <strong>Ubicación:</strong> {selected.location?.[activeTab]}
                 </p>
@@ -143,10 +145,8 @@ const ManagePresentialFormations = () => {
                   <strong>Link de inscripción:</strong>{" "}
                   {selected.registrationLink}
                 </p>
-
-                <button className="edit" onClick={() => setIsEditing(true)}>
-                  ✏️ Editar
-                </button>
+</div>
+ 
               </div>
             )}
           </div>

@@ -9,8 +9,8 @@ const EmptyState = ({ title, subtitle }) => {
   return (
     <div className="empty-wrapper">
     <div className="empty-state-container">
-      <h2 className="empty-title">{title}</h2>
-      <p className="empty-subtitle">{subtitle}</p>
+      <h2 className="titulo-principal">{title}</h2>
+      <p className="subtitulo">{subtitle}</p>
     </div>
     </div>
   );
