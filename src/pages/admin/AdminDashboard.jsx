@@ -38,9 +38,17 @@ function AdminDashboard() {
           <p className="texto">Accedé a la gestión de cursos individuales disponibles para los alumnos.</p>
           <Link to="/admin/cursos" className="boton-secundario">Ver Cursos</Link>
         </div>
+
+        {/* Bonos / Descuentos */}
+        <div className="admin-card">
+          <h2 className="titulo-principal">Bonos de Descuento</h2>
+          <p className="texto">Creá, modificá o desactivá descuentos por campaña para tus cursos y formaciones.</p>
+          <Link to="/admin/bonos" className="boton-secundario">Gestionar Bonos</Link>
+        </div>
       </div>
     </div>
   );
 }
 
 export default AdminDashboard;
+

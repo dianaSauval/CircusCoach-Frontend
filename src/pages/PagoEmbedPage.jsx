@@ -20,7 +20,15 @@ const PagoEmbedPage = () => {
   const { language } = useLanguage();
   const t = translations.cart[language];
 
-  const totalPrice = cart.reduce((sum, item) => sum + (item.price || 0), 0);
+  const calcularPrecioConDescuento = (item) => {
+    if (!item.discount || !item.discount.percentage) return item.price;
+    return item.price - (item.price * item.discount.percentage) / 100;
+  };
+
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + calcularPrecioConDescuento(item),
+    0
+  );
 
   useEffect(() => {
     const obtenerClientSecret = async () => {
@@ -50,12 +58,7 @@ const PagoEmbedPage = () => {
   const options = { clientSecret, appearance };
 
   if (cartCount === 0) {
-    return (
-      <EmptyState
-        title={t.emptyTitle}
-        subtitle={t.emptySubtitle}
-      />
-    );
+    return <EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} />;
   }
 
   return (
@@ -64,19 +67,36 @@ const PagoEmbedPage = () => {
 
       <ul className="cart-list">
         {cart.map((item, index) => (
+         
+
           <li key={index} className="cart-item">
             <img
               src={
-                item.image?.[language] ||
-                item.image?.es ||
-                "/placeholder.png"
+                item.image?.[language] || item.image?.es || "/placeholder.png"
               }
               alt={item.title?.[language] || item.title?.es || "Curso"}
               className="cart-item-img"
             />
             <div className="cart-item-info">
-              <h3 className="titulo-principal">{item.title?.[language] || item.title?.es}</h3>
-              <p>USD {item.price}</p>
+              <h3 className="titulo-principal">
+                {item.title?.[language] || item.title?.es}
+              </h3>
+              {item.discount ? (
+                <div className="precio-con-descuento">
+                  <span className="precio-final">
+                    USD {calcularPrecioConDescuento(item).toFixed(2)}
+                  </span>
+                  <span className="precio-original">
+                    USD {item.price.toFixed(2)}
+                  </span>
+                  <span className="nombre-descuento">
+                    🎁 {item.discount.name} - {item.discount.percentage}% OFF
+                  </span>
+                </div>
+              ) : (
+                <p className="precio-normal">USD {item.price.toFixed(2)}</p>
+              )}
+
               <button
                 className="boton-eliminar small"
                 onClick={() => handleRemoveItem(index)}

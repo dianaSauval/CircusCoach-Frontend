@@ -24,6 +24,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ManageCourses from "./pages/admin/ManageCourses";
 import ManagePresentialFormations from "./pages/admin/ManagePresentialFormations";
+import ManageDiscounts from "./pages/admin/ManageDiscounts";
 import RequireAdmin from "./components/routes/RequireAdmin/RequireAdmin";
 import CartPage from "./pages/CartPage";
 import MyCourseDetail from "./pages/MyCourseDetail";
@@ -70,6 +71,7 @@ function App() {
               element={<ManageFormations />}
             />
             <Route path="/admin/cursos" element={<ManageCourses />} />
+            <Route path="/admin/bonos" element={<ManageDiscounts />} />
             <Route
               path="/admin/formaciones-presenciales"
               element={<ManagePresentialFormations />}

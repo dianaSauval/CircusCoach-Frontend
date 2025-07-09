@@ -67,9 +67,79 @@
   text-align: center;
 }
 
+.precio-contenedor {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.precio-original {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.etiqueta-descuento {
+  background-color: #e74c3c;
+  color: white;
+  display: inline-block;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.nombre-del-bono {
+  font-family: var(--font-titulo);
+  font-size: 1.2rem;
+  color: var(--color-petroleo);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+
+
 @keyframes fadeInOut {
   0% { opacity: 0; transform: translateY(10px); }
   20% { opacity: 1; transform: translateY(0); }
   80% { opacity: 1; }
   100% { opacity: 0; transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+  .international-card {
+    padding: 20px;
+    margin: 40px 16px;
+  }
+
+  .card-title {
+    font-size: 1.8rem;
+  }
+
+  .card-price {
+    font-size: 1.6rem;
+  }
+
+  .card-benefits {
+    font-size: 1rem;
+  }
+
+  .add-to-cart-btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .nombre-del-bono {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+  }
+
+  .etiqueta-descuento {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+  }
 }

@@ -9,6 +9,8 @@ import EmptyState from "../components/EmptyState/EmptyState";
 import { getYoutubeEmbedUrl } from "../utils/youtube";
 import InternationalPriceCard from "../components/InternationalPriceCard/InternationalPriceCard";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
+import { getActiveDiscounts } from "../services/discountService";
+import DiscountBanner from "../components/common/DiscountBanner/DiscountBanner";
 
 function CourseDetail() {
   const { id, slug } = useParams();
@@ -20,6 +22,7 @@ function CourseDetail() {
   const [showVideo, setShowVideo] = useState(false);
   const [idiomaNoDisponible, setIdiomaNoDisponible] = useState(false);
   const [idiomasDisponibles, setIdiomasDisponibles] = useState([]);
+  const [bonoDelCurso, setBonoDelCurso] = useState(null);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -35,11 +38,21 @@ function CourseDetail() {
           setIdiomasDisponibles(langs);
         } else {
           setCourse(data);
+
           setIdiomaNoDisponible(false);
           const langs = Object.entries(data.visible || {})
             .filter(([_, visible]) => visible)
             .map(([idioma]) => idioma.toUpperCase());
           setIdiomasDisponibles(langs);
+
+          const descuentos = await getActiveDiscounts();
+          const bonoAplicable = descuentos.find(
+            (d) =>
+              (d.type === "course" || d.type === "both") &&
+              d.targetIds.includes(data._id)
+          );
+
+          setBonoDelCurso(bonoAplicable || null);
         }
       } catch (error) {
         console.error("Error al obtener detalles del curso:", error);
@@ -92,6 +105,12 @@ function CourseDetail() {
 
   return (
     <>
+      {bonoDelCurso && (
+        <DiscountBanner
+          name={bonoDelCurso.name}
+          endDate={bonoDelCurso.endDate}
+        />
+      )}
       <div className="detalle-container">
         <div className="left-section">
           <h1 className="detalle-title">{course.title?.[lang]}</h1>
@@ -161,7 +180,7 @@ function CourseDetail() {
         </div>
       </div>
 
-      <InternationalPriceCard isCourse={true} course={course} />
+      <InternationalPriceCard isCourse={true} course={course} discount={bonoDelCurso} />
     </>
   );
 }
