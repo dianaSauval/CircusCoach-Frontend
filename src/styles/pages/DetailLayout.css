@@ -18,12 +18,21 @@
 
 .right-column {
   flex: 1;
-  min-width: 300px;
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
+  padding: 1rem;
 }
+
+.formation-detail-image {
+  width: 100%;
+  max-width: 450px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  object-fit: cover;
+}
+
 
 .detalle-title {
   font-family: var(--font-titulo);
@@ -73,14 +82,7 @@
   color: var(--color-azul-profundo);
 }
 
-.formation-image {
-  width: 100%;
-  max-width: 650px;
-  height: auto;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
+
 
 .image-container {
   width: 100%;

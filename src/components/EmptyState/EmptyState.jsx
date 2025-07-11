@@ -10,7 +10,7 @@ const EmptyState = ({ title, subtitle }) => {
     <div className="empty-wrapper">
     <div className="empty-state-container">
       <h2 className="titulo-principal">{title}</h2>
-      <p className="subtitulo">{subtitle}</p>
+      <p>{subtitle}</p>
     </div>
     </div>
   );

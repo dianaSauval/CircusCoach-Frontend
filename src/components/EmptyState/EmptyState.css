@@ -10,12 +10,21 @@
   transition: all 0.3s ease;
 }
 
+.empty-state-container p {
+  font-family: var(--font-texto); /* Lato */
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--color-azul-profundo);
+  text-align: center;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+}
+
 .empty-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2rem;
-  height: 70vh;
 }
 
 .empty-state-container:hover {

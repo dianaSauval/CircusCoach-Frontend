@@ -82,10 +82,18 @@
   cursor: pointer;
 }
 
+.agregar-bono{
+  min-width: 250px;
+}
+
 /* 🔹 Responsivo */
 @media (max-width: 768px) {
   .edit {
     width: 100%;
     text-align: center;
+  }
+
+  .main-title{
+    margin-top: 15px;
   }
 }

@@ -71,7 +71,6 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
 
     onSave({
       ...formData,
-      targetIds: undefined, // eliminamos si existe por compatibilidad
     });
   };
 
@@ -139,7 +138,9 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
                 {course.title?.es || "Curso sin título"}
                 <input
                   type="checkbox"
-                  checked={formData.targetIds.includes(course._id)}
+                  checked={formData.targetItems.some(
+                    (item) => item._id === course._id
+                  )}
                   onChange={(e) => {
                     const isChecked = e.target.checked;
                     setFormData((prev) => {
@@ -181,7 +182,9 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
                 {formation.title?.es || "Formación sin título"}
                 <input
                   type="checkbox"
-                  checked={formData.targetIds.includes(formation._id)}
+                  checked={formData.targetItems.some(
+                    (item) => item._id === formation._id
+                  )}
                   onChange={(e) => {
                     const isChecked = e.target.checked;
                     setFormData((prev) => {

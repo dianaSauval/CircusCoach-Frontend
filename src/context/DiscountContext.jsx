@@ -4,7 +4,7 @@ import { getActiveDiscounts } from "../services/discountService";
 const DiscountContext = createContext();
 
 export const DiscountProvider = ({ children }) => {
-  const [activeDiscount, setActiveDiscount] = useState(null);
+  const [activeDiscounts, setActiveDiscount] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetchActiveDiscount = async () => {
@@ -24,7 +24,7 @@ export const DiscountProvider = ({ children }) => {
   }, []);
 
   return (
-    <DiscountContext.Provider value={{ activeDiscount, loading, refreshDiscount: fetchActiveDiscount }}>
+    <DiscountContext.Provider value={{ activeDiscounts, loading, refreshDiscount: fetchActiveDiscount }}>
       {children}
     </DiscountContext.Provider>
   );

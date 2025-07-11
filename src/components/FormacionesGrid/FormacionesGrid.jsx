@@ -53,8 +53,7 @@ const FormacionesGrid = () => {
           {formaciones.map((formacion) => (
             <Card
               key={formacion._id}
-              image={formacion.image}
-              description={formacion.description}
+              data={formacion}
               onClick={() => handleCardClick(formacion._id, formacion.title)}
             />
           ))}

@@ -20,8 +20,33 @@ function MyCourseDetail() {
   const navigate = useNavigate();
   const location = useLocation();
   const visible = location.state?.visible;
-
   const t = translations.myCourseDetail[language];
+
+  const fechaExpiracion = location.state?.fechaExpiracion
+    ? new Date(location.state.fechaExpiracion)
+    : null;
+
+  const ahora = new Date();
+  const diasRestantes =
+    fechaExpiracion && fechaExpiracion > ahora
+      ? Math.ceil((fechaExpiracion - ahora) / (1000 * 60 * 60 * 24))
+      : null;
+
+  const getTiempoRestanteTexto = () => {
+    if (diasRestantes === null) return null;
+    if (diasRestantes > 30) return null;
+
+    if (diasRestantes >= 28) return t.timeLeft_long_oneMonth;
+    if (diasRestantes >= 21) return t.timeLeft_long_threeWeeks;
+    if (diasRestantes >= 14) return t.timeLeft_long_twoWeeks;
+    if (diasRestantes >= 7) return t.timeLeft_long_oneWeek;
+    if (diasRestantes > 1)
+      return t.timeLeft_long_days.replace("{{days}}", diasRestantes);
+    if (diasRestantes === 1) return t.timeLeft_long_lastDay;
+    return null;
+  };
+
+  const tiempoRestanteTexto = getTiempoRestanteTexto();
 
   const [userId, setUserId] = useState(null);
   const [course, setCourse] = useState(null);
@@ -100,6 +125,10 @@ function MyCourseDetail() {
         {t.back}
       </button>
       <h1 className="formation-title">{getText(course.title)}</h1>
+      {tiempoRestanteTexto && (
+        <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
+      )}
+
       <p className="formation-description">{getText(course.description)}</p>
 
       <h2 className="progress-title">{t.yourProgress}</h2>

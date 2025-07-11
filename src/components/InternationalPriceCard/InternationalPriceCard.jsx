@@ -74,7 +74,7 @@ export default function InternationalPriceCard({
         )}
 
         <p className="card-price">
-          USD {precioFinal} / {t.month}
+          USD {precioFinal}
         </p>
       </div>
 

@@ -442,6 +442,14 @@ const translations = {
       emptyCoursesSubtitleUser:
         "Todavía no has comprado ningún curso online. ¡Explorá nuestro catálogo y empezá a aprender!",
       notAvailableInLanguage: "❌ No disponible en este idioma",
+      timeLeft_oneMonth: "⏳ 1 mes restante",
+      timeLeft_threeWeeks: "⏳ 3 semanas restantes",
+      timeLeft_twoWeeks: "⏳ 2 semanas restantes",
+      timeLeft_oneWeek: "⏳ 1 semana restante",
+      timeLeft_days: "⏳ {{days}} días restantes",
+      timeLeft_lastDay: "⏳ Último día",
+      expiredMessage: "El acceso a este curso ha expirado.",
+      rebuyButton: "Volver a comprar",
     },
     en: {
       titleFormations: "📚 My Trainings",
@@ -459,6 +467,14 @@ const translations = {
       emptyCoursesSubtitleUser:
         "You haven't purchased any online courses yet. Browse our catalog and start learning!",
       notAvailableInLanguage: "❌ Not available in this language",
+      timeLeft_oneMonth: "⏳ 1 month remaining",
+      timeLeft_threeWeeks: "⏳ 3 weeks remaining",
+      timeLeft_twoWeeks: "⏳ 2 weeks remaining",
+      timeLeft_oneWeek: "⏳ 1 week remaining",
+      timeLeft_days: "⏳ {{days}} days remaining",
+      timeLeft_lastDay: "⏳ Last day",
+      expiredMessage: "Access to this course has expired.",
+      rebuyButton: "Buy again",
     },
     fr: {
       titleFormations: "📚 Mes Formations",
@@ -476,6 +492,14 @@ const translations = {
       emptyCoursesSubtitleUser:
         "Vous n’avez encore acheté aucun cours en ligne. Parcourez notre catalogue et commencez à apprendre !",
       notAvailableInLanguage: "❌ Non disponible dans cette langue",
+      timeLeft_oneMonth: "⏳ 1 mois restant",
+      timeLeft_threeWeeks: "⏳ 3 semaines restantes",
+      timeLeft_twoWeeks: "⏳ 2 semaines restantes",
+      timeLeft_oneWeek: "⏳ 1 semaine restante",
+      timeLeft_days: "⏳ {{days}} jours restants",
+      timeLeft_lastDay: "⏳ Dernier jour",
+      expiredMessage: "L'accès à ce cours a expiré.",
+      rebuyButton: "Racheter",
     },
   },
   myCourseDetail: {
@@ -493,6 +517,17 @@ const translations = {
       videosTitle: "🎥 Videos:",
       markAsDone: "✔️ Marcar como hecha",
       unmark: "🔄 Desmarcar clase",
+      timeLeft_long_oneMonth:
+        "Te queda 1 mes para seguir accediendo a este curso.",
+      timeLeft_long_threeWeeks:
+        "Te quedan 3 semanas para seguir accediendo a este curso.",
+      timeLeft_long_twoWeeks:
+        "Te quedan 2 semanas para seguir accediendo a este curso.",
+      timeLeft_long_oneWeek:
+        "Te queda 1 semana para seguir accediendo a este curso.",
+      timeLeft_long_days:
+        "Te quedan {{days}} días para seguir accediendo a este curso.",
+      timeLeft_long_lastDay: "¡Último día de acceso al curso!",
     },
     en: {
       back: "⬅️ Back to my courses",
@@ -508,6 +543,12 @@ const translations = {
       videosTitle: "🎥 Videos:",
       markAsDone: "✔️ Mark as done",
       unmark: "🔄 Unmark class",
+      timeLeft_long_oneMonth: "You have 1 month left to access this course.",
+      timeLeft_long_threeWeeks: "You have 3 weeks left to access this course.",
+      timeLeft_long_twoWeeks: "You have 2 weeks left to access this course.",
+      timeLeft_long_oneWeek: "You have 1 week left to access this course.",
+      timeLeft_long_days: "You have {{days}} days left to access this course.",
+      timeLeft_long_lastDay: "Last day to access this course!",
     },
     fr: {
       back: "⬅️ Retour à mes cours",
@@ -523,6 +564,15 @@ const translations = {
       videosTitle: "🎥 Vidéos :",
       markAsDone: "✔️ Marquer comme faite",
       unmark: "🔄 Défaire la classe",
+      timeLeft_long_oneMonth: "Il vous reste 1 mois pour accéder à ce cours.",
+      timeLeft_long_threeWeeks:
+        "Il vous reste 3 semaines pour accéder à ce cours.",
+      timeLeft_long_twoWeeks:
+        "Il vous reste 2 semaines pour accéder à ce cours.",
+      timeLeft_long_oneWeek: "Il vous reste 1 semaine pour accéder à ce cours.",
+      timeLeft_long_days:
+        "Il vous reste {{days}} jours pour accéder à ce cours.",
+      timeLeft_long_lastDay: "Dernier jour pour accéder à ce cours !",
     },
   },
   myFormationDetail: {
@@ -541,6 +591,12 @@ const translations = {
       videosTitle: "🎥 Videos:",
       markAsDone: "✔️ Marcar como hecha",
       unmark: "🔄 Desmarcar clase",
+      timeLeft_long_oneMonth: "⏳ Te queda 1 mes de acceso",
+      timeLeft_long_threeWeeks: "⏳ Te quedan 3 semanas de acceso",
+      timeLeft_long_twoWeeks: "⏳ Te quedan 2 semanas de acceso",
+      timeLeft_long_oneWeek: "⏳ Te queda 1 semana de acceso",
+      timeLeft_long_days: "⏳ Te quedan {{days}} días de acceso",
+      timeLeft_long_lastDay: "⏳ ¡Último día de acceso!",
     },
     en: {
       back: "⬅️ Back to my courses",
@@ -557,6 +613,12 @@ const translations = {
       videosTitle: "🎥 Videos:",
       markAsDone: "✔️ Mark as done",
       unmark: "🔄 Unmark class",
+      timeLeft_long_oneMonth: "⏳ 1 month of access left",
+      timeLeft_long_threeWeeks: "⏳ 3 weeks of access left",
+      timeLeft_long_twoWeeks: "⏳ 2 weeks of access left",
+      timeLeft_long_oneWeek: "⏳ 1 week of access left",
+      timeLeft_long_days: "⏳ {{days}} days of access left",
+      timeLeft_long_lastDay: "⏳ Last day of access!",
     },
     fr: {
       back: "⬅️ Retour à mes cours",
@@ -573,6 +635,12 @@ const translations = {
       videosTitle: "🎥 Vidéos :",
       markAsDone: "✔️ Marquer comme faite",
       unmark: "🔄 Défaire la classe",
+      timeLeft_long_oneMonth: "⏳ Il vous reste 1 mois d'accès",
+      timeLeft_long_threeWeeks: "⏳ Il vous reste 3 semaines d'accès",
+      timeLeft_long_twoWeeks: "⏳ Il vous reste 2 semaines d'accès",
+      timeLeft_long_oneWeek: "⏳ Il vous reste 1 semaine d'accès",
+      timeLeft_long_days: "⏳ Il vous reste {{days}} jours d'accès",
+      timeLeft_long_lastDay: "⏳ Dernier jour d'accès !",
     },
   },
   loginPage: {

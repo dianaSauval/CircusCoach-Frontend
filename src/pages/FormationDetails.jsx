@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import "../styles/pages/DetailLayout.css";
 import { getYoutubeEmbedUrl } from "../utils/youtube";
 import { getFormationById } from "../services/formationService";
+import { getActiveDiscounts } from "../services/discountService"; // ✅ NUEVO
+import DiscountBanner from "../components/common/DiscountBanner/DiscountBanner"; // ✅ NUEVO
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import EmptyState from "../components/EmptyState/EmptyState";
@@ -21,6 +23,7 @@ function FormationDetails() {
   const [showVideo, setShowVideo] = useState(false);
   const [idiomaNoDisponible, setIdiomaNoDisponible] = useState(false);
   const [idiomasDisponibles, setIdiomasDisponibles] = useState([]);
+  const [bonoDeLaFormacion, setBonoDeLaFormacion] = useState(null); // ✅ NUEVO
 
   useEffect(() => {
     const fetchFormation = async () => {
@@ -29,7 +32,6 @@ function FormationDetails() {
         setFormation(data);
         setIdiomaNoDisponible(false);
 
-        // Corrige la URL si el slug no coincide
         const generatedSlug = slugify(data.title?.[lang] || "", {
           lower: true,
         });
@@ -42,6 +44,16 @@ function FormationDetails() {
           .map(([idioma]) => idioma.toUpperCase());
 
         setIdiomasDisponibles(langs);
+
+        // ✅ Buscar descuentos activos
+        const descuentos = await getActiveDiscounts();
+        const bonoAplicable = descuentos.find(
+          (d) =>
+            (d.type === "formation" || d.type === "both") &&
+            d.targetItems?.some((item) => item._id === data._id)
+        );
+
+        setBonoDeLaFormacion(bonoAplicable || null);
       } catch (error) {
         if (error.response?.status === 403) {
           setIdiomaNoDisponible(true);
@@ -94,6 +106,13 @@ function FormationDetails() {
 
   return (
     <>
+      {bonoDeLaFormacion && (
+        <DiscountBanner
+          name={bonoDeLaFormacion.name}
+          endDate={bonoDeLaFormacion.endDate}
+        />
+      )}
+
       <div className="detalle-container">
         <div className="left-section">
           <h1 className="detalle-title">{formation.title?.[lang]}</h1>
@@ -125,7 +144,7 @@ function FormationDetails() {
         </div>
 
         <div className="right-column">
-          {embedUrl && showVideo ? (
+          {embedUrl ? (
             <iframe
               className="video-iframe"
               src={embedUrl}
@@ -134,27 +153,17 @@ function FormationDetails() {
               allowFullScreen
             ></iframe>
           ) : (
-            <div
-              className="image-container"
-              onClick={() => setShowVideo(true)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && setShowVideo(true)}
-            >
-              <img
-                src={
-                  formation.image?.[lang] ||
-                  formation.image?.es || // fallback seguro si falta el idioma actual
-                  "/placeholder.png"
-                }
-                alt={
-                  formation.title?.[lang] || formation.title?.es || "Formación"
-                }
-                className="formation-image"
-              />
-
-              {embedUrl && <div className="play-overlay">▶️</div>}
-            </div>
+            <img
+              src={
+                formation.image?.[lang] ||
+                formation.image?.es ||
+                "/placeholder.png"
+              }
+              alt={
+                formation.title?.[lang] || formation.title?.es || "Formación"
+              }
+              className="formation-detail-image"
+            />
           )}
         </div>
       </div>
@@ -174,7 +183,11 @@ function FormationDetails() {
         </div>
       </div>
 
-      <InternationalPriceCard isCourse={false} formation={formation} />
+      <InternationalPriceCard
+        isCourse={false}
+        formation={formation}
+        discount={bonoDeLaFormacion} // ✅ PASA EL DESCUENTO
+      />
     </>
   );
 }

@@ -37,6 +37,32 @@ function MyFormationDetail() {
 
   const visible = location.state?.visible;
 
+  const fechaExpiracion = location.state?.fechaExpiracion
+    ? new Date(location.state.fechaExpiracion)
+    : null;
+
+  const ahora = new Date();
+  const diasRestantes =
+    fechaExpiracion && fechaExpiracion > ahora
+      ? Math.ceil((fechaExpiracion - ahora) / (1000 * 60 * 60 * 24))
+      : null;
+
+  const getTiempoRestanteTexto = () => {
+    if (diasRestantes === null) return null;
+    if (diasRestantes > 30) return null;
+
+    if (diasRestantes >= 28) return t.timeLeft_long_oneMonth;
+    if (diasRestantes >= 21) return t.timeLeft_long_threeWeeks;
+    if (diasRestantes >= 14) return t.timeLeft_long_twoWeeks;
+    if (diasRestantes >= 7) return t.timeLeft_long_oneWeek;
+    if (diasRestantes > 1)
+      return t.timeLeft_long_days.replace("{{days}}", diasRestantes);
+    if (diasRestantes === 1) return t.timeLeft_long_lastDay;
+    return null;
+  };
+
+  const tiempoRestanteTexto = getTiempoRestanteTexto();
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -144,6 +170,10 @@ function MyFormationDetail() {
         {t.back}
       </button>
       <h1 className="formation-title">{getLocalizedText(formacion.title)}</h1>
+      {tiempoRestanteTexto && (
+        <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
+      )}
+
       <p className="formation-description">
         {getLocalizedText(formacion.description)}
       </p>
@@ -247,7 +277,9 @@ function MyFormationDetail() {
                   .map(({ pdf, index }) => (
                     <div className="resource-card" key={index}>
                       <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
-                      <p className="texto">{pdf.description?.[language] || ""}</p>
+                      <p className="texto">
+                        {pdf.description?.[language] || ""}
+                      </p>
                       <PdfPrivadoViewer
                         classId={claseCompleta._id}
                         index={index}
@@ -267,7 +299,9 @@ function MyFormationDetail() {
                   .map(({ video, index }) => (
                     <div className="resource-card" key={index}>
                       <h4>{video.title?.[language] || `Video ${index + 1}`}</h4>
-                      <p className="texto">{video.description?.[language] || ""}</p>
+                      <p className="texto">
+                        {video.description?.[language] || ""}
+                      </p>
                       <VideoPrivadoViewer
                         classId={claseCompleta._id}
                         index={index}

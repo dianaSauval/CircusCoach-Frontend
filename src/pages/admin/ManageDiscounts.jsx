@@ -50,6 +50,7 @@ const ManageDiscounts = () => {
         prev.map((d) => (d._id === updated._id ? updated : d))
       );
       setSelected(updated);
+      console.log("Se va a guardar:", data);
     } catch (err) {
       console.error("Error al guardar:", err);
     }
@@ -78,7 +79,7 @@ const ManageDiscounts = () => {
         <div className="courses-list">
           <h2 className="titulo-principal">Bonos creados</h2>
           <button
-            className="boton-agregar"
+            className="boton-agregar agregar-bono"
             onClick={() => setShowAddModal(true)}
           >
             <FaPlus /> Crear nuevo bono

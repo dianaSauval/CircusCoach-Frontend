@@ -46,8 +46,7 @@ const CoursesPage = () => {
           {courses.map((course) => (
             <Card
               key={course._id}
-              image={course.image}
-              description={course.description}
+              data={course}
               onClick={() => {
                 const slug = course.title?.[language]
                   ?.toLowerCase()

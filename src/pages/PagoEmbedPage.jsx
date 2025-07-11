@@ -9,6 +9,7 @@ import translations from "../i18n/translations";
 import TermsCheckbox from "../components/common/TermsCheckbox/TermsCheckbox";
 import EmptyState from "../components/EmptyState/EmptyState";
 import "../styles/pages/PagoEmbedPage.css"; // mismo estilo que CartPage
+import { FaTrash } from "react-icons/fa";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -58,7 +59,7 @@ const PagoEmbedPage = () => {
   const options = { clientSecret, appearance };
 
   if (cartCount === 0) {
-    return <EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} />;
+    return <div className="empty-wrapper-carrito"><EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} /></div>;
   }
 
   return (
@@ -101,7 +102,7 @@ const PagoEmbedPage = () => {
                 className="boton-eliminar small"
                 onClick={() => handleRemoveItem(index)}
               >
-                🗑 Eliminar
+                <FaTrash/> Eliminar
               </button>
             </div>
           </li>

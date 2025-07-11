@@ -133,7 +133,7 @@
   border-radius: 12px;
 }
 
-.StripeElement{
+.StripeElement {
   margin-bottom: 15px;
 }
 
@@ -179,7 +179,12 @@
   font-weight: bold;
 }
 
-
+.empty-wrapper-carrito {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh;
+}
 
 @media (max-width: 768px) {
   .cart-item {

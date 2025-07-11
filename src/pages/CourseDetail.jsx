@@ -19,7 +19,6 @@ function CourseDetail() {
   const tc = translations.courseDetail[lang];
 
   const [course, setCourse] = useState(null);
-  const [showVideo, setShowVideo] = useState(false);
   const [idiomaNoDisponible, setIdiomaNoDisponible] = useState(false);
   const [idiomasDisponibles, setIdiomasDisponibles] = useState([]);
   const [bonoDelCurso, setBonoDelCurso] = useState(null);
@@ -49,7 +48,7 @@ function CourseDetail() {
           const bonoAplicable = descuentos.find(
             (d) =>
               (d.type === "course" || d.type === "both") &&
-              d.targetIds.includes(data._id)
+              d.targetItems?.some((item) => item._id === data._id)
           );
 
           setBonoDelCurso(bonoAplicable || null);
@@ -138,7 +137,7 @@ function CourseDetail() {
         </div>
 
         <div className="right-column">
-          {embedUrl && showVideo ? (
+          {embedUrl ? (
             <iframe
               className="video-iframe"
               src={embedUrl}
@@ -147,20 +146,11 @@ function CourseDetail() {
               allowFullScreen
             ></iframe>
           ) : (
-            <div
-              className="image-container"
-              onClick={() => setShowVideo(true)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === "Enter" && setShowVideo(true)}
-            >
-              <img
-                src={course.image?.[lang]}
-                alt="Imagen del curso"
-                className="formation-image"
-              />
-              {embedUrl && <div className="play-overlay">▶️</div>}
-            </div>
+            <img
+              src={course.image?.[lang] || "/placeholder.png"}
+              alt={course.title?.[lang] || "Imagen del curso"}
+              className="formation-detail-image"
+            />
           )}
         </div>
       </div>
@@ -180,7 +170,11 @@ function CourseDetail() {
         </div>
       </div>
 
-      <InternationalPriceCard isCourse={true} course={course} discount={bonoDelCurso} />
+      <InternationalPriceCard
+        isCourse={true}
+        course={course}
+        discount={bonoDelCurso}
+      />
     </>
   );
 }
