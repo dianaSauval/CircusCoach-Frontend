@@ -30,6 +30,7 @@ import CartPage from "./pages/CartPage";
 import MyCourseDetail from "./pages/MyCourseDetail";
 import PagoExitoso from "./pages/pago-exitoso";
 import PagoEmbedPage from "./pages/PagoEmbedPage";
+import SearchResults from "./pages/SearchResults";
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
           <Route path="/pago-embed" element={<PagoEmbedPage />} />
           <Route path="/formaciones/:id/:slug" element={<FormationDetails />} />
           <Route path="/courses/:id/:slug" element={<CourseDetail />} />
+          <Route path="/buscar" element={<SearchResults />} />
 
           {/* 🔒 Rutas protegidas para admins */}
           <Route element={<RequireAdmin />}>

@@ -864,6 +864,24 @@ const translations = {
         "✨ Aucun cours disponible pour le moment, mais nous préparons du nouveau contenu pour vous.",
     },
   },
+  searchResults: {
+    es: {
+      title: "Resultados de búsqueda",
+      noResults: "No se encontraron resultados.",
+      noResultsSubtitle:
+        "No encontramos coincidencias. ¿Probamos con otra palabra? ✨",
+    },
+    en: {
+      title: "Search Results",
+      noResults: "No results found.",
+      noResultsSubtitle: "No matches found. Try another keyword? ✨",
+    },
+    fr: {
+      title: "Résultats de recherche",
+      noResults: "Aucun résultat trouvé.",
+      noResultsSubtitle: "Aucun résultat trouvé. Essayez un autre mot-clé ? ✨",
+    },
+  },
 };
 
 export default translations;

@@ -34,7 +34,13 @@ const PagoEmbedPage = () => {
   useEffect(() => {
     const obtenerClientSecret = async () => {
       try {
-        const res = await crearPaymentIntent(cart);
+        const itemsParaPago = cart.map((item) => ({
+          id: item._id,
+          type: item.type,
+          price: calcularPrecioConDescuento(item), // 👈 Incluí el precio
+        }));
+
+        const res = await crearPaymentIntent(itemsParaPago);
         setClientSecret(res.clientSecret);
       } catch (err) {
         console.error("Error al obtener clientSecret", err);
@@ -59,7 +65,11 @@ const PagoEmbedPage = () => {
   const options = { clientSecret, appearance };
 
   if (cartCount === 0) {
-    return <div className="empty-wrapper-carrito"><EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} /></div>;
+    return (
+      <div className="empty-wrapper-carrito">
+        <EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} />
+      </div>
+    );
   }
 
   return (
@@ -68,8 +78,6 @@ const PagoEmbedPage = () => {
 
       <ul className="cart-list">
         {cart.map((item, index) => (
-         
-
           <li key={index} className="cart-item">
             <img
               src={
@@ -102,7 +110,7 @@ const PagoEmbedPage = () => {
                 className="boton-eliminar small"
                 onClick={() => handleRemoveItem(index)}
               >
-                <FaTrash/> Eliminar
+                <FaTrash /> Eliminar
               </button>
             </div>
           </li>
