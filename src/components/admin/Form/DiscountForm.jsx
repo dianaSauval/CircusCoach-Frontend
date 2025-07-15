@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import "./CourseForm.css"; // reutilizás el mismo estilo que el resto
+import { useState, useEffect, useRef } from "react";
+import "./CourseForm.css";
 import { getAllCourses } from "../../../services/courseService";
 import { getAllFormations } from "../../../services/formationService";
+import validateDiscountForm from "../../../utils/validations/validateDiscountForm";
 
 const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,7 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
     startDate: initialData.startDate ? initialData.startDate.slice(0, 10) : "",
     endDate: initialData.endDate ? initialData.endDate.slice(0, 10) : "",
     active: initialData.active ?? true,
-    type: initialData.type || "course", // "course", "formation" o "both"
+    type: initialData.type || "course",
     targetItems: initialData.targetItems || [],
   });
 
@@ -20,14 +21,20 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
   const [courses, setCourses] = useState([]);
   const [formations, setFormations] = useState([]);
 
+  // Refs para errores
+  const nameRef = useRef(null);
+  const percentageRef = useRef(null);
+  const startDateRef = useRef(null);
+  const endDateRef = useRef(null);
+
   useEffect(() => {
     const fetchItems = async () => {
       try {
         if (formData.type === "course" || formData.type === "both") {
-          const resCourses = await getAllCourses(); // solo visibles para admin
+          const resCourses = await getAllCourses();
           setCourses(resCourses);
         } else {
-          setCourses([]); // Limpia si no se aplica
+          setCourses([]);
         }
 
         if (formData.type === "formation" || formData.type === "both") {
@@ -49,35 +56,38 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
       ...prev,
       [field]: value,
     }));
+
+    // Eliminar solo el error de ese campo
+    setErrors((prev) => {
+      if (!(field in prev)) return prev;
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const newErrors = {};
-
-    if (!formData.name.trim()) newErrors.name = "El nombre es obligatorio";
-    if (!formData.startDate)
-      newErrors.startDate = "Fecha de inicio obligatoria";
-    if (!formData.endDate) newErrors.endDate = "Fecha de fin obligatoria";
-    if (formData.percentage <= 0 && formData.amount <= 0)
-      newErrors.discount = "Debe ingresar un % o un monto";
-
-    if (formData.percentage < 0 || formData.amount < 0)
-      newErrors.discount = "El descuento no puede ser negativo";
-
+    const newErrors = validateDiscountForm(formData);
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length > 0) return;
+    // Auto-focus al primer error
+    if (Object.keys(newErrors).length > 0) {
+      if (newErrors.name && nameRef.current) nameRef.current.focus();
+      else if (newErrors.percentage && percentageRef.current) percentageRef.current.focus();
+      else if (newErrors.startDate && startDateRef.current) startDateRef.current.focus();
+      else if (newErrors.endDate && endDateRef.current) endDateRef.current.focus();
+      return;
+    }
 
-    onSave({
-      ...formData,
-    });
+    onSave(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} className="presential-form">
       <label className="label-formulario">🎁 Nombre del bono:</label>
       <input
+        ref={nameRef}
         type="text"
         placeholder="Ej: Promo Invierno"
         value={formData.name}
@@ -91,29 +101,33 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
         value={formData.description}
         onChange={(e) => handleChange("description", e.target.value)}
       />
+
       <label className="label-formulario">📊 Descuento (%):</label>
       <input
+        ref={percentageRef}
         type="number"
-        min="1"
+        min="0"
         max="100"
         placeholder="Ej: 20"
         value={formData.percentage}
-        onChange={(e) => handleChange("percentage", parseFloat(e.target.value))}
+        onChange={(e) =>
+          handleChange("percentage", parseFloat(e.target.value) || 0)
+        }
       />
-      {errors.discount && <div className="field-error">{errors.discount}</div>}
+      {errors.percentage && <div className="field-error">{errors.percentage}</div>}
 
       <label className="label-formulario">📅 Fecha de inicio:</label>
       <input
+        ref={startDateRef}
         type="date"
         value={formData.startDate}
         onChange={(e) => handleChange("startDate", e.target.value)}
       />
-      {errors.startDate && (
-        <div className="field-error">{errors.startDate}</div>
-      )}
+      {errors.startDate && <div className="field-error">{errors.startDate}</div>}
 
       <label className="label-formulario">📅 Fecha de fin:</label>
       <input
+        ref={endDateRef}
         type="date"
         value={formData.endDate}
         onChange={(e) => handleChange("endDate", e.target.value)}
@@ -129,6 +143,7 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
         <option value="formation">Formaciones</option>
         <option value="both">Ambos</option>
       </select>
+
       {(formData.type === "course" || formData.type === "both") && (
         <>
           <label className="label-formulario">📚 Cursos:</label>
@@ -215,6 +230,10 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
             ))}
           </div>
         </>
+      )}
+
+      {errors.targetItems && (
+        <div className="field-error">{errors.targetItems}</div>
       )}
 
       <label className="label-formulario">✔️ Estado:</label>

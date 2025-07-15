@@ -126,7 +126,7 @@ const ManageCourses = () => {
           {!isCollapsed && (
             <>
               <h2 className="titulo-principal">Cursos disponibles</h2>
-              <button className="btn green" onClick={handleOpenAddCourseModal}>
+              <button className="boton-agregar btn green" onClick={handleOpenAddCourseModal}>
                 ➕ Agregar curso
               </button>
 

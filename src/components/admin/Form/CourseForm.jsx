@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./CourseForm.css";
 import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
@@ -6,6 +6,7 @@ import VideoPromocionalForm from "../../common/VideoPromocionalForm/VideoPromoci
 import CourseClassForm from "./CourseClassForm";
 import UploadPdfPublicoField from "../../common/UploadPdfPublicoField/UploadPdfPublicoField";
 import UploadImagenField from "../../common/UploadImagenField/UploadImagenField";
+import validateCourseForm from "../../../utils/validations/validateCourseForm";
 
 const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
   // Los hooks van siempre arriba
@@ -34,8 +35,11 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       ...initialData, // pisa valores si ya existían
     };
   });
-
+  const [errors, setErrors] = useState({});
   const [tempUploads, setTempUploads] = useState({ pdfs: [], videos: [] });
+  const titleRef = useRef(null);
+const descriptionRef = useRef(null);
+const priceRef = useRef(null);
 
   // Inicializar campos por si vienen incompletos
   useEffect(() => {
@@ -140,27 +144,73 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
     };
   };
 
-  const handleChange = (e, field, lang) => {
-    const value = e.target.value;
-    setFormData((prev) => ({
-      ...prev,
-      [field]: {
-        ...prev[field],
-        [lang]: value,
-      },
-    }));
-  };
+const handleChange = (e, field, lang) => {
+  const value = e.target.value;
 
-  const handleSimpleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  setFormData((prev) => ({
+    ...prev,
+    [field]: {
+      ...prev[field],
+      [lang]: value,
+    },
+  }));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const cleanedData = prepareDataForSave(formData);
-    onSave(cleanedData);
-  };
+  // Limpia el error si existía
+  if (errors[field]) {
+    setErrors((prev) => {
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
+    });
+  }
+};
+
+
+const handleSimpleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData((prev) => ({ ...prev, [name]: value }));
+
+  // Limpia el error si existía
+  if (errors[name]) {
+    setErrors((prev) => {
+      const updated = { ...prev };
+      delete updated[name];
+      return updated;
+    });
+  }
+};
+
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  const validationErrors = validateCourseForm(formData);
+  setErrors(validationErrors);
+
+  if (Object.keys(validationErrors).length > 0) {
+    const firstError = Object.keys(validationErrors)[0];
+
+    // Mapeo campo => ref
+    const fieldRefMap = {
+      title: titleRef,
+      description: descriptionRef,
+      price: priceRef,
+    };
+
+    const ref = fieldRefMap[firstError];
+    if (ref && ref.current) {
+      ref.current.focus();
+    }
+
+    return;
+  }
+
+  const cleanedData = prepareDataForSave(formData);
+  onSave(cleanedData);
+};
+
+
 
   return (
     <form className="course-form" onSubmit={handleSubmit}>
@@ -168,19 +218,23 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         <label className="label-formulario">Título:</label>
         <input
           type="text"
+          ref={titleRef}
           value={formData.title?.[activeTab] || ""}
           onChange={(e) => handleChange(e, "title", activeTab)}
-          required
+          
         />
+        {errors.title && <div className="field-error">{errors.title}</div>}
       </div>
 
       <>
         <div className="form-section">
           <label className="label-formulario">Descripción:</label>
           <textarea
+           ref={descriptionRef}
             value={formData.description?.[activeTab] || ""}
             onChange={(e) => handleChange(e, "description", activeTab)}
           />
+          {errors.description && <div className="field-error">{errors.description}</div>}
         </div>
 
         <div className="form-section">
@@ -188,9 +242,11 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
           <input
             type="number"
             name="price"
+              ref={priceRef}
             value={formData.price || ""}
             onChange={handleSimpleChange}
           />
+          {errors.price && <div className="field-error">{errors.price}</div>}
         </div>
 
         <UploadImagenField
@@ -207,10 +263,14 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
             }));
           }}
         />
+        {errors.image && <div className="field-error">{errors.image}</div>}
+
 
         <div className="form-section">
           <div className="form-section">
-            <label className="subtitulo">PDF de presentación del curso ({activeTab})</label>
+            <label className="subtitulo">
+              PDF de presentación del curso ({activeTab})
+            </label>
             <UploadPdfPublicoField
               activeLang={activeTab}
               pdfUrl={formData.pdf}
@@ -257,8 +317,8 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       </>
 
       <div className="form-buttons">
-        <button type="submit">💾 Guardar</button>
-        <button type="boton-eliminar" onClick={handleCancel}>
+        <button className="boton-agregar" type="submit">💾 Guardar</button>
+        <button className="boton-eliminar"  onClick={handleCancel}>
           ❌ Cancelar
         </button>
       </div>

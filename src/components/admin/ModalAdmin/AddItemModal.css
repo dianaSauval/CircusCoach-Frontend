@@ -24,7 +24,18 @@
   font-family: var(--font-texto);
   color: var(--color-azul-profundo);
   text-align: center;
+   scroll-behavior: smooth;
 }
+
+
+
+.add-course-form input,
+.add-course-form textarea,
+.modal-content input,
+.modal-content textarea {
+  box-sizing: border-box;
+}
+
 
 .modal-content h2 {
   font-size: 1.8rem;
@@ -130,8 +141,8 @@
 .field-error {
   color: #d72638 !important;
   font-size: 0.9rem;
-  margin: -0.3rem 0 0.5rem 0.2rem;
   text-align: left;
+  font-weight: 500;
 }
 
 .pdf-block,
@@ -240,13 +251,50 @@
   padding: 0.3rem;
 }
 
+.modal {
+  animation: fadeIn 0.3s ease-out;
+}
+
+
+.form-alert {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  border-radius: 6px;
+  padding: 12px;
+  margin: 16px 0;
+  font-size: 0.95rem;
+  font-family: var(--font-texto);
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
 
 
 
 @media (max-width: 480px) {
   .modal-content {
     width: 95%;
-    padding: 1.5rem;
+    padding: 1rem;
+  }
+
+  .add-course-form input,
+  .add-course-form textarea {
+    font-size: 0.95rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .modal-content h2 {
+    font-size: 1.5rem;
   }
 
   .language-tabs {
@@ -255,6 +303,49 @@
   }
 
   .language-tabs button {
+    width: 100%;
+  }
+
+  .buttons {
+    flex-direction: column !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .language-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .buttons {
+    flex-direction: column !important;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-buttons .btn {
+    width: 100%;
+  }
+
+  .pdf-entry {
+    flex-direction: column;
+  }
+
+  .pdf-entry div {
+    width: 100%;
+  }
+
+  .pdf-entry input {
     width: 100%;
   }
 }

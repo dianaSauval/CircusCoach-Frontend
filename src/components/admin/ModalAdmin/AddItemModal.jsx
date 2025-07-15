@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import "./AddItemModal.css";
 import {
   createClass,
@@ -12,6 +12,9 @@ import VideoPromocionalForm from "../../common/VideoPromocionalForm/VideoPromoci
 import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 import UploadPdfPrivadoField from "../../common/UploadPdfPrivadoField/UploadPdfPrivadoField";
 import UploadVideoField from "../../common/UploadVideoField/UploadVideoField";
+import validateFormationClassForm from "../../../utils/validations/validateFormationClassForm";
+import validateModuleForm from "../../../utils/validations/validateModuleForm";
+import validateFormationForm from "../../../utils/validations/validateFormationForm";
 
 const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
   const [activeTab, setActiveTab] = useState("es");
@@ -69,17 +72,74 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
     },
   });
 
+  const titleRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const classTitleRef = useRef(null);
+  const classContentRef = useRef(null);
+  const priceRef = useRef(null);
+  const [errors, setErrors] = useState({});
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: { ...prev[name], [activeTab]: value },
-    }));
+
+    if (["title", "description"].includes(name)) {
+      // Campos multilenguaje
+      setFormData((prev) => ({
+        ...prev,
+        [name]: { ...prev[name], [activeTab]: value },
+      }));
+
+      const errorKey = `${name}-${activeTab}`;
+      if (errors[errorKey]) {
+        setErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          delete newErrors[errorKey];
+          return newErrors;
+        });
+      }
+    } else {
+      // Campos simples como "price"
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+
+      if (errors[name]) {
+        setErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          delete newErrors[name];
+          return newErrors;
+        });
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let validationResults = {};
+      let newErrors = {};
+
+      if (type === "formation") {
+        validationResults = validateFormationForm(formData);
+      } else if (type === "module") {
+        validationResults = validateModuleForm(formData);
+      } else if (type === "class") {
+        validationResults = validateFormationClassForm(formDataClass);
+      }
+
+      newErrors = validationResults.errors || {};
+      setErrors(newErrors);
+
+      if (newErrors["title-es"] && titleRef.current) titleRef.current.focus();
+      if (newErrors["description-es"] && descriptionRef.current)
+        descriptionRef.current.focus();
+      if (newErrors["content-es"] && classContentRef.current)
+        classContentRef.current.focus();
+      if (newErrors["price"] && priceRef.current) priceRef.current.focus();
+
+      if (Object.keys(newErrors).length > 0) return;
+
       let payload = {};
 
       if (type === "formation") {
@@ -102,8 +162,7 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
           formationId: parentId,
         };
       } else if (type === "class") {
-        // 🔧 Transformar PDF y Video para que tengan estructura multilanguage
-        // Garantiza que las propiedades estén definidas como arrays vacíos
+        // Asegurar arrays
         ["es", "en", "fr"].forEach((lang) => {
           if (!Array.isArray(formDataClass.pdfs?.[lang])) {
             formDataClass.pdfs[lang] = [];
@@ -220,23 +279,44 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
           ))}
         </div>
         <form onSubmit={handleSubmit}>
+          <div className="form-alert">
+            ⚠️{" "}
+            <strong>
+              Solo es obligatorio completar los campos en español.
+            </strong>
+            <br />
+            Los demás idiomas se pueden completar más adelante.
+          </div>
           {/* Título y descripción general SOLO si no es una clase */}
           {(type === "formation" || type === "module") && (
             <>
               <input
                 type="text"
                 name="title"
+                ref={titleRef}
                 value={formData.title[activeTab]}
                 onChange={handleChange}
                 placeholder={`Título (${activeTab.toUpperCase()})`}
-                required
+                className={errors[`title-${activeTab}`] ? "input-error" : ""}
               />
+              {errors[`title-${activeTab}`] && (
+                <p className="field-error">{errors[`title-${activeTab}`]}</p>
+              )}
               <textarea
+                ref={descriptionRef}
                 name="description"
                 value={formData.description[activeTab]}
                 onChange={handleChange}
                 placeholder={`Descripción (${activeTab.toUpperCase()})`}
+                className={
+                  errors[`description-${activeTab}`] ? "input-error" : ""
+                }
               />
+              {errors[`description-${activeTab}`] && (
+                <p className="field-error">
+                  {errors[`description-${activeTab}`]}
+                </p>
+              )}
             </>
           )}
 
@@ -246,31 +326,51 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
               <input
                 type="text"
                 name="title"
+                ref={classTitleRef}
                 value={formDataClass.title[activeTab]}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormDataClass((prev) => ({
                     ...prev,
                     title: { ...prev.title, [activeTab]: e.target.value },
-                  }))
-                }
+                  }));
+                  if (errors[`title-${activeTab}`]) {
+                    setErrors((prev) => {
+                      const newErrors = { ...prev };
+                      delete newErrors[`title-${activeTab}`];
+                      return newErrors;
+                    });
+                  }
+                }}
                 placeholder={`Título (${activeTab.toUpperCase()})`}
-                required
+                className={errors[`title-${activeTab}`] ? "input-error" : ""}
               />
+              {errors[`title-${activeTab}`] && (
+                <p className="field-error">{errors[`title-${activeTab}`]}</p>
+              )}
 
               <textarea
+                ref={classContentRef}
                 name="content"
                 value={formDataClass.content[activeTab]}
                 placeholder={`Contenido principal (${activeTab.toUpperCase()})`}
-                onChange={(e) =>
+                onChange={(e) => {
                   setFormDataClass((prev) => ({
                     ...prev,
-                    content: {
-                      ...prev.content,
-                      [activeTab]: e.target.value,
-                    },
-                  }))
-                }
+                    content: { ...prev.content, [activeTab]: e.target.value },
+                  }));
+                  if (errors[`content-${activeTab}`]) {
+                    setErrors((prev) => {
+                      const newErrors = { ...prev };
+                      delete newErrors[`content-${activeTab}`];
+                      return newErrors;
+                    });
+                  }
+                }}
+                className={errors[`content-${activeTab}`] ? "input-error" : ""}
               />
+              {errors[`content-${activeTab}`] && (
+                <p className="field-error">{errors[`content-${activeTab}`]}</p>
+              )}
 
               <input
                 type="text"
@@ -369,14 +469,15 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
               <input
                 type="number"
                 name="price"
+                ref={priceRef}
                 value={formData.price}
-                onChange={(e) =>
-                  setFormData({ ...formData, price: e.target.value })
-                }
+                onChange={handleChange}
                 placeholder="Precio"
-                required
               />
-             
+              {errors["price"] && (
+                <p className="field-error">{errors["price"]}</p>
+              )}
+
               <UploadImagenField
                 activeLang={activeTab}
                 value={formData.image[activeTab]}
@@ -391,8 +492,10 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                   }))
                 }
               />
+              {errors[`image-${activeTab}`] && (
+                <p className="field-error">{errors[`image-${activeTab}`]}</p>
+              )}
 
-           
               <UploadPdfPublicoField
                 activeLang={activeTab}
                 pdfUrl={pdfUrl}
@@ -417,9 +520,11 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
           )}
 
           <div className="content-button-modal">
-            <button className="boton-agregar" type="submit">✅ Agregar</button>
+            <button className="boton-agregar" type="submit">
+              ✅ Agregar
+            </button>
             <button
-            className="boton-eliminar"
+              className="boton-eliminar"
               type="button"
               onClick={async () => {
                 const imageId = formData.image_public_id?.[activeTab];

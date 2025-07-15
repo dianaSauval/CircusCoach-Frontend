@@ -1,96 +1,79 @@
-import { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { FaTrashAlt } from "react-icons/fa";
 import UploadVideoField from "../../../common/UploadVideoField/UploadVideoField";
-import { eliminarArchivoDesdeFrontend } from "../../../../services/uploadCloudinary";
-import { eliminarVideoDeVimeo } from "../../../../services/uploadVimeoService";
 import UploadPdfPrivadoField from "../../../common/UploadPdfPrivadoField/UploadPdfPrivadoField";
+import "./AddCourseForm.css";
 
 const AddCourseClassForm = ({
+  titleRef,
+  contentRef,
   formData,
   setFormData,
   activeTab,
   errors,
-  onClose,
-  onSubmit,
+  onTempPdf,
+  onTempVideo,
+  setErrors,
 }) => {
   const inputClass = (field) => (errors?.[field] ? "input error" : "input");
 
-  const [tempPdfPublicIds, setTempPdfPublicIds] = useState([]);
-  const [tempVideoUrls, setTempVideoUrls] = useState([]);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-  const handleCancel = async () => {
-    for (const id of tempPdfPublicIds) {
-      try {
-        await eliminarArchivoDesdeFrontend(id);
-      } catch (e) {
-        console.warn("No se pudo borrar PDF temporal:", id);
-      }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        [activeTab]: value,
+      },
+    }));
+
+    if (errors[name]) {
+      setErrors((prevErrors) => {
+        const updated = { ...prevErrors };
+        delete updated[name];
+        return updated;
+      });
     }
-    for (const url of tempVideoUrls) {
-      try {
-        await eliminarVideoDeVimeo(url);
-      } catch (e) {
-        console.warn("No se pudo borrar video temporal:", url);
-      }
-    }
-    onClose();
   };
 
   return (
     <>
+      <div className="nota-form-aviso">
+        ⚠️ Solo es obligatorio completar el título y contenido en español. Los
+        demás idiomas podés editarlos más adelante desde el panel.
+      </div>
+
       <input
         type="text"
         name="title"
+        ref={titleRef}
         value={formData.title?.[activeTab] || ""}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            title: { ...formData.title, [activeTab]: e.target.value },
-          })
-        }
+        onChange={handleChange}
         placeholder={`Título (${activeTab})`}
         className={inputClass("title")}
       />
+      {errors.title && <div className="field-error">{errors.title}</div>}
 
+      <textarea
+        ref={contentRef}
+        name="content"
+        value={formData.content?.[activeTab] || ""}
+        onChange={handleChange}
+        placeholder={`Contenido (${activeTab})`}
+        className={inputClass("content")}
+      />
+      {errors.content && <div className="field-error">{errors.content}</div>}
       <input
         type="text"
         name="subtitle"
         value={formData.subtitle?.[activeTab] || ""}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            subtitle: { ...formData.subtitle, [activeTab]: e.target.value },
-          })
-        }
+        onChange={handleChange}
         placeholder={`Subtítulo (${activeTab})`}
         className={inputClass("subtitle")}
       />
-
-      <textarea
-        name="content"
-        value={formData.content?.[activeTab] || ""}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            content: { ...formData.content, [activeTab]: e.target.value },
-          })
-        }
-        placeholder={`Contenido (${activeTab})`}
-      />
-
       <textarea
         name="secondaryContent"
         value={formData.secondaryContent?.[activeTab] || ""}
-        onChange={(e) =>
-          setFormData({
-            ...formData,
-            secondaryContent: {
-              ...formData.secondaryContent,
-              [activeTab]: e.target.value,
-            },
-          })
-        }
+        onChange={handleChange}
         placeholder={`Contenido secundario (${activeTab})`}
       />
 
@@ -116,13 +99,10 @@ const AddCourseClassForm = ({
             },
           }))
         }
-        onTempPublicId={(publicId) =>
-          setTempPdfPublicIds((prev) => [...prev, publicId])
-        }
+        onTempPublicId={onTempPdf}
       />
 
       <h3 className="subtitulo">🎥 Videos</h3>
-
       <UploadVideoField
         activeLang={activeTab}
         videos={formData[activeTab]?.videos || []}
@@ -135,21 +115,8 @@ const AddCourseClassForm = ({
             },
           }))
         }
-        onTempUpload={(url) =>
-          setTempVideoUrls((prev) =>
-            prev.includes(url) ? prev : [...prev, url]
-          )
-        }
+        onTempUpload={onTempVideo}
       />
-
-      <div className="content-button-modal">
-        <button type="button" className="boton-agregar" onClick={onSubmit}>
-          ✅ Crear Clase
-        </button>
-        <button type="button" className="boton-eliminar" onClick={handleCancel}>
-          ❌ Cancelar
-        </button>
-      </div>
     </>
   );
 };

@@ -79,3 +79,22 @@
   outline: none;
   border-color: var(--color-azul-profundo);
 }
+
+/* 🌐 Responsive */
+@media (max-width: 768px) {
+  .uploaded-image-preview {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .uploaded-image-preview img {
+    max-width: 100%;
+  }
+
+  .upload-imagen-field .btn,
+  .uploaded-image-preview .btn {
+    width: 100%;
+    text-align: center;
+  }
+}

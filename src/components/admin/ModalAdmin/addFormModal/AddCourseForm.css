@@ -68,7 +68,16 @@
 .field-error {
   color: #d72638;
   font-size: 0.85rem;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
   padding-left: 0.3rem;
+}
+
+.aviso-espanol-obligatorio {
+  background-color: #fff8c4;
+  color: #665c00;
+  font-size: 0.95rem;
+  border: 1px solid #ffe58f;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-texto);
 }

@@ -270,7 +270,7 @@ function MyFormationDetail() {
 
             {claseCompleta.pdfs?.some((pdf) => pdf.url?.[language]) && (
               <div className="pdf-list">
-                <h3>{t.pdfsTitle}</h3>
+                <h4>{t.pdfsTitle}</h4>
                 {claseCompleta.pdfs
                   .map((pdf, index) => ({ pdf, index }))
                   .filter(({ pdf }) => pdf.url?.[language])
@@ -292,7 +292,7 @@ function MyFormationDetail() {
 
             {claseCompleta.videos?.length > 0 && (
               <div className="video-list">
-                <h3>{t.videosTitle}</h3>
+                <h4>{t.videosTitle}</h4>
                 {claseCompleta.videos
                   .map((video, index) => ({ video, index }))
                   .filter(({ video }) => video.url?.[language])

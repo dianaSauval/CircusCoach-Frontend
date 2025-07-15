@@ -166,6 +166,7 @@ const UploadPdfPrivadoField = ({
           </div>
           <div className="buttons">
             <button
+            className="boton-agregar"
               type="button"
               onClick={() => subirPDF(i)}
               disabled={pdf.uploading}

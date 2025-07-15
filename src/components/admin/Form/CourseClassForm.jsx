@@ -1,7 +1,8 @@
 import UploadVideoField from "../../common/UploadVideoField/UploadVideoField";
 import "./CourseForm.css";
 import UploadPdfPrivadoField from "../../common/UploadPdfPrivadoField/UploadPdfPrivadoField";
-import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
+import { useState, useRef } from "react";
+import validateCourseClassForm from "../../../utils/validations/validateCourseClassForm";
 
 const CourseClassForm = ({
   formData,
@@ -11,8 +12,14 @@ const CourseClassForm = ({
   onSave,
   setTempUploads,
 }) => {
+  const [errors, setErrors] = useState({});
+  const titleRef = useRef(null);
+  const contentRef = useRef(null);
+
   const handleChange = (e, field, lang) => {
     const value = e.target.value;
+
+    // Actualiza el formData
     setFormData((prev) => ({
       ...prev,
       [field]: {
@@ -20,13 +27,42 @@ const CourseClassForm = ({
         [lang]: value,
       },
     }));
+
+    // Elimina el error si existía
+    if (errors[field]) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[field];
+        return updated;
+      });
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("🧠 FormData a guardar:", formData);
-    onSave(formData);
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  const validationErrors = validateCourseClassForm(formData);
+  setErrors(validationErrors);
+
+  if (Object.keys(validationErrors).length > 0) {
+    const firstError = Object.keys(validationErrors)[0];
+
+    const fieldRefMap = {
+      title: titleRef,
+      content: contentRef,
+    };
+
+    const ref = fieldRefMap[firstError];
+    if (ref && ref.current) {
+      ref.current.focus();
+    }
+
+    return;
+  }
+
+  onSave(formData);
+};
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -34,9 +70,21 @@ const CourseClassForm = ({
         <label className="label-formulario">Titulo:</label>
         <input
           type="text"
+          ref={titleRef}
           value={formData.title?.[activeTab] || ""}
           onChange={(e) => handleChange(e, "title", activeTab)}
         />
+        {errors.title && <div className="field-error">{errors.title}</div>}
+      </div>
+
+      <div className="form-section">
+        <label className="label-formulario">Contenido:</label>
+        <textarea
+          ref={contentRef}
+          value={formData.content?.[activeTab] || ""}
+          onChange={(e) => handleChange(e, "content", activeTab)}
+        />
+        {errors.content && <div className="field-error">{errors.content}</div>}
       </div>
       <div className="form-section">
         <label className="label-formulario">Subtítulo:</label>
@@ -46,15 +94,6 @@ const CourseClassForm = ({
           onChange={(e) => handleChange(e, "subtitle", activeTab)}
         />
       </div>
-
-      <div className="form-section">
-        <label className="label-formulario">Contenido:</label>
-        <textarea
-          value={formData.content?.[activeTab] || ""}
-          onChange={(e) => handleChange(e, "content", activeTab)}
-        />
-      </div>
-
       <div className="form-section">
         <label className="label-formulario">Contenido secundario:</label>
         <textarea
@@ -143,8 +182,10 @@ const CourseClassForm = ({
 
       {/* Botones */}
       <div className="form-buttons">
-        <button type="submit">💾 Guardar</button>
-        <button type="boton-eliminar" onClick={onCancel}>
+        <button className="boton-agregar" type="submit">
+          💾 Guardar
+        </button>
+        <button className="boton-eliminar" type="button" onClick={onCancel}>
           ❌ Cancelar
         </button>
       </div>

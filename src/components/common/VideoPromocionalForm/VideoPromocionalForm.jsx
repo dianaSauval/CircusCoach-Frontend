@@ -141,9 +141,8 @@ const VideoPromocionalForm = ({
   return (
     <div className="video-promocional-form">
       <label className="label-formulario">
-        🎥 Video de presentación ({activeTab})
+        🎥 Video de presentación (Opcional) ({activeTab})
       </label>
-
       {!videoUrl && !uploading && !uploadMode && (
         <div className="video-mode-buttons">
           <button

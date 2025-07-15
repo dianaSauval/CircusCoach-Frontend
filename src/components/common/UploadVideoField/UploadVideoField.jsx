@@ -35,6 +35,12 @@ const UploadVideoField = ({
     onChange(updated);
   };
 
+  const handleDiscard = (videoId) => {
+    const updated = localVideos.filter((v) => v._id !== videoId);
+    setLocalVideos(updated);
+    onChange(updated);
+  };
+
   const handleDelete = async (videoId) => {
     const video = localVideos.find((v) => v._id === videoId);
     const url = video?.url?.[activeLang];
@@ -81,11 +87,17 @@ const UploadVideoField = ({
           activeLang={activeLang}
           onUploadSuccess={handleUploadSuccess}
           onDelete={() => handleDelete(video._id)}
+          onDiscard={() => handleDiscard(video._id)}
           onTempUpload={onTempUpload} // ✅ ESTA LÍNEA FALTABA
         />
       ))}
 
-      <button type="button" className="boton-secundario" onClick={addNewVideo} style={{ marginTop: 8 }}>
+      <button
+        type="button"
+        className="boton-secundario"
+        onClick={addNewVideo}
+        style={{ marginTop: 8 }}
+      >
         ➕ Agregar Video
       </button>
     </div>
@@ -100,6 +112,7 @@ const SingleVideoUploader = ({
   activeLang,
   onUploadSuccess,
   onDelete,
+  onDiscard,
   onTempUpload = () => {},
 }) => {
   const [videoFile, setVideoFile] = useState(null);
@@ -183,14 +196,23 @@ const SingleVideoUploader = ({
             onChange={(e) => setDescription(e.target.value)}
             disabled={uploading}
           />
-          <button
-            type="button"
-            className="upload"
-            onClick={handleUpload}
-            disabled={uploading || !videoFile}
-          >
-            {uploading ? "Subiendo..." : "Subir Video"}
-          </button>
+          <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
+            <button
+              type="button"
+              className="boton-agregar upload"
+              onClick={handleUpload}
+              disabled={uploading || !videoFile}
+            >
+              {uploading ? "Subiendo..." : "Subir Video"}
+            </button>
+            <button
+              type="button"
+              className="boton-eliminar"
+              onClick={onDiscard}
+            >
+              ❌ Quitar
+            </button>
+          </div>
         </>
       ) : uploading ? (
         <>
@@ -218,7 +240,11 @@ const SingleVideoUploader = ({
               {description || "Sin descripción"}
             </p>
           </div>
-          <button type="button" className="boton-eliminar delete-button" onClick={onDelete}>
+          <button
+            type="button"
+            className="boton-eliminar delete-button"
+            onClick={onDelete}
+          >
             <FaTrashAlt />
           </button>
         </div>

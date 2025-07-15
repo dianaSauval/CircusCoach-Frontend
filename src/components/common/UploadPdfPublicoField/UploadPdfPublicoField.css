@@ -114,3 +114,40 @@
   font-size: 1rem;
   color: red;
 }
+
+
+@media (max-width: 768px) {
+  .pdf-file-card.cargado {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+  }
+
+  .file-info {
+    width: 100%;
+  }
+
+  .file-name {
+    font-size: 1rem;
+  }
+
+  .ver-link {
+    width: 100%;
+    padding: 0.5rem;
+    text-align: center;
+  }
+
+  .upload-pdf-field button {
+    width: 100%;
+  }
+
+  .upload-pdf-field input[type="file"],
+  .upload-pdf-field input[type="text"] {
+    font-size: 1rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .progress-bar {
+    font-size: 0.7rem;
+  }
+}
