@@ -84,13 +84,6 @@ export default function Header() {
         >
           {t.aboutUs}
         </NavLink>
-         <NavLink
-          to="/nosotros"
-          className="nav-link"
-          onClick={() => setMenuOpen(false)}
-        >
-         probando
-        </NavLink>
 
         {isAuthenticated && (
           <>
