@@ -89,7 +89,7 @@ export default function Header() {
           className="nav-link"
           onClick={() => setMenuOpen(false)}
         >
-         probando
+         libro
         </NavLink>
 
         {isAuthenticated && (
