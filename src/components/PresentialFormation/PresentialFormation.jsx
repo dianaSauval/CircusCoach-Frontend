@@ -4,6 +4,7 @@ import { FaMapMarkerAlt, FaRegCalendarAlt } from "react-icons/fa";
 import { useLanguage } from "../../context/LanguageContext";
 import translations from "../../i18n/translations";
 import { getPresentialFormationsByLang } from "../../services/presentialService";
+import EmptyState from "../EmptyState/EmptyState";
 
 const PresentialFormationCard = ({ formation }) => {
   const { title, location, dateType, singleDate, dateRange, registrationLink } =
@@ -94,10 +95,7 @@ const PresentialFormationsList = () => {
       <h2 className="formations-title">{t.upcomingTitle}</h2>
 
       {formations.length === 0 ? (
-        <div className="no-formations-message">
-          <p className="no-formations-title">{t.noPresentialTitle}</p>
-          <p className="no-formations-text">{t.noPresentialText}</p>
-        </div>
+        <EmptyState title={t.noPresentialTitle} subtitle={t.noPresentialText} />
       ) : (
         formations.map((formation) => (
           <PresentialFormationCard key={formation._id} formation={formation} />

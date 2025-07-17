@@ -30,6 +30,7 @@
   max-width: 1000px;
   text-align: center;
   color: var(--color-negro);
+  padding-top: 25px;
 }
 
 .home-content h1 {
