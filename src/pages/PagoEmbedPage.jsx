@@ -35,7 +35,7 @@ const PagoEmbedPage = () => {
     const obtenerClientSecret = async () => {
       try {
         const itemsParaPago = cart.map((item) => ({
-          id: item._id,
+          id: item.id || item._id,
           type: item.type,
           price: calcularPrecioConDescuento(item), // 👈 Incluí el precio
         }));
