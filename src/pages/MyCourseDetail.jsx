@@ -213,6 +213,7 @@ function MyCourseDetail() {
                         classId={claseCompleta._id}
                         index={index}
                         language={language}
+                        tipo="curso"
                       />
                     </div>
                   ))}

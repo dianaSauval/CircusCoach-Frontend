@@ -136,3 +136,15 @@ export const obtenerUrlPdfPrivado = async (classId, index, lang) => {
  const response = await api.get(`/cloudinary/privado/${classId}/${index}/${lang}`);
 return response.data.url; // ✅ ahora te devuelve la URL directa del PDF
 };
+
+export const obtenerUrlPdfPrivadoCurso = async (classId, index, lang) => {
+  try {
+    const response = await api.get(
+      `/cloudinary/pdf-curso-privado/${classId}/${index}/${lang}`
+    );
+    return response.data.url;
+  } catch (error) {
+    console.error("❌ Error al obtener PDF privado de curso:", error);
+    throw new Error("No se pudo cargar el PDF del curso");
+  }
+};

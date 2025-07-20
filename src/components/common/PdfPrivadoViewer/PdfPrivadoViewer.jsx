@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { obtenerUrlPdfPrivado } from "../../../services/uploadCloudinary";
+import {
+  obtenerUrlPdfPrivado,
+  obtenerUrlPdfPrivadoCurso,
+} from "../../../services/uploadCloudinary";
 import LoadingSpinner from "../../LoadingSpinner/LoadingSpinner"; // si querés usarlo
 import "./PdfPrivadoViewer.css";
 
-const PdfPrivadoViewer = ({ classId, index, language }) => {
+const PdfPrivadoViewer = ({ classId, index, language, tipo = "formacion" }) => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [error, setError] = useState(null);
 
@@ -12,7 +15,11 @@ const PdfPrivadoViewer = ({ classId, index, language }) => {
 
     const cargarUrl = async () => {
       try {
-        const url = await obtenerUrlPdfPrivado(classId, index, language);
+        const url =
+          tipo === "curso"
+            ? await obtenerUrlPdfPrivadoCurso(classId, index, language)
+            : await obtenerUrlPdfPrivado(classId, index, language);
+
         setPdfUrl(url);
         objectUrl = url;
       } catch (err) {
@@ -28,7 +35,7 @@ const PdfPrivadoViewer = ({ classId, index, language }) => {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [classId, index, language]);
+  }, [classId, index, language, tipo]); // ✅ agregado `tipo` aquí
 
   if (error) return <p className="pdf-error">{error}</p>;
   if (!pdfUrl) return <LoadingSpinner texto="Cargando PDF..." />;
