@@ -242,3 +242,4 @@ function MyCourseDetail() {
 }
 
 export default MyCourseDetail;
+ 
