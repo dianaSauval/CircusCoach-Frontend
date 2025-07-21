@@ -7,6 +7,7 @@ import {
   confirmarCompraConPaymentIntent,
 } from "../services/paymentService";
 import "../styles/pages/PagoExitoso.css";
+import { Helmet } from "react-helmet";
 
 export default function PagoExitoso() {
   const [searchParams] = useSearchParams();
@@ -31,7 +32,9 @@ export default function PagoExitoso() {
         if (sessionId) {
           const res = await confirmarCompraStripe(sessionId);
           if (res.success) {
-            setMensaje("¡Gracias por tu compra! Ya podés acceder a tu contenido 🎉");
+            setMensaje(
+              "¡Gracias por tu compra! Ya podés acceder a tu contenido 🎉"
+            );
             setCart([]);
           } else {
             setMensaje("⚠️ Hubo un problema al registrar tu compra.");
@@ -39,7 +42,9 @@ export default function PagoExitoso() {
         } else if (paymentIntentId) {
           const res = await confirmarCompraConPaymentIntent(paymentIntentId);
           if (res.success) {
-            setMensaje("¡Gracias por tu compra! Ya podés acceder a tu contenido 🎉");
+            setMensaje(
+              "¡Gracias por tu compra! Ya podés acceder a tu contenido 🎉"
+            );
             setCart([]);
           } else {
             setMensaje("⚠️ Hubo un problema al registrar tu compra.");
@@ -57,13 +62,19 @@ export default function PagoExitoso() {
   }, [isAuthenticated, searchParams, confirmado, setCart]);
 
   return (
-    <div className="pago-exitoso-container">
-      <div className="mensaje-box">
-        <h1 className="titulo">{mensaje}</h1>
-        <p className="detalle">
-          Te esperamos en la sección <strong>Mis Cursos</strong> para que empieces tu recorrido 💫
-        </p>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="pago-exitoso-container">
+        <div className="mensaje-box">
+          <h1 className="titulo">{mensaje}</h1>
+          <p className="detalle">
+            Te esperamos en la sección <strong>Mis Cursos</strong> para que
+            empieces tu recorrido 💫
+          </p>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

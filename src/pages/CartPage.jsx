@@ -9,7 +9,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { crearSesionStripe } from "../services/paymentService";
 import TermsCheckbox from "../components/common/TermsCheckbox/TermsCheckbox";
 import { useState } from "react";
-
+import { Helmet } from "react-helmet";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -45,57 +45,61 @@ export default function CartPage() {
   }
 
   return (
-    <div className="cart-page-container">
-      <h1>{t.title}</h1>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="cart-page-container">
+        <h1>{t.title}</h1>
 
-      {cartCount === 0 ? (
-        <EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} />
-      ) : (
-        <>
-          <ul className="cart-list">
-            {cart.map((item, index) => (
-              <li key={index} className="cart-item">
-                <img
-                  src={
-                    item.image?.[language] ||
-                    item.image?.es ||
-                    "/placeholder.png"
-                  }
-                  alt={item.title?.[language] || item.title?.es || "Curso"}
-                  className="cart-item-img"
-                />
-                <div className="cart-item-info">
-                  <h3>{item.title?.[language] || item.title?.es}</h3>
-                  <p>USD {item.price}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+        {cartCount === 0 ? (
+          <EmptyState title={t.emptyTitle} subtitle={t.emptySubtitle} />
+        ) : (
+          <>
+            <ul className="cart-list">
+              {cart.map((item, index) => (
+                <li key={index} className="cart-item">
+                  <img
+                    src={
+                      item.image?.[language] ||
+                      item.image?.es ||
+                      "/placeholder.png"
+                    }
+                    alt={item.title?.[language] || item.title?.es || "Curso"}
+                    className="cart-item-img"
+                  />
+                  <div className="cart-item-info">
+                    <h3>{item.title?.[language] || item.title?.es}</h3>
+                    <p>USD {item.price}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
 
-          <div className="cart-summary">
-            <p className="total-label">{t.total}:</p>
-            <p className="total-amount">USD {totalPrice.toFixed(2)}</p>
-          </div>
-<TermsCheckbox
-  checked={termsAccepted}
-  onChange={(e) => setTermsAccepted(e.target.checked)}
-  termsUrl="https://docs.google.com/document/d/1FSbvt75QDQxrmPJVhnGuCZPLCp7vkE3Zi341OFJtLWw/edit"
-/>
-          <div className="cart-buttons">
-            <button onClick={handleClearCart} className="btn-clear">
-              {t.clear}
-            </button>
-<button
-  onClick={handleCheckout}
- className={`btn-buy ${!termsAccepted ? "disabled" : ""}`}
-
-  disabled={cartCount === 0 || !termsAccepted}
->
-  {t.buy}
-</button>
-          </div>
-        </>
-      )}
-    </div>
+            <div className="cart-summary">
+              <p className="total-label">{t.total}:</p>
+              <p className="total-amount">USD {totalPrice.toFixed(2)}</p>
+            </div>
+            <TermsCheckbox
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              termsUrl="https://docs.google.com/document/d/1FSbvt75QDQxrmPJVhnGuCZPLCp7vkE3Zi341OFJtLWw/edit"
+            />
+            <div className="cart-buttons">
+              <button onClick={handleClearCart} className="btn-clear">
+                {t.clear}
+              </button>
+              <button
+                onClick={handleCheckout}
+                className={`btn-buy ${!termsAccepted ? "disabled" : ""}`}
+                disabled={cartCount === 0 || !termsAccepted}
+              >
+                {t.buy}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 }

@@ -4,6 +4,7 @@ import { registerUser } from "../services/authService";
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import "../styles/pages/Login.css";
+import { Helmet } from "react-helmet";
 
 function Register() {
   const { language } = useLanguage();
@@ -34,7 +35,9 @@ function Register() {
 
     if (!formData.password) {
       newErrors.password = t.errors.passwordRequired;
-    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(formData.password)) {
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(formData.password)
+    ) {
       newErrors.password = t.errors.passwordInvalid;
     }
 
@@ -68,7 +71,13 @@ function Register() {
         password: formData.password,
       });
       setSuccess(t.successMessage);
-      setFormData({ name: "", surname: "", email: "", password: "", confirmPassword: "" });
+      setFormData({
+        name: "",
+        surname: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
       setTimeout(() => navigate("/registro-exitoso"), 2000);
     } catch (err) {
       console.error("Error al registrar:", err?.response?.data || err.message);
@@ -77,76 +86,87 @@ function Register() {
   };
 
   return (
-    <div className="login-container">
-      <h1 className="login-title">{t.title}</h1>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="login-container">
+        <h1 className="login-title">{t.title}</h1>
 
-      {errors.general && <p className="login-error">{errors.general}</p>}
-      {success && <p className="login-success">{success}</p>}
+        {errors.general && <p className="login-error">{errors.general}</p>}
+        {success && <p className="login-success">{success}</p>}
 
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="input-group">
-          <input
-            type="text"
-            name="name"
-            placeholder={t.namePlaceholder}
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
-          {errors.name && <p className="field-error">{errors.name}</p>}
-        </div>
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="input-group">
+            <input
+              type="text"
+              name="name"
+              placeholder={t.namePlaceholder}
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+            {errors.name && <p className="field-error">{errors.name}</p>}
+          </div>
 
-        <div className="input-group">
-          <input
-            type="text"
-            name="surname"
-            placeholder={t.surnamePlaceholder}
-            value={formData.surname}
-            onChange={handleChange}
-            required
-          />
-          {errors.surname && <p className="field-error">{errors.surname}</p>}
-        </div>
+          <div className="input-group">
+            <input
+              type="text"
+              name="surname"
+              placeholder={t.surnamePlaceholder}
+              value={formData.surname}
+              onChange={handleChange}
+              required
+            />
+            {errors.surname && <p className="field-error">{errors.surname}</p>}
+          </div>
 
-        <div className="input-group">
-          <input
-            type="email"
-            name="email"
-            placeholder={t.emailPlaceholder}
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          {errors.email && <p className="field-error">{errors.email}</p>}
-        </div>
+          <div className="input-group">
+            <input
+              type="email"
+              name="email"
+              placeholder={t.emailPlaceholder}
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            {errors.email && <p className="field-error">{errors.email}</p>}
+          </div>
 
-        <div className="input-group">
-          <input
-            type="password"
-            name="password"
-            placeholder={t.passwordPlaceholder}
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          {errors.password && <p className="field-error">{errors.password}</p>}
-        </div>
+          <div className="input-group">
+            <input
+              type="password"
+              name="password"
+              placeholder={t.passwordPlaceholder}
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+            {errors.password && (
+              <p className="field-error">{errors.password}</p>
+            )}
+          </div>
 
-        <div className="input-group">
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder={t.confirmPasswordPlaceholder}
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-          {errors.confirmPassword && <p className="field-error">{errors.confirmPassword}</p>}
-        </div>
+          <div className="input-group">
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder={t.confirmPasswordPlaceholder}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+            {errors.confirmPassword && (
+              <p className="field-error">{errors.confirmPassword}</p>
+            )}
+          </div>
 
-        <button className="boton-secundario" type="submit">{t.registerButton}</button>
-      </form>
-    </div>
+          <button className="boton-secundario" type="submit">
+            {t.registerButton}
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
 

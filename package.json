@@ -19,6 +19,7 @@
     "react": "^19.0.0",
     "react-context-api": "^1.0.2",
     "react-dom": "^19.0.0",
+    "react-helmet": "^6.1.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.30.0",
     "react-world-flags": "^1.6.0",

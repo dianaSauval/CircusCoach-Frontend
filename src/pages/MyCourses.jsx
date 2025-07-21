@@ -10,6 +10,7 @@ import Card from "../components/Card/Card";
 import EmptyState from "../components/EmptyState/EmptyState";
 import { getMisCompras } from "../services/userService";
 import { useCart } from "../context/CartContext"; // ✅ agregado
+import { Helmet } from "react-helmet";
 
 function MyCourses() {
   const [formations, setFormations] = useState([]);
@@ -97,105 +98,126 @@ function MyCourses() {
   };
 
   return (
-    <div className="my-courses-page">
-      {/* FORMACIONES ACTIVAS */}
-      <h2 className="titulo-principal">{t.titleFormations}</h2>
-      <div className="formaciones-grid">
-        {formations.length > 0 ? (
-          formations.map((formacion) => (
-            <Card
-              key={formacion._id}
-              data={formacion}
-              fechaExpiracion={formacion.fechaExpiracion}
-              expirado={false}
-              visible={formacion.visible?.[language]}
-              onClick={() =>
-                navigate(`/mis-cursos/formacion/${formacion._id}`, {
-                  state: {
-                    visible: formacion.visible?.[language],
-                    fechaExpiracion: formacion.fechaExpiracion,
-                  },
-                })
-              }
-            />
-          ))
-        ) : (
-          <EmptyState
-            title={isAdmin ? t.emptyFormationsTitleAdmin : t.emptyFormationsTitleUser}
-            subtitle={isAdmin ? t.emptyFormationsSubtitleAdmin : t.emptyFormationsSubtitleUser}
-          />
-        )}
-      </div>
-
-      {/* FORMACIONES EXPIRADAS */}
-      {expiredFormations.length > 0 && (
-        <>
-          <h3 className="subtitulo-expirado">{t.titleExpiredFormations}</h3>
-          <div className="formaciones-grid">
-            {expiredFormations.map((formacion) => (
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="my-courses-page">
+        {/* FORMACIONES ACTIVAS */}
+        <h2 className="titulo-principal">{t.titleFormations}</h2>
+        <div className="formaciones-grid">
+          {formations.length > 0 ? (
+            formations.map((formacion) => (
               <Card
                 key={formacion._id}
                 data={formacion}
                 fechaExpiracion={formacion.fechaExpiracion}
-                expirado={true}
+                expirado={false}
                 visible={formacion.visible?.[language]}
-                onRebuy={!isAdmin ? onRebuy : undefined}
-                onClick={() => navigate(`/detalle/formacion/${formacion._id}`)}
+                onClick={() =>
+                  navigate(`/mis-cursos/formacion/${formacion._id}`, {
+                    state: {
+                      visible: formacion.visible?.[language],
+                      fechaExpiracion: formacion.fechaExpiracion,
+                    },
+                  })
+                }
               />
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* CURSOS ACTIVOS */}
-      <h2 className="titulo-principal">{t.titleCourses}</h2>
-      <div className="formaciones-grid">
-        {courses.length > 0 ? (
-          courses.map((course) => (
-            <Card
-              key={course._id}
-              data={course}
-              fechaExpiracion={course.fechaExpiracion}
-              expirado={false}
-              visible={course.visible?.[language]}
-              onClick={() =>
-                navigate(`/mis-cursos/curso/${course._id}`, {
-                  state: {
-                    visible: course.visible?.[language],
-                    fechaExpiracion: course.fechaExpiracion,
-                  },
-                })
+            ))
+          ) : (
+            <EmptyState
+              title={
+                isAdmin
+                  ? t.emptyFormationsTitleAdmin
+                  : t.emptyFormationsTitleUser
+              }
+              subtitle={
+                isAdmin
+                  ? t.emptyFormationsSubtitleAdmin
+                  : t.emptyFormationsSubtitleUser
               }
             />
-          ))
-        ) : (
-          <EmptyState
-            title={isAdmin ? t.emptyCoursesTitleAdmin : t.emptyCoursesTitleUser}
-            subtitle={isAdmin ? t.emptyCoursesSubtitleAdmin : t.emptyCoursesSubtitleUser}
-          />
-        )}
-      </div>
+          )}
+        </div>
 
-      {/* CURSOS EXPIRADOS */}
-      {expiredCourses.length > 0 && (
-        <>
-          <h3 className="subtitulo-expirado">{t.titleExpiredCourses}</h3>
-          <div className="formaciones-grid">
-            {expiredCourses.map((course) => (
+        {/* FORMACIONES EXPIRADAS */}
+        {expiredFormations.length > 0 && (
+          <>
+            <h3 className="subtitulo-expirado">{t.titleExpiredFormations}</h3>
+            <div className="formaciones-grid">
+              {expiredFormations.map((formacion) => (
+                <Card
+                  key={formacion._id}
+                  data={formacion}
+                  fechaExpiracion={formacion.fechaExpiracion}
+                  expirado={true}
+                  visible={formacion.visible?.[language]}
+                  onRebuy={!isAdmin ? onRebuy : undefined}
+                  onClick={() =>
+                    navigate(`/detalle/formacion/${formacion._id}`)
+                  }
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* CURSOS ACTIVOS */}
+        <h2 className="titulo-principal">{t.titleCourses}</h2>
+        <div className="formaciones-grid">
+          {courses.length > 0 ? (
+            courses.map((course) => (
               <Card
                 key={course._id}
                 data={course}
                 fechaExpiracion={course.fechaExpiracion}
-                expirado={true}
+                expirado={false}
                 visible={course.visible?.[language]}
-                onRebuy={!isAdmin ? onRebuy : undefined}
-                onClick={() => navigate(`/detalle/curso/${course._id}`)}
+                onClick={() =>
+                  navigate(`/mis-cursos/curso/${course._id}`, {
+                    state: {
+                      visible: course.visible?.[language],
+                      fechaExpiracion: course.fechaExpiracion,
+                    },
+                  })
+                }
               />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+            ))
+          ) : (
+            <EmptyState
+              title={
+                isAdmin ? t.emptyCoursesTitleAdmin : t.emptyCoursesTitleUser
+              }
+              subtitle={
+                isAdmin
+                  ? t.emptyCoursesSubtitleAdmin
+                  : t.emptyCoursesSubtitleUser
+              }
+            />
+          )}
+        </div>
+
+        {/* CURSOS EXPIRADOS */}
+        {expiredCourses.length > 0 && (
+          <>
+            <h3 className="subtitulo-expirado">{t.titleExpiredCourses}</h3>
+            <div className="formaciones-grid">
+              {expiredCourses.map((course) => (
+                <Card
+                  key={course._id}
+                  data={course}
+                  fechaExpiracion={course.fechaExpiracion}
+                  expirado={true}
+                  visible={course.visible?.[language]}
+                  onRebuy={!isAdmin ? onRebuy : undefined}
+                  onClick={() => navigate(`/detalle/curso/${course._id}`)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 }
 

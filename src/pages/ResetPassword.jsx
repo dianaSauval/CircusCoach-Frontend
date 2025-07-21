@@ -4,6 +4,7 @@ import { resetPassword } from "../services/authService";
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import "../styles/pages/Login.css";
+import { Helmet } from "react-helmet";
 
 function ResetPassword() {
   const { token } = useParams();
@@ -58,40 +59,47 @@ function ResetPassword() {
   };
 
   return (
-    <div className="login-container">
-      <h1 className="login-title">{t.title}</h1>
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="login-container">
+        <h1 className="login-title">{t.title}</h1>
 
-      {success && <p className="login-success">{success}</p>}
-      {errors.general && <p className="login-error">{errors.general}</p>}
+        {success && <p className="login-success">{success}</p>}
+        {errors.general && <p className="login-error">{errors.general}</p>}
 
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="input-group">
-          <input
-            type="password"
-            placeholder={t.newPasswordPlaceholder}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {errors.password && <p className="field-error">{errors.password}</p>}
-        </div>
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="input-group">
+            <input
+              type="password"
+              placeholder={t.newPasswordPlaceholder}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {errors.password && (
+              <p className="field-error">{errors.password}</p>
+            )}
+          </div>
 
-        <div className="input-group">
-          <input
-            type="password"
-            placeholder={t.confirmPasswordPlaceholder}
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          {errors.confirmPassword && (
-            <p className="field-error">{errors.confirmPassword}</p>
-          )}
-        </div>
+          <div className="input-group">
+            <input
+              type="password"
+              placeholder={t.confirmPasswordPlaceholder}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            {errors.confirmPassword && (
+              <p className="field-error">{errors.confirmPassword}</p>
+            )}
+          </div>
 
-        <button type="submit">{t.resetButton}</button>
-      </form>
-    </div>
+          <button type="submit">{t.resetButton}</button>
+        </form>
+      </div>
+    </>
   );
 }
 

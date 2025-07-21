@@ -13,6 +13,7 @@ import translations from "../i18n/translations";
 import "../styles/pages/MyFormationDetail.css";
 import VideoPrivadoViewer from "../components/common/VideoPrivadoViewer/VideoPrivadoViewer";
 import PdfPrivadoViewer from "../components/common/PdfPrivadoViewer/PdfPrivadoViewer";
+import { Helmet } from "react-helmet";
 
 function MyCourseDetail() {
   const { id } = useParams();
@@ -120,127 +121,140 @@ function MyCourseDetail() {
   const porcentaje = Math.round((clasesHechas / totalClases) * 100);
 
   return (
-    <div className="my-course-detail">
-      <button className="volver-button" onClick={() => navigate("/mis-cursos")}>
-        {t.back}
-      </button>
-      <h1 className="formation-title">{getText(course.title)}</h1>
-      {tiempoRestanteTexto && (
-        <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
-      )}
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="my-course-detail">
+        <button
+          className="volver-button"
+          onClick={() => navigate("/mis-cursos")}
+        >
+          {t.back}
+        </button>
+        <h1 className="formation-title">{getText(course.title)}</h1>
+        {tiempoRestanteTexto && (
+          <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
+        )}
 
-      <p className="formation-description">{getText(course.description)}</p>
+        <p className="formation-description">{getText(course.description)}</p>
 
-      <h2 className="progress-title">{t.yourProgress}</h2>
-      <div className="progress-section">
-        <div className="progress-item">
-          <div
-            className="progress-icon progress-contenido"
-            style={{
-              background: `conic-gradient(var(--color-petroleo) ${porcentaje}%, #e0e0e0 ${porcentaje}%)`,
-            }}
-          >
-            📘
+        <h2 className="progress-title">{t.yourProgress}</h2>
+        <div className="progress-section">
+          <div className="progress-item">
+            <div
+              className="progress-icon progress-contenido"
+              style={{
+                background: `conic-gradient(var(--color-petroleo) ${porcentaje}%, #e0e0e0 ${porcentaje}%)`,
+              }}
+            >
+              📘
+            </div>
+            <p>
+              {porcentaje}%<br />
+              {t.content}
+            </p>
           </div>
-          <p>
-            {porcentaje}%<br />
-            {t.content}
-          </p>
+        </div>
+
+        <div className="class-selector">
+          {clases.map((cl, j) => (
+            <button
+              key={cl._id}
+              className={`class-pill ${
+                j === claseSeleccionada ? "active" : ""
+              }`}
+              onClick={() => setClaseSeleccionada(j)}
+            >
+              {t.class} {j + 1}
+            </button>
+          ))}
+        </div>
+
+        <div className="class-content">
+          {claseCompleta ? (
+            <>
+              <h2>{getText(claseCompleta.title)}</h2>
+              {claseCompleta.subtitle && (
+                <h3>{getText(claseCompleta.subtitle)}</h3>
+              )}
+              {claseCompleta.content && <p>{getText(claseCompleta.content)}</p>}
+              {claseCompleta.secondaryContent && (
+                <p className="secondary-content">
+                  {getText(claseCompleta.secondaryContent)}
+                </p>
+              )}
+
+              {claseCompleta.pdfs?.length > 0 && (
+                <div className="pdf-list">
+                  <h4>{t.pdfsTitle}</h4>
+                  {claseCompleta.pdfs
+                    .map((pdf, index) => ({ pdf, index }))
+                    .filter(({ pdf }) => pdf.url?.[language])
+                    .map(({ pdf, index }) => (
+                      <div key={index} className="resource-card">
+                        <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
+                        {pdf.description?.[language] && (
+                          <p>{pdf.description[language]}</p>
+                        )}
+                        <PdfPrivadoViewer
+                          classId={claseCompleta._id}
+                          index={index}
+                          language={language}
+                          tipo="curso"
+                        />
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {claseCompleta.videos?.length > 0 && (
+                <div className="video-list">
+                  <h4>{t.videosTitle}</h4>
+                  {claseCompleta.videos
+                    .map((video, index) => ({ video, index }))
+                    .filter(({ video }) => video.url?.[language])
+                    .map(({ video, index }) => (
+                      <div key={index} className="resource-card">
+                        <h4>
+                          {video.title?.[language] || `Video ${index + 1}`}
+                        </h4>
+                        {video.description?.[language] && (
+                          <p>{video.description[language]}</p>
+                        )}
+                        <VideoPrivadoViewer
+                          classId={claseCompleta._id}
+                          index={index}
+                          language={language}
+                        />
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {clasesCompletadas.includes(claseCompleta._id) ? (
+                <button
+                  className="mark-done-button unmark"
+                  onClick={handleDesmarcarClase}
+                >
+                  {t.unmark}
+                </button>
+              ) : (
+                <button
+                  className="mark-done-button"
+                  onClick={handleMarcarClase}
+                >
+                  {t.markAsDone}
+                </button>
+              )}
+            </>
+          ) : (
+            <p>{t.noContent}</p>
+          )}
         </div>
       </div>
-
-      <div className="class-selector">
-        {clases.map((cl, j) => (
-          <button
-            key={cl._id}
-            className={`class-pill ${j === claseSeleccionada ? "active" : ""}`}
-            onClick={() => setClaseSeleccionada(j)}
-          >
-            {t.class} {j + 1}
-          </button>
-        ))}
-      </div>
-
-      <div className="class-content">
-        {claseCompleta ? (
-          <>
-            <h2>{getText(claseCompleta.title)}</h2>
-            {claseCompleta.subtitle && (
-              <h3>{getText(claseCompleta.subtitle)}</h3>
-            )}
-            {claseCompleta.content && <p>{getText(claseCompleta.content)}</p>}
-            {claseCompleta.secondaryContent && (
-              <p className="secondary-content">
-                {getText(claseCompleta.secondaryContent)}
-              </p>
-            )}
-
-            {claseCompleta.pdfs?.length > 0 && (
-              <div className="pdf-list">
-                <h4>{t.pdfsTitle}</h4>
-                {claseCompleta.pdfs
-                  .map((pdf, index) => ({ pdf, index }))
-                  .filter(({ pdf }) => pdf.url?.[language])
-                  .map(({ pdf, index }) => (
-                    <div key={index} className="resource-card">
-                      <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
-                      {pdf.description?.[language] && (
-                        <p>{pdf.description[language]}</p>
-                      )}
-                      <PdfPrivadoViewer
-                        classId={claseCompleta._id}
-                        index={index}
-                        language={language}
-                        tipo="curso"
-                      />
-                    </div>
-                  ))}
-              </div>
-            )}
-
-            {claseCompleta.videos?.length > 0 && (
-              <div className="video-list">
-                <h4>{t.videosTitle}</h4>
-                {claseCompleta.videos
-                  .map((video, index) => ({ video, index }))
-                  .filter(({ video }) => video.url?.[language])
-                  .map(({ video, index }) => (
-                    <div key={index} className="resource-card">
-                      <h4>{video.title?.[language] || `Video ${index + 1}`}</h4>
-                      {video.description?.[language] && (
-                        <p>{video.description[language]}</p>
-                      )}
-                      <VideoPrivadoViewer
-                        classId={claseCompleta._id}
-                        index={index}
-                        language={language}
-                        
-                      />
-                    </div>
-                  ))}
-              </div>
-            )}
-
-            {clasesCompletadas.includes(claseCompleta._id) ? (
-              <button
-                className="mark-done-button unmark"
-                onClick={handleDesmarcarClase}
-              >
-                {t.unmark}
-              </button>
-            ) : (
-              <button className="mark-done-button" onClick={handleMarcarClase}>
-                {t.markAsDone}
-              </button>
-            )}
-          </>
-        ) : (
-          <p>{t.noContent}</p>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 
 export default MyCourseDetail;
- 

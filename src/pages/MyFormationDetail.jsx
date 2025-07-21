@@ -17,6 +17,7 @@ import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import PdfPrivadoViewer from "../components/common/PdfPrivadoViewer/PdfPrivadoViewer";
 import VideoPrivadoViewer from "../components/common/VideoPrivadoViewer/VideoPrivadoViewer";
+import { Helmet } from "react-helmet";
 
 function MyFormationDetail() {
   const { id } = useParams();
@@ -165,171 +166,188 @@ function MyFormationDetail() {
   };
 
   return (
-    <div className="my-course-detail">
-      <button className="volver-button" onClick={() => navigate("/mis-cursos")}>
-        {t.back}
-      </button>
-      <h1 className="formation-title">{getLocalizedText(formacion.title)}</h1>
-      {tiempoRestanteTexto && (
-        <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
-      )}
+    <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
+      <div className="my-course-detail">
+        <button
+          className="volver-button"
+          onClick={() => navigate("/mis-cursos")}
+        >
+          {t.back}
+        </button>
+        <h1 className="formation-title">{getLocalizedText(formacion.title)}</h1>
+        {tiempoRestanteTexto && (
+          <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
+        )}
 
-      <p className="formation-description">
-        {getLocalizedText(formacion.description)}
-      </p>
+        <p className="formation-description">
+          {getLocalizedText(formacion.description)}
+        </p>
 
-      <h2 className="progress-title">{t.yourProgress}</h2>
-      <div className="progress-section">
-        <div className="progress-item">
-          <div
-            className="progress-icon progress-contenido"
-            style={{
-              background: `conic-gradient(var(--color-petroleo) ${porcentaje}%, #e0e0e0 ${porcentaje}%)`,
-            }}
-          >
-            📘
+        <h2 className="progress-title">{t.yourProgress}</h2>
+        <div className="progress-section">
+          <div className="progress-item">
+            <div
+              className="progress-icon progress-contenido"
+              style={{
+                background: `conic-gradient(var(--color-petroleo) ${porcentaje}%, #e0e0e0 ${porcentaje}%)`,
+              }}
+            >
+              📘
+            </div>
+            <p>
+              {porcentaje}%<br />
+              {t.content}
+            </p>
           </div>
-          <p>
-            {porcentaje}%<br />
-            {t.content}
-          </p>
+
+          <div className="progress-item">
+            <div
+              className="progress-icon progress-modulos"
+              style={{
+                background: `conic-gradient(var(--color-menta) ${progresoModulos}%, #e0e0e0 ${progresoModulos}%)`,
+              }}
+            >
+              📚
+            </div>
+            <p>
+              {modulosCompletados}/{totalModulos}
+              <br />
+              {t.modules}
+            </p>
+          </div>
         </div>
 
-        <div className="progress-item">
-          <div
-            className="progress-icon progress-modulos"
-            style={{
-              background: `conic-gradient(var(--color-menta) ${progresoModulos}%, #e0e0e0 ${progresoModulos}%)`,
-            }}
-          >
-            📚
-          </div>
-          <p>
-            {modulosCompletados}/{totalModulos}
-            <br />
-            {t.modules}
-          </p>
+        <div className="module-selector">
+          {modules.map((mod, i) => (
+            <button
+              key={mod._id}
+              className={`module-pill ${
+                i === moduloSeleccionado ? "active" : ""
+              }`}
+              onClick={() => {
+                setModuloSeleccionado(i);
+                setClaseSeleccionada(0);
+              }}
+            >
+              M{i + 1}
+            </button>
+          ))}
+        </div>
+
+        <div className="class-selector">
+          {modules[moduloSeleccionado].classes?.map((cl, j) => (
+            <button
+              key={cl._id}
+              className={`class-pill ${
+                j === claseSeleccionada ? "active" : ""
+              }`}
+              onClick={() => setClaseSeleccionada(j)}
+            >
+              {t.class} {j + 1}
+            </button>
+          ))}
+        </div>
+        <div className="module-content">
+          {modules[moduloSeleccionado] ? (
+            <>
+              <h2>{getLocalizedText(modules[moduloSeleccionado].title)}</h2>
+              {modules[moduloSeleccionado].description && (
+                <p>
+                  {getLocalizedText(modules[moduloSeleccionado].description)}
+                </p>
+              )}
+            </>
+          ) : (
+            <p>{t.noContent}</p>
+          )}
+        </div>
+        <div className="class-content">
+          {claseCompleta ? (
+            <>
+              <h2>{getLocalizedText(claseCompleta.title)}</h2>
+              {claseCompleta.subtitle && (
+                <h3>{getLocalizedText(claseCompleta.subtitle)}</h3>
+              )}
+              {claseCompleta.content && (
+                <p>{getLocalizedText(claseCompleta.content)}</p>
+              )}
+              {claseCompleta.secondaryContent && (
+                <p className="secondary-content">
+                  {getLocalizedText(claseCompleta.secondaryContent)}
+                </p>
+              )}
+
+              {claseCompleta.pdfs?.some((pdf) => pdf.url?.[language]) && (
+                <div className="pdf-list">
+                  <h4>{t.pdfsTitle}</h4>
+                  {claseCompleta.pdfs
+                    .map((pdf, index) => ({ pdf, index }))
+                    .filter(({ pdf }) => pdf.url?.[language])
+                    .map(({ pdf, index }) => (
+                      <div className="resource-card" key={index}>
+                        <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
+                        <p className="texto">
+                          {pdf.description?.[language] || ""}
+                        </p>
+                        <PdfPrivadoViewer
+                          classId={claseCompleta._id}
+                          index={index}
+                          language={language}
+                        />
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {claseCompleta.videos?.length > 0 && (
+                <div className="video-list">
+                  <h4>{t.videosTitle}</h4>
+                  {claseCompleta.videos
+                    .map((video, index) => ({ video, index }))
+                    .filter(({ video }) => video.url?.[language])
+                    .map(({ video, index }) => (
+                      <div className="resource-card" key={index}>
+                        <h4>
+                          {video.title?.[language] || `Video ${index + 1}`}
+                        </h4>
+                        <p className="texto">
+                          {video.description?.[language] || ""}
+                        </p>
+                        <VideoPrivadoViewer
+                          classId={claseCompleta._id}
+                          index={index}
+                          language={language}
+                        />
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {clasesCompletadas.includes(claseCompleta._id) ? (
+                <button
+                  className="mark-done-button unmark"
+                  onClick={handleDesmarcarClase}
+                >
+                  {t.unmark}
+                </button>
+              ) : (
+                <button
+                  className="mark-done-button"
+                  onClick={handleMarcarClase}
+                >
+                  {t.markAsDone}
+                </button>
+              )}
+            </>
+          ) : (
+            <p>{t.noContent}</p>
+          )}
         </div>
       </div>
-
-      <div className="module-selector">
-        {modules.map((mod, i) => (
-          <button
-            key={mod._id}
-            className={`module-pill ${
-              i === moduloSeleccionado ? "active" : ""
-            }`}
-            onClick={() => {
-              setModuloSeleccionado(i);
-              setClaseSeleccionada(0);
-            }}
-          >
-            M{i + 1}
-          </button>
-        ))}
-      </div>
-
-      <div className="class-selector">
-        {modules[moduloSeleccionado].classes?.map((cl, j) => (
-          <button
-            key={cl._id}
-            className={`class-pill ${j === claseSeleccionada ? "active" : ""}`}
-            onClick={() => setClaseSeleccionada(j)}
-          >
-            {t.class} {j + 1}
-          </button>
-        ))}
-      </div>
-      <div className="module-content">
-        {modules[moduloSeleccionado] ? (
-          <>
-            <h2>{getLocalizedText(modules[moduloSeleccionado].title)}</h2>
-            {modules[moduloSeleccionado].description && (
-              <p>{getLocalizedText(modules[moduloSeleccionado].description)}</p>
-            )}
-          </>
-        ) : (
-          <p>{t.noContent}</p>
-        )}
-      </div>
-      <div className="class-content">
-        {claseCompleta ? (
-          <>
-            <h2>{getLocalizedText(claseCompleta.title)}</h2>
-            {claseCompleta.subtitle && (
-              <h3>{getLocalizedText(claseCompleta.subtitle)}</h3>
-            )}
-            {claseCompleta.content && (
-              <p>{getLocalizedText(claseCompleta.content)}</p>
-            )}
-            {claseCompleta.secondaryContent && (
-              <p className="secondary-content">
-                {getLocalizedText(claseCompleta.secondaryContent)}
-              </p>
-            )}
-
-            {claseCompleta.pdfs?.some((pdf) => pdf.url?.[language]) && (
-              <div className="pdf-list">
-                <h4>{t.pdfsTitle}</h4>
-                {claseCompleta.pdfs
-                  .map((pdf, index) => ({ pdf, index }))
-                  .filter(({ pdf }) => pdf.url?.[language])
-                  .map(({ pdf, index }) => (
-                    <div className="resource-card" key={index}>
-                      <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
-                      <p className="texto">
-                        {pdf.description?.[language] || ""}
-                      </p>
-                      <PdfPrivadoViewer
-                        classId={claseCompleta._id}
-                        index={index}
-                        language={language}
-                      />
-                    </div>
-                  ))}
-              </div>
-            )}
-
-            {claseCompleta.videos?.length > 0 && (
-              <div className="video-list">
-                <h4>{t.videosTitle}</h4>
-                {claseCompleta.videos
-                  .map((video, index) => ({ video, index }))
-                  .filter(({ video }) => video.url?.[language])
-                  .map(({ video, index }) => (
-                    <div className="resource-card" key={index}>
-                      <h4>{video.title?.[language] || `Video ${index + 1}`}</h4>
-                      <p className="texto">
-                        {video.description?.[language] || ""}
-                      </p>
-                      <VideoPrivadoViewer
-                        classId={claseCompleta._id}
-                        index={index}
-                        language={language}
-                      />
-                    </div>
-                  ))}
-              </div>
-            )}
-
-            {clasesCompletadas.includes(claseCompleta._id) ? (
-              <button
-                className="mark-done-button unmark"
-                onClick={handleDesmarcarClase}
-              >
-                {t.unmark}
-              </button>
-            ) : (
-              <button className="mark-done-button" onClick={handleMarcarClase}>
-                {t.markAsDone}
-              </button>
-            )}
-          </>
-        ) : (
-          <p>{t.noContent}</p>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import "../styles/pages/Login.css";
+import { Helmet } from "react-helmet";
 
 function Login() {
   const { login } = useAuth();
@@ -31,6 +32,10 @@ function Login() {
   };
 
   return (
+    <>
+    <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
     <div className="login-container">
       <h1 className="login-title">{t.title}</h1>
       {error && <p className="login-error">{error}</p>}
@@ -64,6 +69,7 @@ function Login() {
         </div>
       </form>
     </div>
+    </>
   );
 }
 
