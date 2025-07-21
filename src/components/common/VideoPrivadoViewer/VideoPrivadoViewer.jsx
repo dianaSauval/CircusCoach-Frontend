@@ -7,6 +7,7 @@ const VideoPrivadoViewer = ({ classId, index, language }) => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [error, setError] = useState(null);
 
+
   useEffect(() => {
     let cancelled = false;
 
