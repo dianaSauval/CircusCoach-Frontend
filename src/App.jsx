@@ -55,7 +55,7 @@ function App() {
           <Route path="/olvidaste-tu-contraseña" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/formaciones" element={<FormationPage />} />
-          <Route path="/nosotros" element={<BioRocioGarrote />} />
+          <Route path="/biografia" element={<BioRocioGarrote />} />
           <Route path="/carrito" element={<CartPage />} />
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
 

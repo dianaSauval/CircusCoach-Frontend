@@ -1,12 +1,12 @@
-import { useRef } from 'react';
-import '../styles/pages/FormationPage.css';
-import FormacionesGrid from '../components/FormacionesGrid/FormacionesGrid';
-import PresentialFormationsList from '../components/PresentialFormation/PresentialFormation';
-import TrainingSchools from '../components/TrainingSchools/TrainingSchools';
-import VideoTrainingSchool from '../components/VideoTrainingSchool/VideoTrainingSchool';
+import { useRef } from "react";
+import "../styles/pages/FormationPage.css";
+import FormacionesGrid from "../components/FormacionesGrid/FormacionesGrid";
+import PresentialFormationsList from "../components/PresentialFormation/PresentialFormation";
+import TrainingSchools from "../components/TrainingSchools/TrainingSchools";
+import VideoTrainingSchool from "../components/VideoTrainingSchool/VideoTrainingSchool";
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
-
+import { Helmet } from "react-helmet";
 
 export default function FormationPage() {
   const presencialRef = useRef(null);
@@ -19,36 +19,55 @@ export default function FormationPage() {
     ref.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-
-
-
   return (
     <>
-    <div className="formation-hero">
-      <div className="formation-buttons">
-        <button className="boton-principal" onClick={() => scrollToSection(onlineRef)}> {t.online}</button>
-        <button className="boton-principal" onClick={() => scrollToSection(presencialRef)}>{t.presential}</button>
-        <button className="boton-principal" onClick={() => scrollToSection(escuelasRef)}>{t.schools}</button>
+      <Helmet>
+        <title>CircusCoach - Formaciones de Circo Online y Presenciales</title>
+        <link rel="canonical" href="https://mycircuscoach.com/formaciones" />
+        <meta
+          name="description"
+          content="Explorá nuestras formaciones de circo online y presenciales, diseñadas por Rocío Garrote con un enfoque técnico, pedagógico y artístico. Acceso a cursos intensivos, escuelas asociadas y entrenamientos especializados."
+        />
+      </Helmet>
+      <div className="formation-hero">
+        <div className="formation-buttons">
+          <button
+            className="boton-principal"
+            onClick={() => scrollToSection(onlineRef)}
+          >
+            {" "}
+            {t.online}
+          </button>
+          <button
+            className="boton-principal"
+            onClick={() => scrollToSection(presencialRef)}
+          >
+            {t.presential}
+          </button>
+          <button
+            className="boton-principal"
+            onClick={() => scrollToSection(escuelasRef)}
+          >
+            {t.schools}
+          </button>
+        </div>
       </div>
-    </div>
       {/* 🔹 ONLINE */}
       <section ref={onlineRef} className="section">
-        
-        <FormacionesGrid/>
+        <FormacionesGrid />
       </section>
-        {/* 🔹 PRESENCIALES */}
-            <section ref={presencialRef} className="section">
-              <PresentialFormationsList/>
-        
-        </section>
+      {/* 🔹 PRESENCIALES */}
+      <section ref={presencialRef} className="section">
+        <PresentialFormationsList />
+      </section>
 
       {/* 🔹 ESCUELAS */}
       <section ref={escuelasRef} className="section school">
-        <TrainingSchools/>
+        <TrainingSchools />
       </section>
       <section className="section">
-      <VideoTrainingSchool/>
-      </section>  
+        <VideoTrainingSchool />
+      </section>
     </>
   );
 }
