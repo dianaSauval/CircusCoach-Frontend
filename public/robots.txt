@@ -1,3 +1,16 @@
+# ❌ Bloquear todos los bots por defecto
 User-agent: *
+Disallow: /
+
+# ✅ Permitir solo a bots confiables
+User-agent: Googlebot
 Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# 🗺️ Mantener el sitemap para Google y compañía
 Sitemap: https://mycircuscoach.com/sitemap.xml
