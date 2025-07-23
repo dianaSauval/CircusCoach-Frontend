@@ -36,7 +36,7 @@ if (error) return <p className="video-error">{error}</p>;
 if (!videoUrl) return <LoadingSpinner />;
 
 
-  const embedUrl = videoUrl.replace("vimeo.com", "player.vimeo.com/video");
+ const embedUrl = videoUrl;
 
   return (
     <div className="video-embed-container" style={{ marginBottom: "1rem" }}>

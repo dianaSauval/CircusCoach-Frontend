@@ -11,6 +11,7 @@ import {
 import { getVideoEmbedUrl } from "../../../utils/videoEmbed";
 import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
 import { FaDollarSign } from "react-icons/fa";
+import VideoPrivadoViewer from "../../common/VideoPrivadoViewer/VideoPrivadoViewer";
 
 const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const [activeTab, setActiveTab] = useState("es");
@@ -97,15 +98,17 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
 
       if (!url) {
         return (
-          <> <h3>{labelByLang[activeTab].pdf}</h3>
-          <p className="texto no-material">
-            📭{" "}
-            {activeTab === "es"
-              ? "Aún no se ha cargado ningún PDF en este idioma."
-              : activeTab === "en"
-              ? "No PDF uploaded in this language yet."
-              : "Aucun PDF disponible dans cette langue."}
-          </p>
+          <>
+            {" "}
+            <h3>{labelByLang[activeTab].pdf}</h3>
+            <p className="texto no-material">
+              📭{" "}
+              {activeTab === "es"
+                ? "Aún no se ha cargado ningún PDF en este idioma."
+                : activeTab === "en"
+                ? "No PDF uploaded in this language yet."
+                : "Aucun PDF disponible dans cette langue."}
+            </p>
           </>
         );
       }
@@ -206,14 +209,10 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
                 <strong>📝 Descripción:</strong> {description}
               </p>
             )}
-            <iframe
-              src={embedUrl}
-              width="100%"
-              height="360"
-              frameBorder="0"
-              allow="autoplay; fullscreen"
-              allowFullScreen
-              title={`video-${i}`}
+            <VideoPrivadoViewer
+              classId={data._id}
+              index={i}
+              language={activeTab}
             />
           </div>
         );
@@ -376,7 +375,9 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
               ? labelByLang[activeTab].class
               : labelByLang[activeTab].course}
           </h2>
-          <h3 className="titulo-principal">{data.title?.[activeTab] || "Sin título"}</h3>
+          <h3 className="titulo-principal">
+            {data.title?.[activeTab] || "Sin título"}
+          </h3>
 
           {!isClass && (
             <>
@@ -393,16 +394,14 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
                 </h4>
                 {data.image?.[activeTab] ? (
                   <div className="div-image">
-                  <img
-                    src={data.image[activeTab]}
-                    alt="Imagen del curso"
-                    className="course-image"
-                  />
+                    <img
+                      src={data.image[activeTab]}
+                      alt="Imagen del curso"
+                      className="course-image"
+                    />
                   </div>
                 ) : (
-                  <p className="texto no-image">
-                    Imagen aún no cargada
-                  </p>
+                  <p className="texto no-image">Imagen aún no cargada</p>
                 )}
               </div>
             </>
@@ -413,7 +412,9 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
               <p className="texto">
                 {data.content?.[activeTab] || "No hay contenido disponible."}
               </p>
-              <h4 className="subtitulo">{data.subtitle?.[activeTab] || "Sin subtítulo"}</h4>
+              <h4 className="subtitulo">
+                {data.subtitle?.[activeTab] || "Sin subtítulo"}
+              </h4>
               <p className="texto">
                 {data.secondaryContent?.[activeTab] ||
                   "No hay contenido secundario."}
@@ -429,7 +430,10 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
           </div>
 
           <div className="button-group">
-            <button className="boton-secundario edit" onClick={() => setIsEditing(true)}>
+            <button
+              className="boton-secundario edit"
+              onClick={() => setIsEditing(true)}
+            >
               ✏️ Editar
             </button>
             <button
