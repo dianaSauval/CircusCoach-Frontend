@@ -8,7 +8,7 @@
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
-    max-height: 400px; /* Para que el formulario no desborde la página */
+    max-height: 100%; /* Para que el formulario no desborde la página */
   }
   
   /* 🔹 Títulos */

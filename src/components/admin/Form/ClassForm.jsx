@@ -14,7 +14,6 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
     });
   };
 
-
   return (
     <div className="class-form-container">
       <div className="input-group">
@@ -91,12 +90,21 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
             videos: nuevosVideos,
           }))
         }
-        onTempUpload={(publicId) =>
-          setTempUploads?.((prev) => ({
-            ...prev,
-            videos: [...(prev?.videos || []), publicId],
-          }))
-        }
+        onTempUpload={(data) => {
+          if (typeof data === "string") {
+            // subida
+            setTempUploads((prev) => ({
+              ...prev,
+              videos: [...(prev?.videos || []), data],
+            }));
+          } else if (data.tipo === "eliminar") {
+            // eliminación diferida
+            setTempUploads((prev) => ({
+              ...prev,
+              videosAEliminar: [...(prev?.videosAEliminar || []), data.url],
+            }));
+          }
+        }}
       />
     </div>
   );

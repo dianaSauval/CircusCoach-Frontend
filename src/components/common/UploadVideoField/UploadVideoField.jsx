@@ -3,7 +3,6 @@ import "./UploadVideoField.css";
 import { v4 as uuidv4 } from "uuid";
 import {
   subirVideoPrivado,
-  eliminarVideoDeVimeo,
 } from "../../../services/uploadVimeoService";
 import { FaTrashAlt, FaCheckCircle, FaFileVideo } from "react-icons/fa";
 
@@ -21,40 +20,46 @@ const UploadVideoField = ({
   }, [videos]);
 
   const handleUploadSuccess = (videoPartial) => {
-    const updated = localVideos.map((v) =>
-      v._id === videoPartial._id
-        ? {
-            ...v,
-            url: { ...v.url, ...videoPartial.url },
-            title: { ...v.title, ...videoPartial.title },
-            description: { ...v.description, ...videoPartial.description },
-          }
-        : v
-    );
-    setLocalVideos(updated);
-    onChange(updated);
+    setLocalVideos((prev) => {
+      const updated = prev.map((v) =>
+        v._id === videoPartial._id
+          ? {
+              ...v,
+              url: { ...v.url, ...videoPartial.url },
+              title: { ...v.title, ...videoPartial.title },
+              description: { ...v.description, ...videoPartial.description },
+            }
+          : v
+      );
+      onChange(updated);
+      return updated;
+    });
   };
 
   const handleDiscard = (videoId) => {
-    const updated = localVideos.filter((v) => v._id !== videoId);
-    setLocalVideos(updated);
-    onChange(updated);
+    setLocalVideos((prev) => {
+      const updated = prev.filter((v) => v._id !== videoId);
+      onChange(updated);
+      return updated;
+    });
   };
 
-  const handleDelete = async (videoId) => {
-    const video = localVideos.find((v) => v._id === videoId);
-    const url = video?.url?.[activeLang];
-    if (url) {
-      try {
-        await eliminarVideoDeVimeo(url);
-      } catch (err) {
-        console.warn("❌ No se pudo eliminar el video de Vimeo:", err);
-      }
-    }
-    const updated = localVideos.filter((v) => v._id !== videoId);
-    setLocalVideos(updated);
-    onChange(updated);
-  };
+ const handleDelete = (videoId) => {
+  const video = localVideos.find((v) => v._id === videoId);
+  const url = video?.url?.[activeLang];
+
+  if (url) {
+    onTempUpload({
+      tipo: "eliminar",
+      url,
+    }); // ⚠️ Guardamos temporalmente para borrar solo si se guarda
+  }
+
+  const updated = localVideos.filter((v) => v._id !== videoId);
+  setLocalVideos(updated);
+  onChange(updated);
+};
+
 
   const addNewVideo = () => {
     const newId = uuidv4();
@@ -67,7 +72,7 @@ const UploadVideoField = ({
     const updated = [...localVideos, nuevo];
     setLocalVideos(updated);
     onChange(updated);
-    setAddedIds((prev) => [...prev, newId]); // para que lo veas aunque aún esté vacío
+    setAddedIds((prev) => [...prev, newId]);
   };
 
   const videosToShow = localVideos.filter(
@@ -88,7 +93,7 @@ const UploadVideoField = ({
           onUploadSuccess={handleUploadSuccess}
           onDelete={() => handleDelete(video._id)}
           onDiscard={() => handleDiscard(video._id)}
-          onTempUpload={onTempUpload} // ✅ ESTA LÍNEA FALTABA
+          onTempUpload={onTempUpload}
         />
       ))}
 
@@ -106,14 +111,12 @@ const UploadVideoField = ({
 
 export default UploadVideoField;
 
-// 👇 Subcomponente reutilizado para cada video
 const SingleVideoUploader = ({
   video,
   activeLang,
   onUploadSuccess,
   onDelete,
-  onDiscard,
-  onTempUpload = () => {},
+  onDiscard = () => {},
 }) => {
   const [videoFile, setVideoFile] = useState(null);
   const [title, setTitle] = useState("");
@@ -163,9 +166,7 @@ const SingleVideoUploader = ({
       };
 
       onUploadSuccess(videoPartial);
-      if (publicUrl && !video.url?.[activeLang]) {
-        onTempUpload(publicUrl);
-      }
+
 
       setVideoUrl(publicUrl);
       setVideoFile(null);

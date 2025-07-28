@@ -11,6 +11,7 @@ import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
 import VideoEmbedPreview from "../VideoEmbedPreview/VideoEmbedPreview";
 import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
+import VideoPrivadoViewer from "../../common/VideoPrivadoViewer/VideoPrivadoViewer";
 
 const EditPanel = ({
   selectedFormation,
@@ -22,7 +23,11 @@ const EditPanel = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
   const [videoStatus, setVideoStatus] = useState({});
-  const [tempUploads, setTempUploads] = useState({ pdfs: [] });
+  const [tempUploads, setTempUploads] = useState({
+    pdfs: [],
+    videos: [],
+    videosAEliminar: [],
+  });
 
   const modeLabels = {
     presencial: {
@@ -131,6 +136,21 @@ const EditPanel = ({
         const { updateFormation } = await import(
           "../../../services/formationService"
         );
+        // 🔥 Eliminamos los videos marcados como "pendientes de eliminar"
+        if (tempUploads.videosAEliminar?.length) {
+          for (const vimeoUrl of tempUploads.videosAEliminar) {
+            try {
+              await eliminarVideoDeVimeo(vimeoUrl);
+              console.log(`🗑️ Video eliminado tras guardar: ${vimeoUrl}`);
+            } catch (err) {
+              console.warn(
+                `⚠️ No se pudo eliminar el video ${vimeoUrl}:`,
+                err.message
+              );
+            }
+          }
+        }
+
         const cleanedData = prepareFormationDataForSave(formData);
         await updateFormation(selectedFormation._id, cleanedData);
       }
@@ -255,7 +275,7 @@ const EditPanel = ({
     setIsEditing(false);
 
     // 🔁 Resetamos archivos temporales por si vuelven a editar
-    setTempUploads({ pdfs: [], videos: [] });
+    setTempUploads({ pdfs: [], videos: [], videosAEliminar: [] });
   };
 
   return (
@@ -315,7 +335,7 @@ const EditPanel = ({
                   )}
                 </div>
 
-               <div className="section-card">
+                <div className="section-card">
                   <h4 className="subtitulo">
                     <strong>📄 PDF de presentación:</strong>
                   </h4>
@@ -345,7 +365,7 @@ const EditPanel = ({
                 </div>
 
                 <div className="section-card">
-                 <h4 className="subtitulo">
+                  <h4 className="subtitulo">
                     <strong>🎥 Video de presentación:</strong>
                   </h4>
                   {formData.video?.[activeTab] ? (
@@ -409,8 +429,12 @@ const EditPanel = ({
 
             {selectedClass && (
               <>
-                <p className="texto">{formData.content?.[activeTab] || "No disponible"}</p>
-                <h4 className="subtitulo">{formData.subtitle?.[activeTab] || "No especificado"}</h4>
+                <p className="texto">
+                  {formData.content?.[activeTab] || "No disponible"}
+                </p>
+                <h4 className="subtitulo">
+                  {formData.subtitle?.[activeTab] || "No especificado"}
+                </h4>
                 <p className="texto">
                   {formData.secondaryContent?.[activeTab] || "No disponible"}
                 </p>
@@ -484,81 +508,26 @@ const EditPanel = ({
                       );
                     }
 
-                    return videosEnIdioma.map((video, i) => {
-                      const rawUrl = video.url?.[activeTab];
-                      const embedUrl = getVideoEmbedUrl(rawUrl);
-                      const title = video.title?.[activeTab];
-                      const description = video.description?.[activeTab];
-
-                      const videoId = embedUrl?.split("/").pop();
-                      const isVimeo = embedUrl?.includes("vimeo.com");
-                      const status = isVimeo ? videoStatus[videoId] : "ready";
-
-                      if (!embedUrl || !embedUrl.startsWith("https://")) {
-                        return (
-                          <p key={i} className="no-material">
-                            ❌{" "}
-                            {activeTab === "es"
-                              ? "El enlace no es válido o no se puede mostrar como video embebido."
-                              : activeTab === "en"
-                              ? "The link is invalid or cannot be embedded."
-                              : "Le lien est invalide ou ne peut pas être intégré."}
+                    return videosEnIdioma.map((video, i) => (
+                      <div key={i} className="video-preview-item">
+                        {video.title?.[activeTab] && (
+                          <p>
+                            <strong>📌 Título:</strong> {video.title[activeTab]}
                           </p>
-                        );
-                      }
-
-                      if (isVimeo && (!status || status === "processing")) {
-                        return (
-                          <p key={i} className="no-material">
-                            ⏳{" "}
-                            {activeTab === "es"
-                              ? "El video está siendo procesado por Vimeo. Pronto estará disponible."
-                              : activeTab === "en"
-                              ? "The video is still being processed by Vimeo."
-                              : "La vidéo est encore en cours de traitement par Vimeo."}
+                        )}
+                        {video.description?.[activeTab] && (
+                          <p>
+                            <strong>📝 Descripción:</strong>{" "}
+                            {video.description[activeTab]}
                           </p>
-                        );
-                      }
-
-                      if (status === "error") {
-                        return (
-                          <p key={i} className="no-material">
-                            ❌{" "}
-                            {activeTab === "es"
-                              ? "Hubo un error al cargar el video desde Vimeo. Intentalo más tarde."
-                              : activeTab === "en"
-                              ? "There was an error loading the video from Vimeo. Please try again later."
-                              : "Une erreur s’est produite lors du chargement de la vidéo depuis Vimeo."}
-                          </p>
-                        );
-                      }
-
-                      return (
-                        <div key={i} className="video-preview-item">
-                          {title && (
-                            <p>
-                              <strong>📌 Título:</strong> {title}
-                            </p>
-                          )}
-                          {description && (
-                            <p>
-                              <strong>📝 Descripción:</strong> {description}
-                            </p>
-                          )}
-                          <div className="video-container">
-                            <iframe
-                              src={embedUrl}
-                              width="100%"
-                              height="360"
-                              frameBorder="0"
-                              allow="autoplay; fullscreen"
-                              allowFullScreen
-                              title={`video-${i}`}
-                            />
-                          </div>
-                        </div>
-                      );
-                    });
+                        )}
+                        <VideoPrivadoViewer
+                          classId={selectedClass._id}
+                          index={i}
+                          language={activeTab}
+                        />
+                      </div>
+                    ));
                   })()}
                 </div>
               </>
@@ -566,7 +535,10 @@ const EditPanel = ({
           </div>
 
           <div className="button-group">
-            <button className="boton-secundario edit" onClick={() => setIsEditing(true)}>
+            <button
+              className="boton-secundario edit"
+              onClick={() => setIsEditing(true)}
+            >
               ✏️ Editar
             </button>
             <button
@@ -634,3 +606,5 @@ const EditPanel = ({
 };
 
 export default EditPanel;
+
+
