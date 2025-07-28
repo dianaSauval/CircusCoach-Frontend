@@ -78,7 +78,7 @@ export default function Header() {
           {t.formations}
         </NavLink>
         <NavLink
-          to="/nosotros"
+          to="/biografia"
           className="nav-link"
           onClick={() => setMenuOpen(false)}
         >
