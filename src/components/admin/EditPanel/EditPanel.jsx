@@ -488,12 +488,12 @@ const EditPanel = ({
                   {(() => {
                     const videos = formData?.videos || [];
 
-                    const videosEnIdioma = videos.filter((video) => {
-                      const url = video?.url?.[activeTab]?.trim();
-                      return (
-                        url && (url.startsWith("http") || url.startsWith("www"))
-                      );
-                    });
+                    const videosEnIdioma = videos
+                      .map((video, i) => ({ video, i })) // ⬅️ guardamos el índice real
+                      .filter(({ video }) => {
+                        const url = video?.url?.[activeTab]?.trim();
+                        return url && url.startsWith("http");
+                      });
 
                     if (videosEnIdioma.length === 0) {
                       return (
@@ -508,7 +508,7 @@ const EditPanel = ({
                       );
                     }
 
-                    return videosEnIdioma.map((video, i) => (
+                    return videosEnIdioma.map(({ video, i }) => (
                       <div key={i} className="video-preview-item">
                         {video.title?.[activeTab] && (
                           <p>
@@ -523,7 +523,7 @@ const EditPanel = ({
                         )}
                         <VideoPrivadoViewer
                           classId={selectedClass._id}
-                          index={i}
+                          index={i} // ✅ índice real en el array original
                           language={activeTab}
                         />
                       </div>
@@ -606,5 +606,3 @@ const EditPanel = ({
 };
 
 export default EditPanel;
-
-
