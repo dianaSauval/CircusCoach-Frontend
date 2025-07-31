@@ -15,9 +15,18 @@ const UploadVideoField = ({
   const [localVideos, setLocalVideos] = useState([]);
   const [addedIds, setAddedIds] = useState([]);
 
-  useEffect(() => {
-    setLocalVideos(videos);
-  }, [videos]);
+useEffect(() => {
+  if (Array.isArray(videos)) {
+    const conId = videos.map((v) => ({
+      _id: v._id || uuidv4(),
+      url: v.url || {},
+      title: v.title || {},
+      description: v.description || {},
+    }));
+    setLocalVideos(conId);
+  }
+}, [videos]);
+
 
   const handleUploadSuccess = (videoPartial) => {
     setLocalVideos((prev) => {
@@ -75,13 +84,18 @@ const UploadVideoField = ({
     setAddedIds((prev) => [...prev, newId]);
   };
 
-  const videosToShow = localVideos.filter(
-    (video) =>
-      addedIds.includes(video._id) ||
-      video.url?.[activeLang] ||
-      video.title?.[activeLang] ||
-      video.description?.[activeLang]
+const videosToShow = localVideos.filter((video) => {
+  const url = video.url?.[activeLang] || "";
+  const title = video.title?.[activeLang] || "";
+  const description = video.description?.[activeLang] || "";
+  return (
+    addedIds.includes(video._id) ||
+    url.trim() !== "" ||
+    title.trim() !== "" ||
+    description.trim() !== ""
   );
+});
+
 
   return (
     <div className="upload-video-field-multiple">
