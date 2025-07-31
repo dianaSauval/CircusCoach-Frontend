@@ -1,7 +1,7 @@
 .home-hero {
   width: 100vw;
-  height: 100vh;
-  background-image: url('https://res.cloudinary.com/dkdhdy9e5/image/upload/v1743084512/CircusCoach/26_tljw6r.jpg'); /* Cambiar por la ruta correcta */
+  min-height: calc(100vh - 80px); /* Tené en cuenta el header */
+  background-image: url('https://res.cloudinary.com/dkdhdy9e5/image/upload/v1743084512/CircusCoach/26_tljw6r.jpg');
   background-size: cover;
   background-position: center 30%;
   background-repeat: no-repeat;
@@ -10,8 +10,11 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
+  padding-top: 80px; /* 👈 Compensa el header fijo */
   box-sizing: border-box;
+  scroll-margin-top: 80px; /* 👈 útil si se linkea con anchors internos */
 }
+
 
 .home-hero::before {
   content: '';
