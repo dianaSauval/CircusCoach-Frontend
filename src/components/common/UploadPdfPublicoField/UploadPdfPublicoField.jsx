@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { subirPdfPublico, eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
+import {
+  subirPdfPublico,
+} from "../../../services/uploadCloudinary";
 import { FaTrashAlt, FaFilePdf } from "react-icons/fa";
 import "./UploadPdfPublicoField.css";
 
@@ -9,13 +11,14 @@ const UploadPdfPublicoField = ({
   setPdfUrl,
   publicId,
   setPublicId,
-  onTempUpload = () => {},
+  onMarkForDeletion = () => {},
 }) => {
   const [file, setFile] = useState(null);
   const [titulo, setTitulo] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  
 
   const handleFileChange = (e) => {
     setFile(e.target.files?.[0] || null);
@@ -43,7 +46,6 @@ const UploadPdfPublicoField = ({
         ...prev,
         [activeLang]: public_id,
       }));
-      onTempUpload(public_id);
       setFile(null);
     } catch (err) {
       console.error("❌ Error subiendo PDF:", err);
@@ -53,21 +55,17 @@ const UploadPdfPublicoField = ({
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     const id = publicId?.[activeLang];
     if (!id) return;
 
-    try {
-      await eliminarArchivoDesdeFrontend(id, "raw");
-      setPdfUrl((prev) => ({ ...prev, [activeLang]: null }));
-      setPublicId((prev) => ({ ...prev, [activeLang]: "" }));
-      setTitulo("");
-      setFile(null);
-      setUploadProgress(0);
-    } catch (err) {
-      console.error("❌ Error al eliminar PDF:", err);
-      setError("No se pudo eliminar el archivo.");
-    }
+    // ❌ Ya no eliminamos el archivo directamente
+    onMarkForDeletion(id); // 🟡 Marcamos como pendiente de eliminar
+    setPdfUrl((prev) => ({ ...prev, [activeLang]: null }));
+    setPublicId((prev) => ({ ...prev, [activeLang]: "" }));
+    setTitulo("");
+    setFile(null);
+    setUploadProgress(0);
   };
 
   const current = pdfUrl?.[activeLang];
@@ -75,16 +73,13 @@ const UploadPdfPublicoField = ({
   const tituloMostrado = current?.title || "";
 
   useEffect(() => {
-    console.log("🌐 [useEffect] activeLang:", activeLang);
-    console.log("📚 [useEffect] pdfUrl:", pdfUrl);
-    console.log("📄 [useEffect] currentUrl:", currentUrl);
-    console.log("📝 [useEffect] tituloMostrado:", tituloMostrado);
-    console.log("⏳ [useEffect] uploading:", uploading);
   }, [pdfUrl, activeLang, uploading]);
 
   return (
     <div className="upload-pdf-field">
-         <label className="label-formulario">📄 PDF de presentación ({activeLang})</label>
+      <label className="label-formulario">
+        📄 PDF de presentación ({activeLang})
+      </label>
       {current && !uploading ? (
         <div className="pdf-file-card cargado">
           <FaFilePdf className="file-icon" />

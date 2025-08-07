@@ -38,31 +38,30 @@ const CourseClassForm = ({
     }
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  const validationErrors = validateCourseClassForm(formData);
-  setErrors(validationErrors);
+    const validationErrors = validateCourseClassForm(formData);
+    setErrors(validationErrors);
 
-  if (Object.keys(validationErrors).length > 0) {
-    const firstError = Object.keys(validationErrors)[0];
+    if (Object.keys(validationErrors).length > 0) {
+      const firstError = Object.keys(validationErrors)[0];
 
-    const fieldRefMap = {
-      title: titleRef,
-      content: contentRef,
-    };
+      const fieldRefMap = {
+        title: titleRef,
+        content: contentRef,
+      };
 
-    const ref = fieldRefMap[firstError];
-    if (ref && ref.current) {
-      ref.current.focus();
+      const ref = fieldRefMap[firstError];
+      if (ref && ref.current) {
+        ref.current.focus();
+      }
+
+      return;
     }
 
-    return;
-  }
-
-  onSave(formData);
-};
-
+    onSave(formData);
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -141,17 +140,22 @@ const handleSubmit = (e) => {
             ...(formData[activeTab]?.videos || []),
             ...(Array.isArray(formData.videos) ? formData.videos : []),
           ]}
-         onChange={(updatedList) =>
-  setFormData((prev) => ({
-    ...prev,
-    videos: updatedList,
-  }))
-}
-
+          onChange={(updatedList) =>
+            setFormData((prev) => ({
+              ...prev,
+              videos: updatedList,
+            }))
+          }
           onTempUpload={(url) =>
             setTempUploads((prev) => ({
               ...prev,
               videos: [...prev.videos, url],
+            }))
+          }
+          onMarkDelete={(url) =>
+            setTempUploads((prev) => ({
+              ...prev,
+              videosAEliminar: [...(prev.videosAEliminar || []), url],
             }))
           }
         />

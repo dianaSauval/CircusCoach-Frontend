@@ -36,10 +36,15 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
     };
   });
   const [errors, setErrors] = useState({});
-  const [tempUploads, setTempUploads] = useState({ pdfs: [], videos: [] });
+  const [tempUploads, setTempUploads] = useState({
+    pdfs: [],
+    pdfsAEliminar: [],
+    videos: [],
+    videosAEliminar: [],
+  });
   const titleRef = useRef(null);
-const descriptionRef = useRef(null);
-const priceRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const priceRef = useRef(null);
 
   // Inicializar campos por si vienen incompletos
   useEffect(() => {
@@ -56,15 +61,7 @@ const priceRef = useRef(null);
   }, [isClass, initialData]);
 
   const handleCancel = async () => {
-    // Eliminar PDFs nuevos
-    for (let public_id of tempUploads.pdfs) {
-      try {
-        await eliminarArchivoDesdeFrontend(public_id, "raw");
-      } catch (err) {
-        console.error("Error al eliminar PDF temporal:", err);
-      }
-    }
-    // Eliminar Videos nuevos
+    // ✅ Eliminar solo los videos NUEVOS (no los marcados para eliminar)
     for (let url of tempUploads.videos) {
       try {
         await eliminarVideoDeVimeo(url);
@@ -72,16 +69,42 @@ const priceRef = useRef(null);
         console.error("Error al eliminar video temporal:", err);
       }
     }
-    // Eliminar imagen nueva (si hay)
-    if (tempUploads.imagen) {
+
+    // ✅ NO eliminar los de videosAEliminar. Solo se eliminan al guardar.
+
+    // ✅ Eliminar PDFs nuevos
+    for (let public_id of tempUploads.pdfs) {
       try {
-        await eliminarArchivoDesdeFrontend(tempUploads.imagen, "image");
-        console.log("🗑️ Imagen temporal eliminada:", tempUploads.imagen);
+        await eliminarArchivoDesdeFrontend(public_id, "raw");
       } catch (err) {
-        console.warn("⚠️ No se pudo eliminar la imagen:", err.message);
+        console.error("Error al eliminar PDF temporal:", err);
       }
     }
 
+    // ✅ Eliminar imagen nueva (si hay)
+
+    if (tempUploads.imagenNueva) {
+      try {
+        await eliminarArchivoDesdeFrontend(tempUploads.imagenNueva, "image");
+        console.log("🗑️ Imagen nueva eliminada:", tempUploads.imagenNueva);
+      } catch (err) {
+        console.warn("⚠️ No se pudo eliminar imagen nueva:", err.message);
+      }
+    }
+
+    // ❌ NO eliminar imagenAEliminar (es una imagen existente)
+    // Solo se elimina si se guarda
+
+    // ✅ Limpiar estado por si se vuelve a editar luego
+    setTempUploads({
+      pdfs: [],
+      videos: [],
+      videosAEliminar: [],
+      imagenNueva: null,
+      imagenAEliminar: null,
+    });
+
+    // ✅ Cancelar edición
     onCancel();
   };
 
@@ -97,7 +120,13 @@ const priceRef = useRef(null);
           onCancel={handleCancel}
           tempUploads={tempUploads}
           setTempUploads={setTempUploads}
-          onSave={() => onSave({ ...initialData, ...formData })}
+          onSave={() =>
+            onSave({
+              ...prepareDataForSave(formData), // ✅ mismo cleaning que en cursos
+              tempUploads, // ✅ agregás tempUploads correctamente
+            })
+          }
+
           // ✅ asegurás que se pase el `formData` que llega desde adentro
         />
       </>
@@ -111,21 +140,24 @@ const priceRef = useRef(null);
       description: data.description?.es
         ? data.description
         : { es: data.description || "", en: "", fr: "" },
-      image: data.image?.es
-        ? data.image
-        : { es: data.image || "", en: "", fr: "" },
+      image: {
+        es: data.image?.es || "",
+        en: data.image?.en || "",
+        fr: data.image?.fr || "",
+      },
+
       price: Number(data.price),
       pdf: {
         es:
-          typeof data.pdf?.es === "object"
+          typeof data.pdf?.es === "object" && data.pdf?.es !== null
             ? data.pdf.es.url
             : data.pdf?.es || "",
         en:
-          typeof data.pdf?.en === "object"
+          typeof data.pdf?.en === "object" && data.pdf?.en !== null
             ? data.pdf.en.url
             : data.pdf?.en || "",
         fr:
-          typeof data.pdf?.fr === "object"
+          typeof data.pdf?.fr === "object" && data.pdf?.fr !== null
             ? data.pdf.fr.url
             : data.pdf?.fr || "",
       },
@@ -144,73 +176,97 @@ const priceRef = useRef(null);
     };
   };
 
-const handleChange = (e, field, lang) => {
-  const value = e.target.value;
+  const handleChange = (e, field, lang) => {
+    const value = e.target.value;
 
-  setFormData((prev) => ({
-    ...prev,
-    [field]: {
-      ...prev[field],
-      [lang]: value,
-    },
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: {
+        ...prev[field],
+        [lang]: value,
+      },
+    }));
 
-  // Limpia el error si existía
-  if (errors[field]) {
-    setErrors((prev) => {
-      const updated = { ...prev };
-      delete updated[field];
-      return updated;
-    });
-  }
-};
+    // Limpia el error si existía
+    if (errors[field]) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[field];
+        return updated;
+      });
+    }
+  };
 
+  const handleSimpleChange = (e) => {
+    const { name, value } = e.target;
 
-const handleSimpleChange = (e) => {
-  const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-  setFormData((prev) => ({ ...prev, [name]: value }));
+    // Limpia el error si existía
+    if (errors[name]) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
+    }
+  };
 
-  // Limpia el error si existía
-  if (errors[name]) {
-    setErrors((prev) => {
-      const updated = { ...prev };
-      delete updated[name];
-      return updated;
-    });
-  }
-};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    const validationErrors = validateCourseForm(formData);
+    setErrors(validationErrors);
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+    if (Object.keys(validationErrors).length > 0) {
+      const firstError = Object.keys(validationErrors)[0];
 
-  const validationErrors = validateCourseForm(formData);
-  setErrors(validationErrors);
+      const fieldRefMap = {
+        title: titleRef,
+        description: descriptionRef,
+        price: priceRef,
+      };
 
-  if (Object.keys(validationErrors).length > 0) {
-    const firstError = Object.keys(validationErrors)[0];
+      const ref = fieldRefMap[firstError];
+      if (ref && ref.current) {
+        ref.current.focus();
+      }
 
-    // Mapeo campo => ref
-    const fieldRefMap = {
-      title: titleRef,
-      description: descriptionRef,
-      price: priceRef,
-    };
-
-    const ref = fieldRefMap[firstError];
-    if (ref && ref.current) {
-      ref.current.focus();
+      return;
     }
 
-    return;
-  }
+    const cleanedData = prepareDataForSave(formData);
+    console.log("📤 Guardando datos:");
+    console.log("📝 cleanedData:", cleanedData);
+    console.log("🧹 Imagen a eliminar:", tempUploads.imagenAEliminar);
 
-  const cleanedData = prepareDataForSave(formData);
-  onSave(cleanedData);
-};
+    await onSave({
+      ...cleanedData,
+      tempUploads, // 🔥 este campo es clave
+    });
 
+    // guarda en backend
 
+    // ✅ Después de guardar, eliminamos los videos marcados para borrar
+    for (let url of tempUploads.videosAEliminar) {
+      try {
+        await eliminarVideoDeVimeo(url);
+        console.log("🗑️ Video eliminado tras guardar:", url);
+      } catch (err) {
+        console.error("❌ Error al eliminar video tras guardar:", err);
+      }
+    }
+
+    // ✅ Después de guardar, eliminamos los PDFs marcados para borrar
+    for (let public_id of tempUploads.pdfsAEliminar || []) {
+      try {
+        await eliminarArchivoDesdeFrontend(public_id, "raw");
+        console.log("🗑️ PDF eliminado tras guardar:", public_id);
+      } catch (err) {
+        console.error("❌ Error al eliminar PDF tras guardar:", err);
+      }
+    }
+  };
 
   return (
     <form className="course-form" onSubmit={handleSubmit}>
@@ -221,7 +277,6 @@ const handleSubmit = (e) => {
           ref={titleRef}
           value={formData.title?.[activeTab] || ""}
           onChange={(e) => handleChange(e, "title", activeTab)}
-          
         />
         {errors.title && <div className="field-error">{errors.title}</div>}
       </div>
@@ -230,11 +285,13 @@ const handleSubmit = (e) => {
         <div className="form-section">
           <label className="label-formulario">Descripción:</label>
           <textarea
-           ref={descriptionRef}
+            ref={descriptionRef}
             value={formData.description?.[activeTab] || ""}
             onChange={(e) => handleChange(e, "description", activeTab)}
           />
-          {errors.description && <div className="field-error">{errors.description}</div>}
+          {errors.description && (
+            <div className="field-error">{errors.description}</div>
+          )}
         </div>
 
         <div className="form-section">
@@ -242,7 +299,7 @@ const handleSubmit = (e) => {
           <input
             type="number"
             name="price"
-              ref={priceRef}
+            ref={priceRef}
             value={formData.price || ""}
             onChange={handleSimpleChange}
           />
@@ -252,19 +309,15 @@ const handleSubmit = (e) => {
         <UploadImagenField
           activeLang={activeTab}
           value={formData.image?.[activeTab] || ""}
-          onChange={(url, publicId) => {
+          onChange={(url) => {
             setFormData((prev) => ({
               ...prev,
               image: { ...prev.image, [activeTab]: url },
             }));
-            setTempUploads((prev) => ({
-              ...prev,
-              imagen: publicId, // ✅ guardamos temporalmente el ID para eliminarlo si se cancela
-            }));
           }}
         />
-        {errors.image && <div className="field-error">{errors.image}</div>}
 
+        {errors.image && <div className="field-error">{errors.image}</div>}
 
         <div className="form-section">
           <div className="form-section">
@@ -297,6 +350,12 @@ const handleSubmit = (e) => {
                   pdfs: [...prev.pdfs, id],
                 }))
               }
+              onMarkForDeletion={(id) =>
+                setTempUploads((prev) => ({
+                  ...prev,
+                  pdfsAEliminar: [...(prev.pdfsAEliminar || []), id],
+                }))
+              }
             />
           </div>
 
@@ -308,7 +367,7 @@ const handleSubmit = (e) => {
               onAddTempVideo={(url) =>
                 setTempUploads((prev) => ({
                   ...prev,
-                  videos: [...prev.videos, url],
+                  videosAEliminar: [...prev.videosAEliminar, url],
                 }))
               }
             />
@@ -317,8 +376,10 @@ const handleSubmit = (e) => {
       </>
 
       <div className="form-buttons">
-        <button className="boton-agregar" type="submit">💾 Guardar</button>
-        <button className="boton-eliminar"  onClick={handleCancel}>
+        <button className="boton-agregar" type="submit">
+          💾 Guardar
+        </button>
+        <button className="boton-eliminar" onClick={handleCancel}>
           ❌ Cancelar
         </button>
       </div>

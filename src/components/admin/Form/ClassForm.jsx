@@ -90,21 +90,18 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
             videos: nuevosVideos,
           }))
         }
-        onTempUpload={(data) => {
-          if (typeof data === "string") {
-            // subida
-            setTempUploads((prev) => ({
-              ...prev,
-              videos: [...(prev?.videos || []), data],
-            }));
-          } else if (data.tipo === "eliminar") {
-            // eliminación diferida
-            setTempUploads((prev) => ({
-              ...prev,
-              videosAEliminar: [...(prev?.videosAEliminar || []), data.url],
-            }));
-          }
-        }}
+        onTempUpload={(url) =>
+          setTempUploads((prev) => ({
+            ...prev,
+            videos: [...(prev.videos || []), url],
+          }))
+        }
+        onMarkDelete={(url) =>
+          setTempUploads((prev) => ({
+            ...prev,
+            videosAEliminar: [...(prev.videosAEliminar || []), url],
+          }))
+        }
       />
     </div>
   );

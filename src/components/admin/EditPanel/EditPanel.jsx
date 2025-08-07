@@ -27,6 +27,8 @@ const EditPanel = ({
     pdfs: [],
     videos: [],
     videosAEliminar: [],
+    imagenesAEliminar: [],
+    pdfsAEliminar: [],
   });
 
   const modeLabels = {
@@ -122,6 +124,47 @@ const EditPanel = ({
     if (!selectedItem) return;
 
     try {
+      // 🔥 Eliminamos los videos marcados como "pendientes de eliminar"
+      if (tempUploads.videosAEliminar?.length) {
+        for (const vimeoUrl of tempUploads.videosAEliminar) {
+          try {
+            await eliminarVideoDeVimeo(vimeoUrl);
+            console.log(`🗑️ Video eliminado tras guardar: ${vimeoUrl}`);
+          } catch (err) {
+            console.warn(
+              `⚠️ No se pudo eliminar el video ${vimeoUrl}:`,
+              err.message
+            );
+          }
+        }
+      }
+      // 🗑️ Eliminar PDFs marcados
+      if (tempUploads.pdfsAEliminar?.length) {
+        for (const id of tempUploads.pdfsAEliminar) {
+          try {
+            await eliminarArchivoDesdeFrontend(id, "raw");
+            console.log(`🗑️ PDF eliminado tras guardar: ${id}`);
+          } catch (err) {
+            console.warn(`⚠️ No se pudo eliminar el PDF ${id}:`, err.message);
+          }
+        }
+      }
+
+      // 🗑️ Eliminar imágenes marcadas
+      if (tempUploads.imagenesAEliminar?.length) {
+        for (const id of tempUploads.imagenesAEliminar) {
+          try {
+            await eliminarArchivoDesdeFrontend(id, "image");
+            console.log(`🗑️ Imagen eliminada tras guardar: ${id}`);
+          } catch (err) {
+            console.warn(
+              `⚠️ No se pudo eliminar la imagen ${id}:`,
+              err.message
+            );
+          }
+        }
+      }
+
       if (selectedClass) {
         const { updateClass } = await import(
           "../../../services/formationService"
@@ -130,27 +173,12 @@ const EditPanel = ({
       } else if (selectedModule) {
         const { updateModule } = await import(
           "../../../services/formationService"
-        ); // o moduleService si lo tenés separado
+        );
         await updateModule(selectedModule._id, formData);
       } else if (selectedFormation) {
         const { updateFormation } = await import(
           "../../../services/formationService"
         );
-        // 🔥 Eliminamos los videos marcados como "pendientes de eliminar"
-        if (tempUploads.videosAEliminar?.length) {
-          for (const vimeoUrl of tempUploads.videosAEliminar) {
-            try {
-              await eliminarVideoDeVimeo(vimeoUrl);
-              console.log(`🗑️ Video eliminado tras guardar: ${vimeoUrl}`);
-            } catch (err) {
-              console.warn(
-                `⚠️ No se pudo eliminar el video ${vimeoUrl}:`,
-                err.message
-              );
-            }
-          }
-        }
-
         const cleanedData = prepareFormationDataForSave(formData);
         await updateFormation(selectedFormation._id, cleanedData);
       }
@@ -212,34 +240,12 @@ const EditPanel = ({
     : "Hacer visible en este idioma";
 
   const handleCancel = async () => {
-    // 🗑️ Eliminamos los PDFs temporales
-    if (tempUploads.pdfs?.length) {
-      for (const id of tempUploads.pdfs) {
-        try {
-          await eliminarArchivoDesdeFrontend(id, "raw");
-          console.log(`🗑️ PDF temporal eliminado: ${id}`);
-        } catch (err) {
-          console.warn(`⚠️ No se pudo eliminar el PDF ${id}:`, err.message);
-        }
-      }
-    }
 
     // 🗑️ Eliminamos los videos temporales
-    if (tempUploads.videos?.length) {
-      for (const vimeoId of tempUploads.videos) {
-        try {
-          await eliminarVideoDeVimeo(vimeoId);
-          console.log(`🗑️ Video temporal eliminado de Vimeo: ${vimeoId}`);
-        } catch (err) {
-          console.warn(
-            `⚠️ No se pudo eliminar el video ${vimeoId}:`,
-            err.message
-          );
-        }
-      }
-    }
+    // 🚫 Ya no eliminamos videos temporales al cancelar
+    console.log("🟡 Cancelando edición: NO se eliminan videos de Vimeo");
 
-    // ♻️ Recargamos la clase original si estamos editando una clase
+    // ♻️ Restaurar datos según lo que se estaba editando
     if (selectedClass) {
       try {
         const classData = await getClassByIdAdmin(selectedClass._id);
@@ -254,28 +260,23 @@ const EditPanel = ({
           error.message
         );
       }
-    }
-
-    if (selectedFormation) {
-      const cleanVideo = { ...formData.video };
-      for (const lang of Object.keys(cleanVideo)) {
-        // 🧼 Eliminamos solo si es una URL de Vimeo
-        if (cleanVideo[lang]?.includes("vimeo.com")) {
-          delete cleanVideo[lang];
-        }
-      }
-
-      setFormData((prev) => ({
-        ...prev,
-        video: cleanVideo,
-      }));
+    } else if (selectedFormation) {
+      setFormData({ ...selectedFormation });
+    } else if (selectedModule) {
+      setFormData({ ...selectedModule });
     }
 
     // 🚪 Salimos del modo edición
     setIsEditing(false);
 
     // 🔁 Resetamos archivos temporales por si vuelven a editar
-    setTempUploads({ pdfs: [], videos: [], videosAEliminar: [] });
+    setTempUploads({
+      pdfs: [],
+      videos: [],
+      videosAEliminar: [],
+      imagenesAEliminar: [],
+      pdfsAEliminar: [],
+    });
   };
 
   return (

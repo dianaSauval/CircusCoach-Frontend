@@ -11,6 +11,7 @@ const UploadVideoField = ({
   videos = [],
   onChange = () => {},
   onTempUpload = () => {},
+  onMarkDelete = () => {},
 }) => {
   const [localVideos, setLocalVideos] = useState([]);
   const [addedIds, setAddedIds] = useState([]);
@@ -58,10 +59,7 @@ useEffect(() => {
   const url = video?.url?.[activeLang];
 
   if (url) {
-    onTempUpload({
-      tipo: "eliminar",
-      url,
-    }); // ⚠️ Guardamos temporalmente para borrar solo si se guarda
+    onMarkDelete(url);
   }
 
   const updated = localVideos.filter((v) => v._id !== videoId);
@@ -140,11 +138,13 @@ const SingleVideoUploader = ({
   const [error, setError] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
 
-  useEffect(() => {
-    setTitle(video?.title?.[activeLang] || "");
-    setDescription(video?.description?.[activeLang] || "");
-    setVideoUrl(video?.url?.[activeLang] || "");
-  }, [activeLang, video]);
+useEffect(() => {
+  // Solo inicializar si los estados están vacíos
+  setTitle((prev) => prev || video?.title?.[activeLang] || "");
+  setDescription((prev) => prev || video?.description?.[activeLang] || "");
+  setVideoUrl((prev) => prev || video?.url?.[activeLang] || "");
+}, [activeLang, video]);
+
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

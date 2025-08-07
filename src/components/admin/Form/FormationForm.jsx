@@ -60,6 +60,12 @@ const FormationForm = ({
             image: { ...prev.image, [activeTab]: url },
           }))
         }
+        onMarkForDeletion={(id) =>
+          setTempUploads((prev) => ({
+            ...prev,
+            imagenesAEliminar: [...(prev.imagenesAEliminar || []), id],
+          }))
+        }
       />
 
       {/* 🔹 PDF por idioma */}
@@ -83,10 +89,10 @@ const FormationForm = ({
                 : updater,
           }))
         }
-        onTempUpload={(id) =>
-          setTempUploads?.((prev) => ({
+        onMarkForDeletion={(id) =>
+          setTempUploads((prev) => ({
             ...prev,
-            pdfs: [...(prev.pdfs || []), id],
+            pdfsAEliminar: [...(prev.pdfsAEliminar || []), id],
           }))
         }
       />
@@ -104,6 +110,7 @@ const FormationForm = ({
             videos: [...(prev?.videos || []), vimeoId],
           }));
         }}
+        setTempUploads={setTempUploads}
       />
     </>
   );

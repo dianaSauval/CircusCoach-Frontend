@@ -12,6 +12,7 @@ import { getVideoEmbedUrl } from "../../../utils/videoEmbed";
 import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
 import { FaDollarSign } from "react-icons/fa";
 import VideoPrivadoViewer from "../../common/VideoPrivadoViewer/VideoPrivadoViewer";
+import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 
 const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const [activeTab, setActiveTab] = useState("es");
@@ -294,13 +295,27 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
     }
   };
 
-  const handleSave = async (updatedData) => {
-    console.log("🔄 handleSave recibió:", updatedData);
+  const handleSave = async (updatedDataConUploads) => {
+    const { tempUploads: uploads, ...updatedData } = updatedDataConUploads;
+    console.log("📦 Datos al guardar:", updatedDataConUploads);
+    console.log("🧹 Imagen a eliminar:", uploads?.imagenAEliminar);
+
     try {
       if (selectedClass) {
         await updateCourseClass(selectedClass._id, updatedData);
       } else {
         await updateCourse(course._id, updatedData);
+      }
+
+      // 🔥 Eliminar videos marcados
+      if (uploads?.videosAEliminar?.length > 0) {
+        for (let url of uploads.videosAEliminar) {
+          try {
+            await eliminarVideoDeVimeo(url);
+          } catch (err) {
+            console.error("❌ Error al eliminar video tras guardar:", err);
+          }
+        }
       }
 
       Object.assign(data, updatedData);

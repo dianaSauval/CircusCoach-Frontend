@@ -1,7 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   subirVideoPromocional,
-  eliminarVideoDeVimeo,
 } from "../../../services/uploadVimeoService";
 import { FaArrowLeft, FaCheckCircle, FaTrashAlt, FaVideo } from "react-icons/fa";
 import "./VideoPromocionalForm.css";
@@ -11,6 +10,7 @@ const VideoPromocionalForm = ({
   setFormData,
   activeTab,
   onAddTempVideo,
+  setTempUploads 
 }) => {
   const videoUrl = formData?.video?.[activeTab] || "";
 
@@ -28,14 +28,7 @@ const VideoPromocionalForm = ({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    return () => {
-      const tempVideo = formData?.video?.[activeTab];
-      if (tempVideo?.includes("vimeo.com")) {
-        onAddTempVideo?.(tempVideo);
-      }
-    };
-  }, []);
+
 
   if (typeof setFormData !== "function") {
     return (
@@ -88,7 +81,6 @@ const VideoPromocionalForm = ({
         },
       }));
 
-      onAddTempVideo?.(publicUrl);
     } catch (err) {
       console.error("❌ Error al subir video:", err);
       setError("Error al subir el video. Intenta nuevamente.");
@@ -109,34 +101,37 @@ const VideoPromocionalForm = ({
       },
     }));
 
-    onAddTempVideo?.(url);
   };
 
   const handleRemove = async () => {
-    const url = formData?.video?.[activeTab];
-    if (!url) return;
+  const url = formData?.video?.[activeTab];
+  if (!url) return;
 
-    if (url.includes("vimeo.com")) {
-      try {
-        await eliminarVideoDeVimeo(url);
-      } catch (err) {
-        console.warn("⚠️ No se pudo eliminar de Vimeo:", err);
-      }
-    }
-
-    setFormData((prev) => ({
+  // ✅ NO lo borramos ahora, solo lo marcamos como pendiente
+  if (url.includes("vimeo.com")) {
+    onAddTempVideo?.(url); // ya lo usás para marcarlos como temporales
+    setTempUploads?.((prev) => ({
       ...prev,
-      video: {
-        ...(prev?.video || {}),
-        [activeTab]: "",
-      },
+      videosAEliminar: [...(prev?.videosAEliminar || []), url],
     }));
+  }
 
-    setVideoFile(null);
-    setTitles((prev) => ({ ...prev, [activeTab]: "" }));
-    setTempUrls((prev) => ({ ...prev, [activeTab]: "" }));
-    setUploadModeForLang(activeTab, null);
-  };
+  // ✅ Quitamos del formData solo visualmente
+  setFormData((prev) => ({
+    ...prev,
+    video: {
+      ...(prev?.video || {}),
+      [activeTab]: "",
+    },
+  }));
+
+  // Limpiar estado local
+  setVideoFile(null);
+  setTitles((prev) => ({ ...prev, [activeTab]: "" }));
+  setTempUrls((prev) => ({ ...prev, [activeTab]: "" }));
+  setUploadModeForLang(activeTab, null);
+};
+
 
   return (
     <div className="video-promocional-form">
