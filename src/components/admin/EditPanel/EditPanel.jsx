@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from "../../../services/api";
 import "./EditPanel.css";
 import LanguageTabs from "../LanguageTabs/LanguageTabs";
@@ -31,6 +31,17 @@ const EditPanel = ({
     pdfsAEliminar: [],
   });
 
+  const originalRef = useRef(null);
+
+  // 🆕 estado vacío reutilizable para no arrastrar IDs de otra edición
+  const EMPTY_UPLOADS = {
+    pdfs: [],
+    videos: [],
+    videosAEliminar: [],
+    imagenesAEliminar: [],
+    pdfsAEliminar: [],
+  };
+
   const modeLabels = {
     presencial: {
       es: "Presencial",
@@ -54,6 +65,7 @@ const EditPanel = ({
           videos: classData.videos || [],
         });
         setIsEditing(false);
+        setTempUploads(EMPTY_UPLOADS); // 🆕 reset por cambio de selección
       } catch (error) {
         console.error(
           "❌ Error cargando clase:",
@@ -67,12 +79,15 @@ const EditPanel = ({
     } else if (selectedModule && !selectedClass) {
       setFormData({ ...selectedModule });
       setIsEditing(false);
+      setTempUploads(EMPTY_UPLOADS); // 🆕
     } else if (selectedFormation && !selectedClass && !selectedModule) {
       setFormData({ ...selectedFormation });
       setIsEditing(false);
+      setTempUploads(EMPTY_UPLOADS); // 🆕
     } else {
       setFormData(null);
       setIsEditing(false);
+      setTempUploads(EMPTY_UPLOADS); // 🆕
     }
   }, [selectedClass, selectedModule, selectedFormation]);
 
@@ -100,71 +115,55 @@ const EditPanel = ({
     const interval = setInterval(checkAllVideos, 15000);
     return () => clearInterval(interval);
   }, [formData, activeTab]);
-  const prepareFormationDataForSave = (data) => ({
-    title: data.title,
-    description: data.description,
-    price: Number(data.price),
-    image: data.image,
-    visible: data.visible,
-    video: data.video,
-    // 👇 Esta es la parte importante: convertimos el objeto { url, title } a string
-    pdf: {
-      es:
-        typeof data.pdf?.es === "object" ? data.pdf.es.url : data.pdf?.es || "",
-      en:
-        typeof data.pdf?.en === "object" ? data.pdf.en.url : data.pdf?.en || "",
-      fr:
-        typeof data.pdf?.fr === "object" ? data.pdf.fr.url : data.pdf?.fr || "",
-    },
-    pdf_public_id: data.pdf_public_id || { es: "", en: "", fr: "" },
-  });
 
+  useEffect(() => {
+    if (selectedFormation && !selectedClass && !selectedModule) {
+      // snapshot profundo del seleccionado al entrar o cambiar selección
+      originalRef.current = JSON.parse(JSON.stringify(selectedFormation));
+    } else {
+      originalRef.current = null;
+    }
+  }, [selectedFormation, selectedClass, selectedModule]);
+
+  const prepareFormationDataForSave = (data) => {
+    // Normaliza cualquier forma: string | {url,title} | null/undefined
+    const normPdf = (v) => {
+      if (v == null) return ""; // ← si es null/undefined, guardamos vacío
+      if (typeof v === "string") return v.trim();
+      if (typeof v === "object") return (v.url || "").trim();
+      return "";
+    };
+    const ensureLangs = (obj = {}) => ({
+      es: obj.es || "",
+      en: obj.en || "",
+      fr: obj.fr || "",
+    });
+    return {
+      title: data.title,
+      description: data.description,
+      price: Number(data.price),
+      image: data.image,
+      visible: data.visible,
+      video: data.video,
+
+      // 👇 ya no revienta si algún idioma quedó en null
+      pdf: {
+        es: normPdf(data.pdf?.es),
+        en: normPdf(data.pdf?.en),
+        fr: normPdf(data.pdf?.fr),
+      },
+
+      // dejamos el public_id tal cual esté en el estado
+      // (si tocaste el tacho, el componente ya lo dejó en "" para ese idioma)
+      pdf_public_id: ensureLangs(data.pdf_public_id),
+    };
+  };
   const handleSave = async () => {
     const selectedItem = selectedClass || selectedModule || selectedFormation;
     if (!selectedItem) return;
 
     try {
-      // 🔥 Eliminamos los videos marcados como "pendientes de eliminar"
-      if (tempUploads.videosAEliminar?.length) {
-        for (const vimeoUrl of tempUploads.videosAEliminar) {
-          try {
-            await eliminarVideoDeVimeo(vimeoUrl);
-            console.log(`🗑️ Video eliminado tras guardar: ${vimeoUrl}`);
-          } catch (err) {
-            console.warn(
-              `⚠️ No se pudo eliminar el video ${vimeoUrl}:`,
-              err.message
-            );
-          }
-        }
-      }
-      // 🗑️ Eliminar PDFs marcados
-      if (tempUploads.pdfsAEliminar?.length) {
-        for (const id of tempUploads.pdfsAEliminar) {
-          try {
-            await eliminarArchivoDesdeFrontend(id, "raw");
-            console.log(`🗑️ PDF eliminado tras guardar: ${id}`);
-          } catch (err) {
-            console.warn(`⚠️ No se pudo eliminar el PDF ${id}:`, err.message);
-          }
-        }
-      }
-
-      // 🗑️ Eliminar imágenes marcadas
-      if (tempUploads.imagenesAEliminar?.length) {
-        for (const id of tempUploads.imagenesAEliminar) {
-          try {
-            await eliminarArchivoDesdeFrontend(id, "image");
-            console.log(`🗑️ Imagen eliminada tras guardar: ${id}`);
-          } catch (err) {
-            console.warn(
-              `⚠️ No se pudo eliminar la imagen ${id}:`,
-              err.message
-            );
-          }
-        }
-      }
-
+      // ——— Preparar payload según el tipo seleccionado ———
       if (selectedClass) {
         const { updateClass } = await import(
           "../../../services/formationService"
@@ -180,10 +179,95 @@ const EditPanel = ({
           "../../../services/formationService"
         );
         const cleanedData = prepareFormationDataForSave(formData);
+
+        // 🧽 Limpiar por idioma los PDFs marcados para borrar (acepta string u objeto)
+        if (
+          Array.isArray(tempUploads.pdfsAEliminar) &&
+          tempUploads.pdfsAEliminar.length
+        ) {
+          for (const item of tempUploads.pdfsAEliminar) {
+            const id = typeof item === "string" ? item : item?.public_id;
+            const langHint = typeof item === "object" ? item?.lang : null;
+            const langs = langHint ? [langHint] : ["es", "en", "fr"];
+
+            for (const lang of langs) {
+              const currentId = formData?.pdf_public_id?.[lang];
+              const originalId = originalRef.current?.pdf_public_id?.[lang];
+              if (id && (id === currentId || id === originalId)) {
+                cleanedData.pdf[lang] = "";
+                cleanedData.pdf_public_id[lang] = "";
+              }
+            }
+          }
+        }
+
         await updateFormation(selectedFormation._id, cleanedData);
       }
 
-      if (onUpdate) onUpdate();
+      // ——— Si llegamos acá, el update fue OK. Recién ahora borramos en origen ———
+
+      // 🎥 Videos (Vimeo)
+      if (
+        Array.isArray(tempUploads.videosAEliminar) &&
+        tempUploads.videosAEliminar.length
+      ) {
+        for (const vimeoUrl of tempUploads.videosAEliminar) {
+          try {
+            await eliminarVideoDeVimeo(vimeoUrl);
+            console.log("🗑️ Video eliminado tras guardar:", vimeoUrl);
+          } catch (err) {
+            console.warn(
+              "⚠️ No se pudo eliminar el video:",
+              vimeoUrl,
+              err?.message
+            );
+          }
+        }
+      }
+
+      // 📄 PDFs (Cloudinary raw) — dedupe por si se marcó dos veces
+      if (
+        Array.isArray(tempUploads.pdfsAEliminar) &&
+        tempUploads.pdfsAEliminar.length
+      ) {
+        const idsUnicos = Array.from(
+          new Set(
+            tempUploads.pdfsAEliminar
+              .map((x) => (typeof x === "string" ? x : x?.public_id))
+              .filter(Boolean)
+          )
+        );
+        for (const id of idsUnicos) {
+          try {
+            await eliminarArchivoDesdeFrontend(id, "raw");
+            console.log("🗑️ PDF eliminado tras guardar:", id);
+          } catch (err) {
+            console.warn("⚠️ No se pudo eliminar el PDF:", id, err?.message);
+          }
+        }
+      }
+
+      // 🖼️ Imágenes (Cloudinary image) — dedupe
+      if (
+        Array.isArray(tempUploads.imagenesAEliminar) &&
+        tempUploads.imagenesAEliminar.length
+      ) {
+        const idsUnicosImg = Array.from(
+          new Set(tempUploads.imagenesAEliminar.filter(Boolean))
+        );
+        for (const id of idsUnicosImg) {
+          try {
+            await eliminarArchivoDesdeFrontend(id, "image");
+            console.log("🗑️ Imagen eliminada tras guardar:", id);
+          } catch (err) {
+            console.warn("⚠️ No se pudo eliminar la imagen:", id, err?.message);
+          }
+        }
+      }
+
+      // ——— Fin: refresco y salida de edición ———
+      onUpdate?.();
+      setTempUploads(EMPTY_UPLOADS);
       setIsEditing(false);
     } catch (error) {
       console.error(
@@ -221,7 +305,7 @@ const EditPanel = ({
       if (onUpdate) onUpdate();
     } catch (error) {
       console.error(
-        "\u274C Error al cambiar visibilidad:",
+        "❌ Error al cambiar visibilidad:",
         error.response?.data || error
       );
     }
@@ -239,44 +323,82 @@ const EditPanel = ({
     ? "Ocultar en este idioma"
     : "Hacer visible en este idioma";
 
-  const handleCancel = async () => {
+const handleCancel = async (e) => {
+  e?.preventDefault?.();
 
-    // 🗑️ Eliminamos los videos temporales
-    // 🚫 Ya no eliminamos videos temporales al cancelar
-    console.log("🟡 Cancelando edición: NO se eliminan videos de Vimeo");
-
-    // ♻️ Restaurar datos según lo que se estaba editando
-    if (selectedClass) {
+  // 1) Borrar SOLO los PDFs NUEVOS subidos en esta edición (para no dejar huérfanos)
+  if (Array.isArray(tempUploads.pdfs) && tempUploads.pdfs.length) {
+    for (const id of tempUploads.pdfs) {
       try {
-        const classData = await getClassByIdAdmin(selectedClass._id);
-        setFormData({
-          ...classData,
-          pdfs: classData.pdfs || [],
-          videos: classData.videos || [],
-        });
-      } catch (error) {
-        console.error(
-          "❌ Error al recargar clase tras cancelar:",
-          error.message
-        );
+        await eliminarArchivoDesdeFrontend(id, "raw");
+      } catch (err) {
+        console.warn("⚠️ No se pudo borrar PDF temporal al cancelar:", id, err?.message);
       }
-    } else if (selectedFormation) {
-      setFormData({ ...selectedFormation });
-    } else if (selectedModule) {
-      setFormData({ ...selectedModule });
     }
+  }
 
-    // 🚪 Salimos del modo edición
-    setIsEditing(false);
+  // 2) Rehidratar SOLO pdf y pdf_public_id desde el snapshot (si estás editando una FORMACIÓN)
+  if (selectedFormation && !selectedClass && !selectedModule) {
+    const snap = originalRef.current;
+    if (snap) {
+      setFormData((prev) => ({
+        ...prev,
+        pdf: {
+          es: typeof snap?.pdf?.es === "object" ? (snap?.pdf?.es?.url || "") : (snap?.pdf?.es || ""),
+          en: typeof snap?.pdf?.en === "object" ? (snap?.pdf?.en?.url || "") : (snap?.pdf?.en || ""),
+          fr: typeof snap?.pdf?.fr === "object" ? (snap?.pdf?.fr?.url || "") : (snap?.pdf?.fr || ""),
+        },
+        pdf_public_id: {
+          es: snap?.pdf_public_id?.es || "",
+          en: snap?.pdf_public_id?.en || "",
+          fr: snap?.pdf_public_id?.fr || "",
+        },
+      }));
+    }
+  } else if (selectedClass) {
+    // 3) Si estabas editando CLASE: recargo desde backend para dejarla como estaba
+    try {
+      const classData = await getClassByIdAdmin(selectedClass._id);
+      setFormData({
+        ...classData,
+        pdfs: classData.pdfs || [],
+        videos: classData.videos || [],
+      });
+    } catch (error) {
+      console.error("❌ Error al recargar clase tras cancelar:", error?.message);
+    }
+    // Si es MÓDULO, no hay PDF público por idioma → no tocamos nada
+  }
 
-    // 🔁 Resetamos archivos temporales por si vuelven a editar
-    setTempUploads({
-      pdfs: [],
-      videos: [],
-      videosAEliminar: [],
-      imagenesAEliminar: [],
-      pdfsAEliminar: [],
-    });
+  // 4) Limpiar buffers de esta edición y salir de modo edición
+  setTempUploads(EMPTY_UPLOADS);
+  setIsEditing(false);
+};
+
+
+  // —— helpers para el field de PDF ——
+  const isTempPublicId = (id) => (tempUploads.pdfs || []).includes(id);
+
+  const isOriginalPublicId = (lang, id) => {
+    const orig = originalRef.current?.pdf_public_id?.[lang];
+    return !!id && !!orig && id === orig;
+  };
+
+  // ❗ Solo borramos si REALMENTE está en la lista de nuevos
+  const deleteTempNow = async (id) => {
+    if (!isTempPublicId(id)) {
+      console.warn("⚠️ Ignorado deleteTempNow de un id NO temporal:", id);
+      return;
+    }
+    try {
+      await eliminarArchivoDesdeFrontend(id, "raw");
+      setTempUploads((prev) => ({
+        ...prev,
+        pdfs: (prev.pdfs || []).filter((x) => x !== id),
+      }));
+    } catch (err) {
+      console.warn("⚠️ No se pudo eliminar PDF temporal:", err?.message);
+    }
   };
 
   return (
@@ -289,10 +411,10 @@ const EditPanel = ({
           <div className="information">
             <h2 className="titulo-principal">
               {selectedClass
-                ? "\ud83d\udcd6 Clase"
+                ? "📖 Clase"
                 : selectedModule
-                ? "\ud83d\udcdc Módulo"
-                : "\ud83d\udccc Formación"}
+                ? "📜 Módulo"
+                : "📌 Formación"}
             </h2>
 
             <h3 className="titulo-principal">
@@ -490,7 +612,7 @@ const EditPanel = ({
                     const videos = formData?.videos || [];
 
                     const videosEnIdioma = videos
-                      .map((video, i) => ({ video, i })) // ⬅️ guardamos el índice real
+                      .map((video, i) => ({ video, i })) // índice real
                       .filter(({ video }) => {
                         const url = video?.url?.[activeTab]?.trim();
                         return url && url.startsWith("http");
@@ -524,7 +646,7 @@ const EditPanel = ({
                         )}
                         <VideoPrivadoViewer
                           classId={selectedClass._id}
-                          index={i} // ✅ índice real en el array original
+                          index={i}
                           language={activeTab}
                         />
                       </div>
@@ -538,7 +660,13 @@ const EditPanel = ({
           <div className="button-group">
             <button
               className="boton-secundario edit"
-              onClick={() => setIsEditing(true)}
+              onClick={() => {
+                // snapshot profundo del estado actual al entrar en edición
+                originalRef.current = JSON.parse(
+                  JSON.stringify(formData || selectedFormation)
+                );
+                setIsEditing(true);
+              }}
             >
               ✏️ Editar
             </button>
@@ -569,6 +697,9 @@ const EditPanel = ({
               activeTab={activeTab}
               modeLabels={modeLabels}
               setTempUploads={setTempUploads}
+              isTempPublicId={isTempPublicId}
+              onDeleteTempNow={deleteTempNow}
+              originalPublicIdMap={originalRef.current?.pdf_public_id || {}}
             />
           )}
 
@@ -590,13 +721,25 @@ const EditPanel = ({
           )}
 
           <div className="button-group">
-            <button className="boton-agregar" onClick={handleSave}>
+            <button
+              type="button"
+              className="boton-agregar"
+              onClick={handleSave}
+            >
               💾 Guardar
             </button>
-            <button className="boton-eliminar" onClick={handleCancel}>
+            <button
+              type="button"
+              className="boton-eliminar"
+              onClick={handleCancel}
+            >
               ❌ Cancelar
             </button>
-            <button className="toggle-visibility" onClick={toggleVisibility}>
+            <button
+              type="button"
+              className="toggle-visibility"
+              onClick={toggleVisibility}
+            >
               {visibilityText}
             </button>
           </div>

@@ -7,6 +7,9 @@ const FormationForm = ({
   setFormData,
   activeTab,
   setTempUploads,
+  isTempPublicId,
+  onDeleteTempNow,
+  originalPublicIdMap,
 }) => {
   return (
     <>
@@ -79,7 +82,7 @@ const FormationForm = ({
             pdf: typeof updater === "function" ? updater(prev.pdf) : updater,
           }))
         }
-        publicId={formData.pdf_public_id || {}} // ✅ ahora sí
+        publicId={formData.pdf_public_id || {}}
         setPublicId={(updater) =>
           setFormData((prev) => ({
             ...prev,
@@ -89,11 +92,28 @@ const FormationForm = ({
                 : updater,
           }))
         }
-        onMarkForDeletion={(id) =>
+        // ✅ dedupe: agregar solo si no está
+        onTempUpload={(id) =>
           setTempUploads((prev) => ({
             ...prev,
-            pdfsAEliminar: [...(prev.pdfsAEliminar || []), id],
+            pdfs: prev.pdfs?.includes(id)
+              ? prev.pdfs
+              : [...(prev.pdfs || []), id],
           }))
+        }
+        onMarkForDeletion={(id) =>
+          setTempUploads((prev) => {
+            const item = { lang: activeTab, public_id: id };
+            const yaEsta = (prev.pdfsAEliminar || []).some((x) =>
+              typeof x === "string" ? x === id : x?.public_id === id
+            );
+            return {
+              ...prev,
+              pdfsAEliminar: yaEsta
+                ? prev.pdfsAEliminar
+                : [...(prev.pdfsAEliminar || []), item],
+            };
+          })
         }
       />
 

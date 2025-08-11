@@ -46,93 +46,6 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
   const descriptionRef = useRef(null);
   const priceRef = useRef(null);
 
-  // Inicializar campos por si vienen incompletos
-  useEffect(() => {
-    if (isClass && initialData?.videos?.length > 0) {
-      setFormData((prev) => {
-        const ids = initialData.videos.map((v) => v._id);
-        return {
-          ...prev,
-          videos: initialData.videos,
-          videoIds: ids,
-        };
-      });
-    }
-  }, [isClass, initialData]);
-
-  const handleCancel = async () => {
-    // ✅ Eliminar solo los videos NUEVOS (no los marcados para eliminar)
-    for (let url of tempUploads.videos) {
-      try {
-        await eliminarVideoDeVimeo(url);
-      } catch (err) {
-        console.error("Error al eliminar video temporal:", err);
-      }
-    }
-
-    // ✅ NO eliminar los de videosAEliminar. Solo se eliminan al guardar.
-
-    // ✅ Eliminar PDFs nuevos
-    for (let public_id of tempUploads.pdfs) {
-      try {
-        await eliminarArchivoDesdeFrontend(public_id, "raw");
-      } catch (err) {
-        console.error("Error al eliminar PDF temporal:", err);
-      }
-    }
-
-    // ✅ Eliminar imagen nueva (si hay)
-
-    if (tempUploads.imagenNueva) {
-      try {
-        await eliminarArchivoDesdeFrontend(tempUploads.imagenNueva, "image");
-        console.log("🗑️ Imagen nueva eliminada:", tempUploads.imagenNueva);
-      } catch (err) {
-        console.warn("⚠️ No se pudo eliminar imagen nueva:", err.message);
-      }
-    }
-
-    // ❌ NO eliminar imagenAEliminar (es una imagen existente)
-    // Solo se elimina si se guarda
-
-    // ✅ Limpiar estado por si se vuelve a editar luego
-    setTempUploads({
-      pdfs: [],
-      videos: [],
-      videosAEliminar: [],
-      imagenNueva: null,
-      imagenAEliminar: null,
-    });
-
-    // ✅ Cancelar edición
-    onCancel();
-  };
-
-  // 👉 Si es una clase, usamos el componente aparte
-  if (isClass) {
-    return (
-      <>
-        <CourseClassForm
-          formData={formData}
-          setFormData={setFormData}
-          initialData={initialData}
-          activeTab={activeTab}
-          onCancel={handleCancel}
-          tempUploads={tempUploads}
-          setTempUploads={setTempUploads}
-          onSave={() =>
-            onSave({
-              ...prepareDataForSave(formData), // ✅ mismo cleaning que en cursos
-              tempUploads, // ✅ agregás tempUploads correctamente
-            })
-          }
-
-          // ✅ asegurás que se pase el `formData` que llega desde adentro
-        />
-      </>
-    );
-  }
-
   const prepareDataForSave = (data) => {
     return {
       title: data.title,
@@ -175,6 +88,107 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       },
     };
   };
+  // Inicializar campos por si vienen incompletos
+  useEffect(() => {
+    if (isClass && initialData?.videos?.length > 0) {
+      setFormData((prev) => {
+        const ids = initialData.videos.map((v) => v._id);
+        return {
+          ...prev,
+          videos: initialData.videos,
+          videoIds: ids,
+        };
+      });
+    }
+  }, [isClass, initialData]);
+
+  const handleCancel = async (e) => {
+    e?.preventDefault?.();
+    // ✅ Eliminar solo los videos NUEVOS (no los marcados para eliminar)
+    for (let url of tempUploads.videos) {
+      try {
+        await eliminarVideoDeVimeo(url);
+      } catch (err) {
+        console.error("Error al eliminar video temporal:", err);
+      }
+    }
+
+    // ✅ NO eliminar los de videosAEliminar. Solo se eliminan al guardar.
+
+    // ✅ Eliminar PDFs nuevos
+    for (let public_id of tempUploads.pdfs) {
+      try {
+        await eliminarArchivoDesdeFrontend(public_id, "raw");
+      } catch (err) {
+        console.error("Error al eliminar PDF temporal:", err);
+      }
+    }
+
+    // 2) 🔄 restaurar SOLO el PDF y su public_id del idioma activo al estado original
+    setFormData((prev) => ({
+      ...prev,
+      pdf: {
+        ...prev.pdf,
+        [activeTab]: initialData?.pdf?.[activeTab] || "",
+      },
+      public_id_pdf: {
+        ...prev.public_id_pdf,
+        [activeTab]: initialData?.public_id_pdf?.[activeTab] || "",
+      },
+    }));
+
+    // ✅ Eliminar imagen nueva (si hay)
+
+    if (tempUploads.imagenNueva) {
+      try {
+        await eliminarArchivoDesdeFrontend(tempUploads.imagenNueva, "image");
+        console.log("🗑️ Imagen nueva eliminada:", tempUploads.imagenNueva);
+      } catch (err) {
+        console.warn("⚠️ No se pudo eliminar imagen nueva:", err.message);
+      }
+    }
+
+    // ❌ NO eliminar imagenAEliminar (es una imagen existente)
+    // Solo se elimina si se guarda
+
+    // ✅ Limpiar estado por si se vuelve a editar luego
+    setTempUploads({
+      pdfs: [],
+      pdfsAEliminar: [],
+      videos: [],
+      videosAEliminar: [],
+      imagenNueva: null,
+      imagenAEliminar: null,
+    });
+
+    // ✅ Cancelar edición
+    onCancel();
+  };
+
+  // 👉 Si es una clase, usamos el componente aparte
+  if (isClass) {
+    return (
+      <>
+        <CourseClassForm
+          formData={formData}
+          setFormData={setFormData}
+          initialData={initialData}
+          activeTab={activeTab}
+          onCancel={handleCancel}
+          tempUploads={tempUploads}
+          setTempUploads={setTempUploads}
+          onSave={() =>
+            onSave({
+              ...prepareDataForSave(formData), // ✅ mismo cleaning que en cursos
+              tempUploads, // ✅ agregás tempUploads correctamente
+            })
+          }
+
+          // ✅ asegurás que se pase el `formData` que llega desde adentro
+        />
+      </>
+    );
+  }
 
   const handleChange = (e, field, lang) => {
     const value = e.target.value;
@@ -268,6 +282,8 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
     }
   };
 
+  
+
   return (
     <form className="course-form" onSubmit={handleSubmit}>
       <div className="form-section">
@@ -353,7 +369,11 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
               onMarkForDeletion={(id) =>
                 setTempUploads((prev) => ({
                   ...prev,
-                  pdfsAEliminar: [...(prev.pdfsAEliminar || []), id],
+                  // guardo par {lang, public_id} por si lo necesito
+                  pdfsAEliminar: [
+                    ...(prev.pdfsAEliminar || []),
+                    { lang: activeTab, public_id: id },
+                  ],
                 }))
               }
             />
@@ -379,7 +399,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         <button className="boton-agregar" type="submit">
           💾 Guardar
         </button>
-        <button className="boton-eliminar" onClick={handleCancel}>
+        <button type="button" className="boton-eliminar" onClick={handleCancel}>
           ❌ Cancelar
         </button>
       </div>

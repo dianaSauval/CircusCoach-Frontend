@@ -13,6 +13,7 @@ import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
 import { FaDollarSign } from "react-icons/fa";
 import VideoPrivadoViewer from "../../common/VideoPrivadoViewer/VideoPrivadoViewer";
 import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
+import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
 
 const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
   const [activeTab, setActiveTab] = useState("es");
@@ -299,7 +300,15 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
     const { tempUploads: uploads, ...updatedData } = updatedDataConUploads;
     console.log("📦 Datos al guardar:", updatedDataConUploads);
     console.log("🧹 Imagen a eliminar:", uploads?.imagenAEliminar);
-
+    // Refuerzo: si hay PDFs marcados para borrar, me aseguro de vaciar por idioma
+    if (uploads?.pdfsAEliminar?.length) {
+      for (const item of uploads.pdfsAEliminar) {
+        const lang = item.lang;
+        if (lang && updatedData.pdf) updatedData.pdf[lang] = "";
+        if (lang && updatedData.public_id_pdf)
+          updatedData.public_id_pdf[lang] = "";
+      }
+    }
     try {
       if (selectedClass) {
         await updateCourseClass(selectedClass._id, updatedData);
@@ -314,6 +323,30 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
             await eliminarVideoDeVimeo(url);
           } catch (err) {
             console.error("❌ Error al eliminar video tras guardar:", err);
+          }
+        }
+      }
+      // ✅ Dentro de handleSave, después de eliminar videos:
+      if (uploads?.pdfsAEliminar?.length > 0) {
+        // Evitar duplicados por si el mismo id se marca dos veces
+        const idsUnicos = Array.from(
+          new Set(
+            uploads.pdfsAEliminar
+              .map((item) =>
+                typeof item === "string" ? item : item?.public_id
+              )
+              .filter(Boolean)
+          )
+        );
+        for (const id of idsUnicos) {
+          try {
+            await eliminarArchivoDesdeFrontend(id, "raw"); // PDFs = resource_type "raw"
+            console.log("🗑️ PDF eliminado tras guardar (panel):", id);
+          } catch (err) {
+            console.error(
+              "❌ Error al eliminar PDF tras guardar (panel):",
+              err
+            );
           }
         }
       }
