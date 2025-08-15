@@ -2,6 +2,7 @@ import UploadPdfPublicoField from "../../../common/UploadPdfPublicoField/UploadP
 import UploadImagenField from "../../../common/UploadImagenField/UploadImagenField";
 import VideoPromocionalForm from "../../../common/VideoPromocionalForm/VideoPromocionalForm";
 import "./AddCourseForm.css";
+import { eliminarArchivoDesdeFrontend } from "../../../../services/uploadCloudinary";
 
 const AddCourseForm = ({
   titleRef,
@@ -15,6 +16,10 @@ const AddCourseForm = ({
   onTempVideo,
   onTempImage,
   setErrors,
+  isTempPdfPublicId,
+  onDeleteTempPdfNow,
+  isTempVideoUrl,
+  onDeleteTempVideoNow,
 }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -93,6 +98,7 @@ const AddCourseForm = ({
       <UploadImagenField
         activeLang={activeTab}
         value={formData.image[activeTab]}
+        publicIdActual={formData.image_public_id?.[activeTab] || ""}
         onChange={(url, publicId) => {
           setFormData((prev) => ({
             ...prev,
@@ -101,6 +107,27 @@ const AddCourseForm = ({
           }));
           onTempImage?.(publicId);
         }}
+        onMarkForDeletion={() => {
+          // En el modal no hay “persistidos”; por seguridad, si llega acá, vaciamos visualmente
+          setFormData((prev) => ({
+            ...prev,
+            image: { ...prev.image, [activeTab]: "" },
+            image_public_id: { ...prev.image_public_id, [activeTab]: "" },
+          }));
+        }}
+        onDeleteTempNow={async (id) => {
+          try {
+            await eliminarArchivoDesdeFrontend(id, "image");
+          } catch (e) {
+            console.warn(e);
+          }
+          setFormData((prev) => ({
+            ...prev,
+            image: { ...prev.image, [activeTab]: "" },
+            image_public_id: { ...prev.image_public_id, [activeTab]: "" },
+          }));
+        }}
+        isTempPublicId={() => true}
       />
       {errors.image && <div className="field-error">{errors.image}</div>}
 
@@ -126,14 +153,34 @@ const AddCourseForm = ({
                 : updater,
           }))
         }
-        onTempUpload={onTempPdf}
+        onTempUpload={(id) => onTempPdf?.(id)} // track temporal
+        isTempPublicId={(id) => isTempPdfPublicId?.(id)} // dice si es temporal
+        onDeleteTempNow={async (id) => {
+          // 🔥 borra YA
+          await onDeleteTempPdfNow?.(id);
+          setFormData((prev) => ({
+            ...prev,
+            pdf: { ...prev.pdf, [activeTab]: "" },
+            public_id_pdf: { ...prev.public_id_pdf, [activeTab]: "" },
+          }));
+        }}
       />
 
       <VideoPromocionalForm
         formData={formData}
         setFormData={setFormData}
         activeTab={activeTab}
-        onAddTempVideo={onTempVideo}
+        onTempUpload={(url) => onTempVideo?.(url)} // track como TEMP
+        isTempVideoUrl={(url) => isTempVideoUrl?.(url)} // dice si es TEMP
+        onDeleteTempNow={async (url) => {
+          // 🔥 borrar YA
+          await onDeleteTempVideoNow?.(url);
+          // limpiar visualmente
+          setFormData((prev) => ({
+            ...prev,
+            video: { ...(prev?.video || {}), [activeTab]: "" },
+          }));
+        }}
       />
     </div>
   );

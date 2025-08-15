@@ -12,7 +12,6 @@ import { getVideoEmbedUrl } from "../../../utils/videoEmbed";
 import { checkVimeoAvailability } from "../../../utils/vimeoStatus";
 import { FaDollarSign } from "react-icons/fa";
 import VideoPrivadoViewer from "../../common/VideoPrivadoViewer/VideoPrivadoViewer";
-import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
 
 const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
@@ -309,6 +308,8 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
           updatedData.public_id_pdf[lang] = "";
       }
     }
+
+    
     try {
       if (selectedClass) {
         await updateCourseClass(selectedClass._id, updatedData);
@@ -316,16 +317,7 @@ const CourseEditPanel = ({ course, selectedClass, onUpdate }) => {
         await updateCourse(course._id, updatedData);
       }
 
-      // 🔥 Eliminar videos marcados
-      if (uploads?.videosAEliminar?.length > 0) {
-        for (let url of uploads.videosAEliminar) {
-          try {
-            await eliminarVideoDeVimeo(url);
-          } catch (err) {
-            console.error("❌ Error al eliminar video tras guardar:", err);
-          }
-        }
-      }
+      
       // ✅ Dentro de handleSave, después de eliminar videos:
       if (uploads?.pdfsAEliminar?.length > 0) {
         // Evitar duplicados por si el mismo id se marca dos veces

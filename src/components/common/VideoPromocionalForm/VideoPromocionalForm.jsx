@@ -1,16 +1,21 @@
 import { useState } from "react";
+import { subirVideoPromocional } from "../../../services/uploadVimeoService";
 import {
-  subirVideoPromocional,
-} from "../../../services/uploadVimeoService";
-import { FaArrowLeft, FaCheckCircle, FaTrashAlt, FaVideo } from "react-icons/fa";
+  FaArrowLeft,
+  FaCheckCircle,
+  FaTrashAlt,
+  FaVideo,
+} from "react-icons/fa";
 import "./VideoPromocionalForm.css";
 
 const VideoPromocionalForm = ({
   formData = { video: {} },
   setFormData,
   activeTab,
-  onAddTempVideo,
-  setTempUploads 
+  onTempUpload, // NUEVO
+  onMarkForDeletion, // NUEVO
+  onDeleteTempNow, // NUEVO
+  isTempVideoUrl,
 }) => {
   const videoUrl = formData?.video?.[activeTab] || "";
 
@@ -27,8 +32,6 @@ const VideoPromocionalForm = ({
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState(null);
-
-
 
   if (typeof setFormData !== "function") {
     return (
@@ -80,7 +83,7 @@ const VideoPromocionalForm = ({
           [activeTab]: publicUrl,
         },
       }));
-
+      onTempUpload?.(publicUrl);
     } catch (err) {
       console.error("❌ Error al subir video:", err);
       setError("Error al subir el video. Intenta nuevamente.");
@@ -95,43 +98,39 @@ const VideoPromocionalForm = ({
 
     setFormData((prev) => ({
       ...prev,
-      video: {
-        ...(prev?.video || {}),
-        [activeTab]: url,
-      },
+      video: { ...(prev?.video || {}), [activeTab]: url },
     }));
-
+    // No marcamos como TEMP porque no lo subimos nosotros
   };
 
   const handleRemove = async () => {
-  const url = formData?.video?.[activeTab];
-  if (!url) return;
+    const url = formData?.video?.[activeTab];
+    if (!url) return;
 
-  // ✅ NO lo borramos ahora, solo lo marcamos como pendiente
-  if (url.includes("vimeo.com")) {
-    onAddTempVideo?.(url); // ya lo usás para marcarlos como temporales
-    setTempUploads?.((prev) => ({
+    const isTemp = isTempVideoUrl?.(url) === true;
+    const isVimeo = typeof url === "string" && url.includes("vimeo.com");
+
+    if (isTemp && isVimeo) {
+      // 🔥 Borrar YA de Vimeo (temporal)
+      await onDeleteTempNow?.(url);
+    } else if (isVimeo) {
+      // 🏷️ Marcamos para borrar al Guardar (existente)
+      onMarkForDeletion?.(url);
+    }
+    // Si no es Vimeo (p.ej. YouTube o enlace externo), solo limpiamos visualmente
+
+    // Limpiar la UI
+    setFormData((prev) => ({
       ...prev,
-      videosAEliminar: [...(prev?.videosAEliminar || []), url],
+      video: { ...(prev?.video || {}), [activeTab]: "" },
     }));
-  }
 
-  // ✅ Quitamos del formData solo visualmente
-  setFormData((prev) => ({
-    ...prev,
-    video: {
-      ...(prev?.video || {}),
-      [activeTab]: "",
-    },
-  }));
-
-  // Limpiar estado local
-  setVideoFile(null);
-  setTitles((prev) => ({ ...prev, [activeTab]: "" }));
-  setTempUrls((prev) => ({ ...prev, [activeTab]: "" }));
-  setUploadModeForLang(activeTab, null);
-};
-
+    // limpiar estado local
+    setVideoFile(null);
+    setTitles((prev) => ({ ...prev, [activeTab]: "" }));
+    setTempUrls((prev) => ({ ...prev, [activeTab]: "" }));
+    setUploadModeForLang(activeTab, null);
+  };
 
   return (
     <div className="video-promocional-form">
@@ -213,7 +212,7 @@ const VideoPromocionalForm = ({
             onClick={() => setUploadModeForLang(activeTab, null)}
             disabled={uploading}
           >
-             <FaArrowLeft /> Volver
+            <FaArrowLeft /> Volver
           </button>
         </div>
       )}

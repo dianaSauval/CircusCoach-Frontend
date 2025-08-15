@@ -25,6 +25,7 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       description: { es: "", en: "", fr: "" },
       price: 0,
       image: { es: "", en: "", fr: "" },
+      image_public_id: { es: "", en: "", fr: "" },
       pdf: { es: "", en: "", fr: "" },
       public_id_pdf: { es: "", en: "", fr: "" },
       video: { es: "", en: "", fr: "" },
@@ -41,6 +42,8 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
     pdfsAEliminar: [],
     videos: [],
     videosAEliminar: [],
+    imagenNueva: null,
+    imagenAEliminar: null,
   });
   const titleRef = useRef(null);
   const descriptionRef = useRef(null);
@@ -147,6 +150,19 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         console.warn("⚠️ No se pudo eliminar imagen nueva:", err.message);
       }
     }
+
+    // 🔄 Restaurar imagen del idioma activo (vuelve al estado original)
+    setFormData((prev) => ({
+      ...prev,
+      image: {
+        ...prev.image,
+        [activeTab]: initialData?.image?.[activeTab] || "",
+      },
+      image_public_id: {
+        ...prev.image_public_id,
+        [activeTab]: initialData?.image_public_id?.[activeTab] || "", // si no lo tenés, podés dejar ""
+      },
+    }));
 
     // ❌ NO eliminar imagenAEliminar (es una imagen existente)
     // Solo se elimina si se guarda
@@ -280,9 +296,23 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         console.error("❌ Error al eliminar PDF tras guardar:", err);
       }
     }
-  };
 
-  
+    // ✅ Después de guardar, eliminamos las imágenes marcadas para borrar
+    if (tempUploads.imagenAEliminar) {
+      try {
+        await eliminarArchivoDesdeFrontend(
+          tempUploads.imagenAEliminar,
+          "image"
+        );
+        console.log(
+          "🗑️ Imagen eliminada tras guardar:",
+          tempUploads.imagenAEliminar
+        );
+      } catch (err) {
+        console.error("❌ Error al eliminar imagen tras guardar:", err);
+      }
+    }
+  };
 
   return (
     <form className="course-form" onSubmit={handleSubmit}>
@@ -325,12 +355,44 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
         <UploadImagenField
           activeLang={activeTab}
           value={formData.image?.[activeTab] || ""}
-          onChange={(url) => {
+          publicIdActual={formData.image_public_id?.[activeTab] || ""} // 👈 nuevo
+          onChange={(url, publicId) => {
+            // Subí una NUEVA imagen => queda "temporal" hasta guardar
             setFormData((prev) => ({
               ...prev,
               image: { ...prev.image, [activeTab]: url },
+              image_public_id: {
+                ...prev.image_public_id,
+                [activeTab]: publicId,
+              },
+            }));
+            setTempUploads((prev) => ({ ...prev, imagenNueva: publicId })); // para borrar si se cancela
+          }}
+          // Si el usuario toca "Eliminar" en una imagen PERSISTIDA
+          onMarkForDeletion={(publicId) => {
+            setTempUploads((prev) => ({ ...prev, imagenAEliminar: publicId }));
+            // Vaciamos visualmente para que prepareDataForSave mande string vacío
+            setFormData((prev) => ({
+              ...prev,
+              image: { ...prev.image, [activeTab]: "" },
+              image_public_id: { ...prev.image_public_id, [activeTab]: "" },
             }));
           }}
+          // Si el usuario toca "Eliminar" en una imagen NUEVA (temporal)
+          onDeleteTempNow={async (publicId) => {
+            try {
+              await eliminarArchivoDesdeFrontend(publicId, "image");
+              setTempUploads((prev) => ({ ...prev, imagenNueva: null }));
+              setFormData((prev) => ({
+                ...prev,
+                image: { ...prev.image, [activeTab]: "" },
+                image_public_id: { ...prev.image_public_id, [activeTab]: "" },
+              }));
+            } catch (e) {
+              console.error("Error borrando imagen temporal:", e);
+            }
+          }}
+          isTempPublicId={(id) => id && id === tempUploads.imagenNueva}
         />
 
         {errors.image && <div className="field-error">{errors.image}</div>}
@@ -376,6 +438,27 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
                   ],
                 }))
               }
+              isTempPublicId={(id) =>
+                Array.isArray(tempUploads.pdfs) && tempUploads.pdfs.includes(id)
+              }
+              onDeleteTempNow={async (id) => {
+                try {
+                  await eliminarArchivoDesdeFrontend(id, "raw");
+                  // sacar del listado de temps para que Cancel no reprocesé
+                  setTempUploads((prev) => ({
+                    ...prev,
+                    pdfs: prev.pdfs.filter((x) => x !== id),
+                  }));
+                  // limpiar UI
+                  setFormData((prev) => ({
+                    ...prev,
+                    pdf: { ...prev.pdf, [activeTab]: "" },
+                    public_id_pdf: { ...prev.public_id_pdf, [activeTab]: "" },
+                  }));
+                } catch (e) {
+                  console.error("Error borrando PDF temporal:", e);
+                }
+              }}
             />
           </div>
 
@@ -384,12 +467,37 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
               formData={formData}
               setFormData={setFormData}
               activeTab={activeTab}
-              onAddTempVideo={(url) =>
+              onTempUpload={(url) =>
                 setTempUploads((prev) => ({
                   ...prev,
-                  videosAEliminar: [...prev.videosAEliminar, url],
+                  videos: [...prev.videos, url], // 👈 NUEVO: track TEMP
                 }))
               }
+              onMarkForDeletion={(url) =>
+                setTempUploads((prev) => ({
+                  ...prev,
+                  videosAEliminar: [...prev.videosAEliminar, url], // 👈 EXISTENTE → borrar al Guardar
+                }))
+              }
+              isTempVideoUrl={(url) =>
+                Array.isArray(tempUploads.videos) &&
+                tempUploads.videos.includes(url)
+              }
+              onDeleteTempNow={async (url) => {
+                try {
+                  await eliminarVideoDeVimeo(url); // 🔥 borrar YA si es TEMP
+                  setTempUploads((prev) => ({
+                    ...prev,
+                    videos: prev.videos.filter((v) => v !== url),
+                  }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    video: { ...(prev?.video || {}), [activeTab]: "" },
+                  }));
+                } catch (e) {
+                  console.error("Error borrando video temporal:", e);
+                }
+              }}
             />
           </div>
         </div>

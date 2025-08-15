@@ -51,6 +51,41 @@ const AddCoursesModal = ({
   const descriptionRef = useRef(null); // para curso
   const contentRef = useRef(null);
 
+  const addTempPdf = (id) =>
+    setTempPdfPublicIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+
+  const removeTempPdf = (id) =>
+    setTempPdfPublicIds((prev) => prev.filter((x) => x !== id));
+
+  const isTempPdf = (id) => !!id && tempPdfPublicIds.includes(id);
+
+  const deleteTempPdfNow = async (id) => {
+    try {
+      await eliminarArchivoDesdeFrontend(id, "raw"); // 🔥 borra YA en Cloudinary
+    } finally {
+      removeTempPdf(id); // que no quede para borrar otra vez al cancelar
+    }
+  };
+
+  const addTempVideo = (url) =>
+    setTempVideoUrls((prev) => (prev.includes(url) ? prev : [...prev, url]));
+
+  const removeTempVideo = (url) =>
+    setTempVideoUrls((prev) => prev.filter((x) => x !== url));
+
+  const isTempVideo = (url) => !!url && tempVideoUrls.includes(url);
+
+  const deleteTempVideoNow = async (url) => {
+    try {
+      await eliminarVideoDeVimeo(url); // 🔥 borrar YA en Vimeo
+      console.log("🗑️ Video temporal eliminado YA:", url);
+    } catch (e) {
+      console.warn("⚠️ Error al eliminar video temporal YA:", e?.message);
+    } finally {
+      removeTempVideo(url); // evitar doble intento en Cancelar
+    }
+  };
+
   const inputClass = (field) => (errors[field] ? "input error" : "input");
 
   const handleSubmit = async () => {
@@ -201,9 +236,13 @@ const AddCoursesModal = ({
             errors={errors}
             setErrors={setErrors}
             inputClass={inputClass}
-            onTempPdf={(id) => setTempPdfPublicIds((prev) => [...prev, id])}
-            onTempVideo={(url) => setTempVideoUrls((prev) => [...prev, url])}
+            onTempPdf={addTempPdf}
+            isTempPdfPublicId={isTempPdf} // si lo querés con este nombre
+            onDeleteTempPdfNow={deleteTempPdfNow}
             onTempImage={(id) => setImagePublicIds((prev) => [...prev, id])}
+            onTempVideo={addTempVideo}
+            isTempVideoUrl={isTempVideo}
+            onDeleteTempVideoNow={deleteTempVideoNow}
           />
         ) : (
           <AddCourseClassForm
