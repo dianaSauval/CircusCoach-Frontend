@@ -8,6 +8,8 @@ import UploadPdfPublicoField from "../../common/UploadPdfPublicoField/UploadPdfP
 import UploadImagenField from "../../common/UploadImagenField/UploadImagenField";
 import validateCourseForm from "../../../utils/validations/validateCourseForm";
 
+const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
+
 const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
   // Los hooks van siempre arriba
   const [formData, setFormData] = useState(() => {
@@ -30,6 +32,9 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       public_id_pdf: { es: "", en: "", fr: "" },
       video: { es: "", en: "", fr: "" },
     };
+
+    // 👇 deep clone del initialData
+    const safeInitial = deepClone(initialData || {});
 
     return {
       ...(isClass ? baseClassData : baseCourseData),
@@ -105,69 +110,74 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
     }
   }, [isClass, initialData]);
 
+  useEffect(() => {
+    if (isClass && Array.isArray(initialData?.videos)) {
+      setFormData((prev) => ({
+        ...prev,
+        videos: deepClone(initialData.videos),
+        videoIds: initialData.videos.map((v) => v._id),
+        // si querés ser consistente, también podés clonar pdfs aquí
+        pdfs: Array.isArray(initialData?.pdfs)
+          ? deepClone(initialData.pdfs)
+          : [],
+      }));
+    }
+  }, [isClass, initialData]);
+
   const handleCancel = async (e) => {
     e?.preventDefault?.();
-    // ✅ Eliminar solo los videos NUEVOS (no los marcados para eliminar)
-    for (let url of tempUploads.videos) {
+
+    // 🎥 Borrar videos NUEVOS subidos en esta edición
+    for (const url of tempUploads.videos || []) {
       try {
         await eliminarVideoDeVimeo(url);
-      } catch (err) {
-        console.error("Error al eliminar video temporal:", err);
+      } catch {
+        console.log("error");
       }
     }
 
-    // ✅ NO eliminar los de videosAEliminar. Solo se eliminan al guardar.
-
-    // ✅ Eliminar PDFs nuevos
-    for (let public_id of tempUploads.pdfs) {
+    // 📄 Borrar PDFs PRIVADOS NUEVOS subidos en esta edición (Cloudinary raw)
+    for (const public_id of tempUploads.pdfs || []) {
       try {
         await eliminarArchivoDesdeFrontend(public_id, "raw");
-      } catch (err) {
-        console.error("Error al eliminar PDF temporal:", err);
+      } catch {
+        console.log("error");
       }
     }
 
-    // 2) 🔄 restaurar SOLO el PDF y su public_id del idioma activo al estado original
+    // 🔄 Restaurar SOLO curso (PDF público / imagen pública) – ya lo tenías
     setFormData((prev) => ({
       ...prev,
-      pdf: {
-        ...prev.pdf,
-        [activeTab]: initialData?.pdf?.[activeTab] || "",
-      },
+      pdf: { ...prev.pdf, [activeTab]: initialData?.pdf?.[activeTab] || "" },
       public_id_pdf: {
         ...prev.public_id_pdf,
         [activeTab]: initialData?.public_id_pdf?.[activeTab] || "",
       },
-    }));
-
-    // ✅ Eliminar imagen nueva (si hay)
-
-    if (tempUploads.imagenNueva) {
-      try {
-        await eliminarArchivoDesdeFrontend(tempUploads.imagenNueva, "image");
-        console.log("🗑️ Imagen nueva eliminada:", tempUploads.imagenNueva);
-      } catch (err) {
-        console.warn("⚠️ No se pudo eliminar imagen nueva:", err.message);
-      }
-    }
-
-    // 🔄 Restaurar imagen del idioma activo (vuelve al estado original)
-    setFormData((prev) => ({
-      ...prev,
       image: {
         ...prev.image,
         [activeTab]: initialData?.image?.[activeTab] || "",
       },
       image_public_id: {
         ...prev.image_public_id,
-        [activeTab]: initialData?.image_public_id?.[activeTab] || "", // si no lo tenés, podés dejar ""
+        [activeTab]: initialData?.image_public_id?.[activeTab] || "",
       },
     }));
 
-    // ❌ NO eliminar imagenAEliminar (es una imagen existente)
-    // Solo se elimina si se guarda
+    // 🔄 Si estás editando una CLASE: rehidratar arrays desde la data original
+    if (isClass) {
+      setFormData((prev) => ({
+        ...prev,
+        // 👇 importantísimo: restaurar a cómo vino del backend
+        pdfs: Array.isArray(initialData?.pdfs)
+          ? deepClone(initialData.pdfs)
+          : [],
+        videos: Array.isArray(initialData?.videos)
+          ? deepClone(initialData.videos)
+          : [],
+      }));
+    }
 
-    // ✅ Limpiar estado por si se vuelve a editar luego
+    // 🧹 Limpiar buffers
     setTempUploads({
       pdfs: [],
       pdfsAEliminar: [],
@@ -177,7 +187,6 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
       imagenAEliminar: null,
     });
 
-    // ✅ Cancelar edición
     onCancel();
   };
 
@@ -193,14 +202,20 @@ const CourseForm = ({ initialData, isClass, onCancel, onSave, activeTab }) => {
           onCancel={handleCancel}
           tempUploads={tempUploads}
           setTempUploads={setTempUploads}
-          onSave={() =>
-            onSave({
-              ...prepareDataForSave(formData), // ✅ mismo cleaning que en cursos
-              tempUploads, // ✅ agregás tempUploads correctamente
-            })
-          }
-
-          // ✅ asegurás que se pase el `formData` que llega desde adentro
+          onSave={(fd) => {
+            const payloadClase = {
+              // campos de CLASE
+              title: fd.title,
+              subtitle: fd.subtitle,
+              content: fd.content,
+              secondaryContent: fd.secondaryContent,
+              visible: fd.visible,
+              pdfs: Array.isArray(fd.pdfs) ? fd.pdfs : [],
+              videos: Array.isArray(fd.videos) ? fd.videos : [],
+              tempUploads, // para que el panel (CourseEditPanel) borre en Cloudinary/Vimeo tras guardar
+            };
+            onSave(payloadClase);
+          }}
         />
       </>
     );

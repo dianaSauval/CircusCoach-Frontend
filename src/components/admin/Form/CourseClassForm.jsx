@@ -3,6 +3,8 @@ import "./CourseForm.css";
 import UploadPdfPrivadoField from "../../common/UploadPdfPrivadoField/UploadPdfPrivadoField";
 import { useState, useRef } from "react";
 import validateCourseClassForm from "../../../utils/validations/validateCourseClassForm";
+import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
+import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 
 const CourseClassForm = ({
   formData,
@@ -10,16 +12,23 @@ const CourseClassForm = ({
   activeTab,
   onCancel,
   onSave,
+  tempUploads,      // 👈 lo necesitamos para leer PDFs/videos temporales
   setTempUploads,
 }) => {
   const [errors, setErrors] = useState({});
   const titleRef = useRef(null);
   const contentRef = useRef(null);
 
+  // Helpers de temporales (sin side effects raros)
+  const isTempPdf = (id) =>
+    !!id && Array.isArray(tempUploads?.pdfs) && tempUploads.pdfs.includes(id);
+
+  const isTempVideo = (url) =>
+    !!url && Array.isArray(tempUploads?.videos) && tempUploads.videos.includes(url);
+
   const handleChange = (e, field, lang) => {
     const value = e.target.value;
 
-    // Actualiza el formData
     setFormData((prev) => ({
       ...prev,
       [field]: {
@@ -28,7 +37,6 @@ const CourseClassForm = ({
       },
     }));
 
-    // Elimina el error si existía
     if (errors[field]) {
       setErrors((prev) => {
         const updated = { ...prev };
@@ -47,15 +55,9 @@ const CourseClassForm = ({
     if (Object.keys(validationErrors).length > 0) {
       const firstError = Object.keys(validationErrors)[0];
 
-      const fieldRefMap = {
-        title: titleRef,
-        content: contentRef,
-      };
-
+      const fieldRefMap = { title: titleRef, content: contentRef };
       const ref = fieldRefMap[firstError];
-      if (ref && ref.current) {
-        ref.current.focus();
-      }
+      if (ref && ref.current) ref.current.focus();
 
       return;
     }
@@ -85,6 +87,7 @@ const CourseClassForm = ({
         />
         {errors.content && <div className="field-error">{errors.content}</div>}
       </div>
+
       <div className="form-section">
         <label className="label-formulario">Subtítulo:</label>
         <input
@@ -93,6 +96,7 @@ const CourseClassForm = ({
           onChange={(e) => handleChange(e, "subtitle", activeTab)}
         />
       </div>
+
       <div className="form-section">
         <label className="label-formulario">Contenido secundario:</label>
         <textarea
@@ -106,26 +110,43 @@ const CourseClassForm = ({
         <label className="label-formulario">PDFs:</label>
         <UploadPdfPrivadoField
           activeTab={activeTab}
-          existingPdfs={formData.pdfs || []}
+          existingPdfs={Array.isArray(formData.pdfs) ? formData.pdfs : []}
+          // ⬇️ setPdfs recibe SIEMPRE un array actualizado (no una función)
           setPdfs={(pdfList) =>
             setFormData((prev) => ({
               ...prev,
-              pdfs: pdfList,
+              pdfs: Array.isArray(pdfList) ? pdfList : [],
             }))
           }
           onPdfUploaded={(nuevoPdf) =>
             setFormData((prev) => {
               const listaActual = Array.isArray(prev.pdfs) ? prev.pdfs : [];
-              return {
-                ...prev,
-                pdfs: [...listaActual, nuevoPdf],
-              };
+              return { ...prev, pdfs: [...listaActual, nuevoPdf] };
             })
           }
           onTempPublicId={(publicId) =>
             setTempUploads((prev) => ({
               ...prev,
               pdfs: [...prev.pdfs, publicId],
+            }))
+          }
+          // 💡 Decide borrar YA (temp) vs. marcar (persistente)
+          isTempPublicId={isTempPdf}
+          onDeleteTempNow={async (id) => {
+            try {
+              await eliminarArchivoDesdeFrontend(id, "raw");
+              setTempUploads((prev) => ({
+                ...prev,
+                pdfs: prev.pdfs.filter((x) => x !== id),
+              }));
+            } catch (e) {
+              console.warn(e);
+            }
+          }}
+          onMarkForDeletion={(id) =>
+            setTempUploads((prev) => ({
+              ...prev,
+              pdfsAEliminar: [...(prev.pdfsAEliminar || []), id],
             }))
           }
         />
@@ -136,10 +157,8 @@ const CourseClassForm = ({
         <label className="label-formulario">Videos:</label>
         <UploadVideoField
           activeLang={activeTab}
-          videos={[
-            ...(formData[activeTab]?.videos || []),
-            ...(Array.isArray(formData.videos) ? formData.videos : []),
-          ]}
+          // 🔧 Unificamos: en edición, usá el array plano formData.videos
+          videos={Array.isArray(formData.videos) ? formData.videos : []}
           onChange={(updatedList) =>
             setFormData((prev) => ({
               ...prev,
@@ -158,6 +177,18 @@ const CourseClassForm = ({
               videosAEliminar: [...(prev.videosAEliminar || []), url],
             }))
           }
+          isTempVideoUrl={isTempVideo}
+          onDeleteTempNow={async (url) => {
+            try {
+              await eliminarVideoDeVimeo(url);
+              setTempUploads((prev) => ({
+                ...prev,
+                videos: prev.videos.filter((v) => v !== url),
+              }));
+            } catch (e) {
+              console.warn(e);
+            }
+          }}
         />
       </div>
 

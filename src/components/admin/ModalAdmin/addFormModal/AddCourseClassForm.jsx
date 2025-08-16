@@ -11,6 +11,10 @@ const AddCourseClassForm = ({
   errors,
   onTempPdf,
   onTempVideo,
+  isTempPdfPublicId,
+  onDeleteTempPdfNow,
+  isTempVideoUrl,
+  onDeleteTempVideoNow,
   setErrors,
 }) => {
   const inputClass = (field) => (errors?.[field] ? "input error" : "input");
@@ -100,6 +104,11 @@ const AddCourseClassForm = ({
           }))
         }
         onTempPublicId={onTempPdf}
+        // En el modal TODO es temporal → borrar YA
+        isTempPublicId={(id) => isTempPdfPublicId?.(id) ?? true}
+        onDeleteTempNow={async (id) => {
+          await onDeleteTempPdfNow?.(id);
+        }}
       />
 
       <h3 className="subtitulo">🎥 Videos</h3>
@@ -116,6 +125,10 @@ const AddCourseClassForm = ({
           }))
         }
         onTempUpload={onTempVideo}
+        isTempVideoUrl={(url) => isTempVideoUrl?.(url) ?? true}
+        onDeleteTempNow={async (url) => {
+          await onDeleteTempVideoNow?.(url);
+        }}
       />
     </>
   );

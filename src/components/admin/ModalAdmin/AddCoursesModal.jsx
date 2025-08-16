@@ -253,8 +253,14 @@ const AddCoursesModal = ({
             setFormData={setFormDataClass}
             errors={errors}
             setErrors={setErrors}
-            onTempPdf={(id) => setTempPdfPublicIds((prev) => [...prev, id])}
-            onTempVideo={(url) => setTempVideoUrls((prev) => [...prev, url])}
+            // PDFs temporales (Cloudinary)
+            onTempPdf={(id) => addTempPdf(id)}
+            isTempPdfPublicId={(id) => isTempPdf(id)}
+            onDeleteTempPdfNow={deleteTempPdfNow}
+            // Videos temporales (Vimeo)
+            onTempVideo={(url) => addTempVideo(url)}
+            isTempVideoUrl={(url) => isTempVideo(url)}
+            onDeleteTempVideoNow={deleteTempVideoNow}
           />
         )}
 

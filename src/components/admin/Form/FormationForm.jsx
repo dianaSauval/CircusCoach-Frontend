@@ -7,9 +7,14 @@ const FormationForm = ({
   setFormData,
   activeTab,
   setTempUploads,
+  onDeleteTempImageNow,
+  isTempImagePublicId,
   isTempPublicId,
   onDeleteTempNow,
   originalPublicIdMap,
+  isTempVideoUrl,
+  onDeleteTempVideoNow,
+  onMarkVideoForDeletion,
 }) => {
   return (
     <>
@@ -57,18 +62,46 @@ const FormationForm = ({
       <UploadImagenField
         activeLang={activeTab}
         value={formData?.image?.[activeTab] || ""}
-        onChange={(url) =>
+        publicIdActual={formData?.image_public_id?.[activeTab] || ""}
+        onChange={(url, publicId) => {
+          // nueva imagen → temp
           setFormData((prev) => ({
             ...prev,
             image: { ...prev.image, [activeTab]: url },
-          }))
-        }
-        onMarkForDeletion={(id) =>
+            image_public_id: {
+              ...(prev.image_public_id || {}),
+              [activeTab]: publicId,
+            },
+          }));
+          setTempUploads((prev) => ({ ...prev, imagenNueva: publicId }));
+        }}
+        onMarkForDeletion={(id) => {
+          // persistida → marcar y vaciar visualmente
           setTempUploads((prev) => ({
             ...prev,
             imagenesAEliminar: [...(prev.imagenesAEliminar || []), id],
-          }))
-        }
+          }));
+          setFormData((prev) => ({
+            ...prev,
+            image: { ...prev.image, [activeTab]: "" },
+            image_public_id: {
+              ...(prev.image_public_id || {}),
+              [activeTab]: "",
+            },
+          }));
+        }}
+        onDeleteTempNow={async (id) => {
+          await onDeleteTempImageNow?.(id); // borra YA y limpia tempUploads.imagenNueva
+          setFormData((prev) => ({
+            ...prev,
+            image: { ...prev.image, [activeTab]: "" },
+            image_public_id: {
+              ...(prev.image_public_id || {}),
+              [activeTab]: "",
+            },
+          }));
+        }}
+        isTempPublicId={(id) => isTempImagePublicId?.(id)}
       />
 
       {/* 🔹 PDF por idioma */}
@@ -115,6 +148,16 @@ const FormationForm = ({
             };
           })
         }
+        isTempPublicId={(id) => isTempPublicId?.(id)}
+        onDeleteTempNow={async (id) => {
+          await onDeleteTempNow?.(id); // 🔥 borrar YA en Cloudinary
+          setFormData((prev) => ({
+            ...prev,
+            pdf: { ...prev.pdf, [activeTab]: "" },
+            pdf_public_id: { ...(prev.pdf_public_id || {}), [activeTab]: "" },
+          }));
+        }}
+        originalPublicId={originalPublicIdMap || {}}
       />
 
       {/* 🔹 Video por idioma */}
@@ -123,14 +166,27 @@ const FormationForm = ({
         formData={formData}
         setFormData={setFormData}
         activeTab={activeTab}
-        onAddTempVideo={(vimeoId) => {
-          console.log("📽️ Video temporal agregado:", vimeoId);
+        // SUBIR (archivo nuestro) → temp
+        onTempUpload={(url) =>
           setTempUploads?.((prev) => ({
             ...prev,
-            videos: [...(prev?.videos || []), vimeoId],
+            videos: prev?.videos?.includes(url)
+              ? prev.videos
+              : [...(prev?.videos || []), url],
+          }))
+        }
+        // PEGAR enlace externo → no es temp (solo limpiar si eliminan)
+        isTempVideoUrl={(url) => isTempVideoUrl?.(url)}
+        onDeleteTempNow={async (url) => {
+          await onDeleteTempVideoNow?.(url); // 🔥 borrar YA en Vimeo
+          setFormData((prev) => ({
+            ...prev,
+            video: { ...(prev?.video || {}), [activeTab]: "" },
           }));
         }}
-        setTempUploads={setTempUploads}
+        onMarkForDeletion={
+          (url) => onMarkVideoForDeletion?.(url) // persistido: borrar al Guardar
+        }
       />
     </>
   );

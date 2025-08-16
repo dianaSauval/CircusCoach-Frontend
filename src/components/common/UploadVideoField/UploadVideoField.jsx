@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import "./UploadVideoField.css";
 import { v4 as uuidv4 } from "uuid";
-import {
-  subirVideoPrivado,
-} from "../../../services/uploadVimeoService";
+import { subirVideoPrivado } from "../../../services/uploadVimeoService";
 import { FaTrashAlt, FaCheckCircle, FaFileVideo } from "react-icons/fa";
 
 const UploadVideoField = ({
@@ -12,22 +10,23 @@ const UploadVideoField = ({
   onChange = () => {},
   onTempUpload = () => {},
   onMarkDelete = () => {},
+  isTempVideoUrl = () => false,
+  onDeleteTempNow = async () => {},
 }) => {
   const [localVideos, setLocalVideos] = useState([]);
   const [addedIds, setAddedIds] = useState([]);
 
-useEffect(() => {
-  if (Array.isArray(videos)) {
-    const conId = videos.map((v) => ({
-      _id: v._id || uuidv4(),
-      url: v.url || {},
-      title: v.title || {},
-      description: v.description || {},
-    }));
-    setLocalVideos(conId);
-  }
-}, [videos]);
-
+  useEffect(() => {
+    if (Array.isArray(videos)) {
+      const conId = videos.map((v) => ({
+        _id: v._id || uuidv4(),
+        url: v.url || {},
+        title: v.title || {},
+        description: v.description || {},
+      }));
+      setLocalVideos(conId);
+    }
+  }, [videos]);
 
   const handleUploadSuccess = (videoPartial) => {
     setLocalVideos((prev) => {
@@ -54,19 +53,29 @@ useEffect(() => {
     });
   };
 
- const handleDelete = (videoId) => {
-  const video = localVideos.find((v) => v._id === videoId);
-  const url = video?.url?.[activeLang];
+  const handleDelete = async (videoId) => {
+    const video = localVideos.find((v) => v._id === videoId);
+    const url = video?.url?.[activeLang];
 
-  if (url) {
-    onMarkDelete(url);
-  }
+    if (url) {
+      if (isTempVideoUrl(url)) {
+        // 💥 nuevo en esta edición → borrar YA en Vimeo
+        try {
+          await onDeleteTempNow(url);
+        } catch {
+          console.log("error");
+          
+        }
+      } else {
+        // 🏷️ persistente → marcar para borrar al Guardar
+        onMarkDelete(url);
+      }
+    }
 
-  const updated = localVideos.filter((v) => v._id !== videoId);
-  setLocalVideos(updated);
-  onChange(updated);
-};
-
+    const updated = localVideos.filter((v) => v._id !== videoId);
+    setLocalVideos(updated);
+    onChange(updated);
+  };
 
   const addNewVideo = () => {
     const newId = uuidv4();
@@ -82,18 +91,17 @@ useEffect(() => {
     setAddedIds((prev) => [...prev, newId]);
   };
 
-const videosToShow = localVideos.filter((video) => {
-  const url = video.url?.[activeLang] || "";
-  const title = video.title?.[activeLang] || "";
-  const description = video.description?.[activeLang] || "";
-  return (
-    addedIds.includes(video._id) ||
-    url.trim() !== "" ||
-    title.trim() !== "" ||
-    description.trim() !== ""
-  );
-});
-
+  const videosToShow = localVideos.filter((video) => {
+    const url = video.url?.[activeLang] || "";
+    const title = video.title?.[activeLang] || "";
+    const description = video.description?.[activeLang] || "";
+    return (
+      addedIds.includes(video._id) ||
+      url.trim() !== "" ||
+      title.trim() !== "" ||
+      description.trim() !== ""
+    );
+  });
 
   return (
     <div className="upload-video-field-multiple">
@@ -129,6 +137,7 @@ const SingleVideoUploader = ({
   onUploadSuccess,
   onDelete,
   onDiscard = () => {},
+  onTempUpload = () => {},
 }) => {
   const [videoFile, setVideoFile] = useState(null);
   const [title, setTitle] = useState("");
@@ -138,13 +147,12 @@ const SingleVideoUploader = ({
   const [error, setError] = useState(null);
   const [videoUrl, setVideoUrl] = useState("");
 
-useEffect(() => {
-  // Solo inicializar si los estados están vacíos
-  setTitle((prev) => prev || video?.title?.[activeLang] || "");
-  setDescription((prev) => prev || video?.description?.[activeLang] || "");
-  setVideoUrl((prev) => prev || video?.url?.[activeLang] || "");
-}, [activeLang, video]);
-
+  useEffect(() => {
+    // Solo inicializar si los estados están vacíos
+    setTitle((prev) => prev || video?.title?.[activeLang] || "");
+    setDescription((prev) => prev || video?.description?.[activeLang] || "");
+    setVideoUrl((prev) => prev || video?.url?.[activeLang] || "");
+  }, [activeLang, video]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -180,7 +188,8 @@ useEffect(() => {
       };
 
       onUploadSuccess(videoPartial);
-
+       // 👇 IMPORTANTE: trackearlo como “temporal”
+      onTempUpload(publicUrl);
 
       setVideoUrl(publicUrl);
       setVideoFile(null);

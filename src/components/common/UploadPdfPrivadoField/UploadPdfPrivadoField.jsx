@@ -2,10 +2,7 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { FaFilePdf, FaTrashAlt } from "react-icons/fa";
-import {
-  subirPdfPrivado,
-  eliminarArchivoDesdeFrontend,
-} from "../../../services/uploadCloudinary";
+import { subirPdfPrivado } from "../../../services/uploadCloudinary";
 import "./UploadPdfPrivadoField.css";
 
 const UploadPdfPrivadoField = ({
@@ -14,6 +11,9 @@ const UploadPdfPrivadoField = ({
   onTempPublicId,
   existingPdfs = [],
   setPdfs,
+  isTempPublicId = () => false,
+  onDeleteTempNow = async () => {},
+  onMarkForDeletion = () => {},
 }) => {
   const [pdfInputs, setPdfInputs] = useState([]);
 
@@ -80,30 +80,35 @@ const UploadPdfPrivadoField = ({
     const pdf = existingPdfs.find((p) => p._id === pdfId);
     const publicId = pdf?.public_id?.[activeTab];
 
+    // ¿Es un archivo nuevo subido en esta edición?
+    const esTemp = publicId && isTempPublicId(publicId);
     if (publicId) {
       try {
-        await eliminarArchivoDesdeFrontend(publicId);
+        if (esTemp) {
+          // 💥 borrar YA (Cloudinary raw)
+          await onDeleteTempNow(publicId);
+        } else {
+          // 🏷️ persistente → marcar para borrar al guardar
+          onMarkForDeletion(publicId);
+        }
       } catch (error) {
-        console.warn("⚠️ Error al eliminar archivo desde Cloudinary:", error);
+        console.warn("⚠️ Error al gestionar eliminación de PDF:", error);
       }
     }
 
-    setPdfs((prev) => {
-      const listaActual = Array.isArray(prev) ? prev : [];
-
-      return listaActual.map((p) => {
-        if (p._id !== pdfId) return p;
-
-        const newPdf = { ...p };
-
-        newPdf.url = { ...newPdf.url, [activeTab]: "" };
-        newPdf.public_id = { ...newPdf.public_id, [activeTab]: "" };
-        newPdf.title = { ...newPdf.title, [activeTab]: "" };
-        newPdf.description = { ...newPdf.description, [activeTab]: "" };
-
-        return newPdf;
-      });
+    // ✅ Construimos la nueva lista desde la prop `existingPdfs`
+    const listaActual = Array.isArray(existingPdfs) ? existingPdfs : [];
+    const actualizada = listaActual.map((p) => {
+      if (p._id !== pdfId) return p;
+      return {
+        ...p,
+        url: { ...(p.url || {}), [activeTab]: "" },
+        public_id: { ...(p.public_id || {}), [activeTab]: "" },
+        title: { ...(p.title || {}), [activeTab]: "" },
+        description: { ...(p.description || {}), [activeTab]: "" },
+      };
     });
+    setPdfs(actualizada);
   };
 
   return (
@@ -129,8 +134,12 @@ const UploadPdfPrivadoField = ({
                   </a>
                 </div>
                 <button
+                  type="button" // 👈 evita el submit del formulario
                   className="boton-eliminar"
-                  onClick={() => eliminarPdf(pdf._id)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    eliminarPdf(pdf._id);
+                  }} // 👈 extra seguro
                 >
                   <FaTrashAlt />
                 </button>

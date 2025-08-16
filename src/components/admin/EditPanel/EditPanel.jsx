@@ -29,6 +29,7 @@ const EditPanel = ({
     videosAEliminar: [],
     imagenesAEliminar: [],
     pdfsAEliminar: [],
+    imagenNueva: null,
   });
 
   const originalRef = useRef(null);
@@ -40,6 +41,7 @@ const EditPanel = ({
     videosAEliminar: [],
     imagenesAEliminar: [],
     pdfsAEliminar: [],
+    imagenNueva: null,
   };
 
   const modeLabels = {
@@ -163,12 +165,49 @@ const EditPanel = ({
     if (!selectedItem) return;
 
     try {
-      // ——— Preparar payload según el tipo seleccionado ———
       if (selectedClass) {
         const { updateClass } = await import(
           "../../../services/formationService"
         );
-        await updateClass(selectedClass._id, formData);
+        await updateClass(selectedClass._id, formData); // 👈 el payload ya viene con url/lang vacíos para los que quitaste
+
+        // 🎥 Videos persistentes marcados para borrar (Vimeo)
+        if (
+          Array.isArray(tempUploads.videosAEliminar) &&
+          tempUploads.videosAEliminar.length
+        ) {
+          const urlsUnicas = Array.from(
+            new Set(tempUploads.videosAEliminar.filter(Boolean))
+          );
+          for (const url of urlsUnicas) {
+            try {
+              await eliminarVideoDeVimeo(url);
+            } catch (err) {
+              console.warn(
+                "⚠️ No se pudo eliminar el video:",
+                url,
+                err?.message
+              );
+            }
+          }
+        }
+
+        // 📄 PDFs persistentes marcados para borrar (Cloudinary raw)
+        if (
+          Array.isArray(tempUploads.pdfsAEliminar) &&
+          tempUploads.pdfsAEliminar.length
+        ) {
+          const idsUnicos = Array.from(
+            new Set(tempUploads.pdfsAEliminar.filter(Boolean))
+          );
+          for (const id of idsUnicos) {
+            try {
+              await eliminarArchivoDesdeFrontend(id, "raw");
+            } catch (err) {
+              console.warn("⚠️ No se pudo eliminar el PDF:", id, err?.message);
+            }
+          }
+        }
       } else if (selectedModule) {
         const { updateModule } = await import(
           "../../../services/formationService"
@@ -323,58 +362,113 @@ const EditPanel = ({
     ? "Ocultar en este idioma"
     : "Hacer visible en este idioma";
 
-const handleCancel = async (e) => {
-  e?.preventDefault?.();
+  const handleCancel = async (e) => {
+    e?.preventDefault?.();
 
-  // 1) Borrar SOLO los PDFs NUEVOS subidos en esta edición (para no dejar huérfanos)
-  if (Array.isArray(tempUploads.pdfs) && tempUploads.pdfs.length) {
-    for (const id of tempUploads.pdfs) {
-      try {
-        await eliminarArchivoDesdeFrontend(id, "raw");
-      } catch (err) {
-        console.warn("⚠️ No se pudo borrar PDF temporal al cancelar:", id, err?.message);
+    // 1) Borrar SOLO los PDFs NUEVOS subidos en esta edición (para no dejar huérfanos)
+    if (Array.isArray(tempUploads.pdfs) && tempUploads.pdfs.length) {
+      for (const id of tempUploads.pdfs) {
+        try {
+          await eliminarArchivoDesdeFrontend(id, "raw");
+        } catch (err) {
+          console.warn(
+            "⚠️ No se pudo borrar PDF temporal al cancelar:",
+            id,
+            err?.message
+          );
+        }
       }
     }
-  }
-
-  // 2) Rehidratar SOLO pdf y pdf_public_id desde el snapshot (si estás editando una FORMACIÓN)
-  if (selectedFormation && !selectedClass && !selectedModule) {
-    const snap = originalRef.current;
-    if (snap) {
-      setFormData((prev) => ({
-        ...prev,
-        pdf: {
-          es: typeof snap?.pdf?.es === "object" ? (snap?.pdf?.es?.url || "") : (snap?.pdf?.es || ""),
-          en: typeof snap?.pdf?.en === "object" ? (snap?.pdf?.en?.url || "") : (snap?.pdf?.en || ""),
-          fr: typeof snap?.pdf?.fr === "object" ? (snap?.pdf?.fr?.url || "") : (snap?.pdf?.fr || ""),
-        },
-        pdf_public_id: {
-          es: snap?.pdf_public_id?.es || "",
-          en: snap?.pdf_public_id?.en || "",
-          fr: snap?.pdf_public_id?.fr || "",
-        },
-      }));
+    // 1b) Videos temp (Vimeo)
+    if (Array.isArray(tempUploads.videos) && tempUploads.videos.length) {
+      for (const url of tempUploads.videos) {
+        try {
+          await eliminarVideoDeVimeo(url);
+        } catch (err) {
+          console.warn(
+            "⚠️ No se pudo borrar video temp al cancelar:",
+            url,
+            err?.message
+          );
+        }
+      }
     }
-  } else if (selectedClass) {
-    // 3) Si estabas editando CLASE: recargo desde backend para dejarla como estaba
-    try {
-      const classData = await getClassByIdAdmin(selectedClass._id);
-      setFormData({
-        ...classData,
-        pdfs: classData.pdfs || [],
-        videos: classData.videos || [],
-      });
-    } catch (error) {
-      console.error("❌ Error al recargar clase tras cancelar:", error?.message);
+
+    // 1c) Imagen temp (Cloudinary)
+    if (tempUploads.imagenNueva) {
+      try {
+        await eliminarArchivoDesdeFrontend(tempUploads.imagenNueva, "image");
+      } catch (err) {
+        console.warn(
+          "⚠️ No se pudo borrar imagen temp al cancelar:",
+          err?.message
+        );
+      }
     }
-    // Si es MÓDULO, no hay PDF público por idioma → no tocamos nada
-  }
+    // 2) Rehidratar desde snapshot (cuando editás una FORMACIÓN)
+    if (selectedFormation && !selectedClass && !selectedModule) {
+      const snap = originalRef.current;
+      if (snap) {
+        setFormData((prev) => ({
+          ...prev,
+          pdf: {
+            es:
+              typeof snap?.pdf?.es === "object"
+                ? snap?.pdf?.es?.url || ""
+                : snap?.pdf?.es || "",
+            en:
+              typeof snap?.pdf?.en === "object"
+                ? snap?.pdf?.en?.url || ""
+                : snap?.pdf?.en || "",
+            fr:
+              typeof snap?.pdf?.fr === "object"
+                ? snap?.pdf?.fr?.url || ""
+                : snap?.pdf?.fr || "",
+          },
+          pdf_public_id: {
+            es: snap?.pdf_public_id?.es || "",
+            en: snap?.pdf_public_id?.en || "",
+            fr: snap?.pdf_public_id?.fr || "",
+          },
+          image: {
+            es: snap?.image?.es || "",
+            en: snap?.image?.en || "",
+            fr: snap?.image?.fr || "",
+          },
+          image_public_id: {
+            es: snap?.image_public_id?.es || "",
+            en: snap?.image_public_id?.en || "",
+            fr: snap?.image_public_id?.fr || "",
+          },
+          video: {
+            es: snap?.video?.es || "",
+            en: snap?.video?.en || "",
+            fr: snap?.video?.fr || "",
+          },
+        }));
+      }
+    } else if (selectedClass) {
+      // 3) Si estabas editando CLASE: recargo desde backend para dejarla como estaba
+      try {
+        const classData = await getClassByIdAdmin(selectedClass._id);
+        setFormData({
+          ...classData,
+          pdfs: classData.pdfs || [],
+          videos: classData.videos || [],
+        });
+      } catch (error) {
+        console.error(
+          "❌ Error al recargar clase tras cancelar:",
+          error?.message
+        );
+      }
+      // Si es MÓDULO, no hay PDF público por idioma → no tocamos nada
+    }
 
-  // 4) Limpiar buffers de esta edición y salir de modo edición
-  setTempUploads(EMPTY_UPLOADS);
-  setIsEditing(false);
-};
-
+    // 4) Limpiar buffers de esta edición y salir de modo edición
+    setTempUploads(EMPTY_UPLOADS);
+    setIsEditing(false);
+  };
 
   // —— helpers para el field de PDF ——
   const isTempPublicId = (id) => (tempUploads.pdfs || []).includes(id);
@@ -398,6 +492,36 @@ const handleCancel = async (e) => {
       }));
     } catch (err) {
       console.warn("⚠️ No se pudo eliminar PDF temporal:", err?.message);
+    }
+  };
+
+  // —— helpers VIDEO (Formación promo video) ——
+  const isTempVideoUrl = (url) =>
+    Array.isArray(tempUploads.videos) && tempUploads.videos.includes(url);
+
+  const deleteTempVideoNow = async (url) => {
+    if (!isTempVideoUrl(url)) return;
+    try {
+      await eliminarVideoDeVimeo(url);
+      setTempUploads((prev) => ({
+        ...prev,
+        videos: prev.videos.filter((v) => v !== url),
+      }));
+    } catch (e) {
+      console.warn("⚠️ No se pudo eliminar video temporal:", e?.message);
+    }
+  };
+
+  // —— helpers IMAGEN (Formación imagen pública) ——
+  const isTempImagePublicId = (id) => !!id && id === tempUploads.imagenNueva;
+
+  const deleteTempImageNow = async (id) => {
+    if (!isTempImagePublicId(id)) return;
+    try {
+      await eliminarArchivoDesdeFrontend(id, "image");
+      setTempUploads((prev) => ({ ...prev, imagenNueva: null }));
+    } catch (e) {
+      console.warn("⚠️ No se pudo eliminar imagen temporal:", e?.message);
     }
   };
 
@@ -697,9 +821,22 @@ const handleCancel = async (e) => {
               activeTab={activeTab}
               modeLabels={modeLabels}
               setTempUploads={setTempUploads}
+              // PDFs
               isTempPublicId={isTempPublicId}
               onDeleteTempNow={deleteTempNow}
               originalPublicIdMap={originalRef.current?.pdf_public_id || {}}
+              // VIDEO promo
+              isTempVideoUrl={isTempVideoUrl}
+              onDeleteTempVideoNow={deleteTempVideoNow}
+              onMarkVideoForDeletion={(url) =>
+                setTempUploads((prev) => ({
+                  ...prev,
+                  videosAEliminar: [...(prev.videosAEliminar || []), url],
+                }))
+              }
+              // IMAGEN pública
+              isTempImagePublicId={isTempImagePublicId}
+              onDeleteTempImageNow={deleteTempImageNow}
             />
           )}
 
@@ -716,6 +853,7 @@ const handleCancel = async (e) => {
               formData={formData}
               setFormData={setFormData}
               activeTab={activeTab}
+              tempUploads={tempUploads} // 👈 NUEVO
               setTempUploads={setTempUploads}
             />
           )}

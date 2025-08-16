@@ -1,8 +1,16 @@
+import { eliminarArchivoDesdeFrontend } from "../../../services/uploadCloudinary";
+import { eliminarVideoDeVimeo } from "../../../services/uploadVimeoService";
 import UploadPdfPrivadoField from "../../common/UploadPdfPrivadoField/UploadPdfPrivadoField";
 import UploadVideoField from "../../common/UploadVideoField/UploadVideoField";
 import "./Form.css";
 
-const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
+const ClassForm = ({
+  formData,
+  setFormData,
+  activeTab,
+  tempUploads,
+  setTempUploads,
+}) => {
   // 🟡 Campos comunes (título, contenido, etc.)
   const handleTextChange = (field, value) => {
     setFormData({
@@ -13,6 +21,12 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
       },
     });
   };
+
+  // 📌 Detectores de “temporal” (subido en esta edición)
+  const isTempPdfPublicId = (id) =>
+    !!id && Array.isArray(tempUploads?.pdfs) && tempUploads.pdfs.includes(id);
+  const isTempVideoUrl = (url) =>
+    !!url && Array.isArray(tempUploads?.videos) && tempUploads.videos.includes(url);
 
   return (
     <div className="class-form-container">
@@ -79,6 +93,24 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
             pdfs: [...(prev?.pdfs || []), publicId],
           }))
         }
+        // ⚖️ decidir si borrar YA o marcar para borrar al Guardar
+        isTempPublicId={isTempPdfPublicId}
+        onDeleteTempNow={async (publicId) => {
+          try {
+            await eliminarArchivoDesdeFrontend(publicId, "raw");
+          } finally {
+            setTempUploads((prev) => ({
+              ...prev,
+              pdfs: (prev.pdfs || []).filter((x) => x !== publicId),
+            }));
+          }
+        }}
+        onMarkForDeletion={(publicId) =>
+          setTempUploads((prev) => ({
+            ...prev,
+            pdfsAEliminar: [...(prev.pdfsAEliminar || []), publicId],
+          }))
+        }
       />
       <h3 className="subtitulo">🎥 Videos</h3>
       <UploadVideoField
@@ -96,6 +128,18 @@ const ClassForm = ({ formData, setFormData, activeTab, setTempUploads }) => {
             videos: [...(prev.videos || []), url],
           }))
         }
+        // ⚖️ idem: si es temporal → borrar YA, si no → marcar para Guardar
+        isTempVideoUrl={isTempVideoUrl}
+        onDeleteTempNow={async (url) => {
+          try {
+            await eliminarVideoDeVimeo(url);
+          } finally {
+            setTempUploads((prev) => ({
+              ...prev,
+              videos: (prev.videos || []).filter((v) => v !== url),
+            }));
+          }
+        }}
         onMarkDelete={(url) =>
           setTempUploads((prev) => ({
             ...prev,

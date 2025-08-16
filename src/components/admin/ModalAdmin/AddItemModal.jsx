@@ -24,6 +24,34 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
   const [tempVideoUrls, setTempVideoUrls] = useState([]);
   const [tempPdfPrivadosPublicIds, setTempPdfPrivadosPublicIds] = useState([]);
 
+  // PDFs
+  const addTempPdf = (id) =>
+    setTempPdfPublicIds((p) => (p.includes(id) ? p : [...p, id]));
+  const removeTempPdf = (id) =>
+    setTempPdfPublicIds((p) => p.filter((x) => x !== id));
+  const isTempPdf = (id) => !!id && tempPdfPublicIds.includes(id);
+  const deleteTempPdfNow = async (id) => {
+    try {
+      await eliminarArchivoDesdeFrontend(id, "raw");
+    } finally {
+      removeTempPdf(id);
+    }
+  };
+
+  // Videos
+  const addTempVideo = (url) =>
+    setTempVideoUrls((p) => (p.includes(url) ? p : [...p, url]));
+  const removeTempVideo = (url) =>
+    setTempVideoUrls((p) => p.filter((x) => x !== url));
+  const isTempVideo = (url) => !!url && tempVideoUrls.includes(url);
+  const deleteTempVideoNow = async (url) => {
+    try {
+      await eliminarVideoDeVimeo(url);
+    } finally {
+      removeTempVideo(url);
+    }
+  };
+
   const isFormation = type === "formation";
   const isClass = type === "class";
 
@@ -440,6 +468,16 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                 onTempPublicId={(id) =>
                   setTempPdfPrivadosPublicIds((prev) => [...prev, id])
                 }
+                isTempPublicId={() => true} // ← en el modal, todo es TEMP
+                onDeleteTempNow={async (id) => {
+                  try {
+                    await eliminarArchivoDesdeFrontend(id, "raw");
+                  } finally {
+                    setTempPdfPrivadosPublicIds((p) =>
+                      p.filter((x) => x !== id)
+                    );
+                  }
+                }}
               />
 
               <h3>🎥 Videos</h3>
@@ -491,6 +529,23 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                     },
                   }))
                 }
+                publicIdActual={formData.image_public_id?.[activeTab] || ""}
+                isTempPublicId={() => true} // en el modal, todo lo subido es TEMP
+                onDeleteTempNow={async (id) => {
+                  try {
+                    await eliminarArchivoDesdeFrontend(id, "image");
+                  } catch (e) {
+                    console.warn(e);
+                  }
+                  setFormData((prev) => ({
+                    ...prev,
+                    image: { ...prev.image, [activeTab]: "" },
+                    image_public_id: {
+                      ...prev.image_public_id,
+                      [activeTab]: "",
+                    },
+                  }));
+                }}
               />
               {errors[`image-${activeTab}`] && (
                 <p className="field-error">{errors[`image-${activeTab}`]}</p>
@@ -502,18 +557,26 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                 setPdfUrl={setPdfUrl}
                 publicId={pdfPublicId}
                 setPublicId={setPdfPublicId}
-                onTempUpload={(id) =>
-                  setTempPdfPublicIds((prev) => [...prev, id])
-                }
+                onTempUpload={(id) => addTempPdf(id)}
+                isTempPublicId={(id) => isTempPdf(id)}
+                onDeleteTempNow={async (id) => {
+                  await deleteTempPdfNow(id); // 🔥 borrar YA
+                  setPdfUrl((prev) => ({ ...prev, [activeTab]: "" }));
+                  setPdfPublicId((prev) => ({ ...prev, [activeTab]: "" }));
+                }}
               />
               <VideoPromocionalForm
                 formData={formData}
                 setFormData={setFormData}
                 activeTab={activeTab}
-                onAddTempVideo={(url) => {
-                  if (!tempVideoUrls.includes(url)) {
-                    setTempVideoUrls((prev) => [...prev, url]);
-                  }
+                onTempUpload={(url) => addTempVideo(url)} // marcar TEMP
+                isTempVideoUrl={(url) => isTempVideo(url)}
+                onDeleteTempNow={async (url) => {
+                  await deleteTempVideoNow(url); // 🔥 borrar YA en Vimeo
+                  setFormData((prev) => ({
+                    ...prev,
+                    video: { ...(prev?.video || {}), [activeTab]: "" },
+                  }));
                 }}
               />
             </>
