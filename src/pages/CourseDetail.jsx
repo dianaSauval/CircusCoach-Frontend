@@ -6,11 +6,14 @@ import "../styles/pages/CourseDetail.css";
 import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import EmptyState from "../components/EmptyState/EmptyState";
-import { getYoutubeEmbedUrl } from "../utils/youtube";
+import { getVideoEmbedUrl } from "../utils/videoEmbed";
 import InternationalPriceCard from "../components/InternationalPriceCard/InternationalPriceCard";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import { getActiveDiscounts } from "../services/discountService";
 import DiscountBanner from "../components/common/DiscountBanner/DiscountBanner";
+
+// Normaliza booleans por si vienen como string
+const toBool = (v) => v === true || v === "true";
 
 function CourseDetail() {
   const { id, slug } = useParams();
@@ -22,52 +25,94 @@ function CourseDetail() {
   const [idiomaNoDisponible, setIdiomaNoDisponible] = useState(false);
   const [idiomasDisponibles, setIdiomasDisponibles] = useState([]);
   const [bonoDelCurso, setBonoDelCurso] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const data = await getCourseById(id, lang);
+  // Normaliza booleans por si vienen como string
+const toBool = (v) => v === true || v === "true";
 
-        // si no está visible en este idioma
-        if (!data.visible?.[lang]) {
-          setIdiomaNoDisponible(true);
-          const langs = Object.entries(data.visible || {})
-            .filter(([_, visible]) => visible)
-            .map(([idioma]) => idioma.toUpperCase());
-          setIdiomasDisponibles(langs);
-        } else {
-          setCourse(data);
+useEffect(() => {
+  let cancelled = false;
 
-          setIdiomaNoDisponible(false);
-          const langs = Object.entries(data.visible || {})
-            .filter(([_, visible]) => visible)
-            .map(([idioma]) => idioma.toUpperCase());
-          setIdiomasDisponibles(langs);
+  // 🔄 limpiar estado al cambiar id/lang para evitar flashes del idioma previo
+  setLoading(true);
+  setCourse(null);
+  setIdiomaNoDisponible(false);
+  setIdiomasDisponibles([]);
+  setBonoDelCurso(null);
 
-          const descuentos = await getActiveDiscounts();
-          const bonoAplicable = descuentos.find(
-            (d) =>
-              (d.type === "course" || d.type === "both") &&
-              d.targetItems?.some((item) => item._id === data._id)
-          );
+  const fetchCourse = async () => {
+    try {
+      const data = await getCourseById(id, lang);
+      if (cancelled) return;
 
-          setBonoDelCurso(bonoAplicable || null);
-        }
-      } catch (error) {
-        console.error("Error al obtener detalles del curso:", error);
+      // idiomas visibles (true/"true")
+      const visibles = Object.entries(data.visible || {})
+        .filter(([, v]) => toBool(v))
+        .map(([k]) => k.toUpperCase());
+      setIdiomasDisponibles(visibles);
+
+      // ⛔ si NO está visible en el idioma actual => solo EmptyState
+      if (!toBool(data.visible?.[lang])) {
+        setIdiomaNoDisponible(true);
+        return;
       }
-    };
 
-    fetchCourse();
-  }, [id, lang]);
+      // ✅ visible en el idioma actual => setear curso + descuentos
+      setCourse(data);
 
-  // Redirige si el slug no coincide con el título actual
+      const descuentos = await getActiveDiscounts();
+      if (cancelled) return;
+      const bonoAplicable = descuentos.find(
+        (d) =>
+          (d.type === "course" || d.type === "both") &&
+          d.targetItems?.some((item) => item._id === data._id)
+      );
+      setBonoDelCurso(bonoAplicable || null);
+    } catch (err) {
+      if (cancelled) return;
+
+      const status = err?.response?.status;
+
+      if (status === 403) {
+        // 🔐 El backend te está diciendo "no visible en este idioma"
+        // Intentamos leer idiomas visibles si el backend los manda:
+        const visibleFromError = err.response?.data?.visible;
+        if (visibleFromError && typeof visibleFromError === "object") {
+          const visibles = Object.entries(visibleFromError)
+            .filter(([, v]) => toBool(v))
+            .map(([k]) => k.toUpperCase());
+          setIdiomasDisponibles(visibles);
+        }
+
+        setIdiomaNoDisponible(true);
+      } else if (status === 404) {
+        // Curso inexistente: podés redirigir a 404 si tenés ruta
+        // navigate("/404", { replace: true });
+        setIdiomaNoDisponible(true);
+      } else {
+        console.error("Error al obtener detalles del curso:", err);
+        // Si querés, mostrar un EmptyState genérico:
+        setIdiomaNoDisponible(true);
+      }
+    } finally {
+      if (!cancelled) setLoading(false);
+    }
+  };
+
+  fetchCourse();
+  return () => {
+    cancelled = true;
+  };
+}, [id, lang]);
+
+  // Redirección de slug SOLO si hay título en el idioma actual (o sea, visible)
   useEffect(() => {
     if (course?.title?.[lang]) {
       const expectedSlug = course.title[lang]
         .toLowerCase()
+        .normalize("NFD").replace(/\p{Diacritic}/gu, "")
         .replace(/\s+/g, "-")
-        .replace(/[^\w-]/g, "");
+        .replace(/[^a-z0-9-]/g, "");
 
       if (slug !== expectedSlug) {
         navigate(`/courses/${id}/${expectedSlug}`, { replace: true });
@@ -78,29 +123,41 @@ function CourseDetail() {
   const handleDownload = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const url = course?.pdf?.[lang];
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
+    const url = (course?.pdf?.[lang] || "").trim();
+    if (url) window.open(url, "_blank", "noopener,noreferrer");
   };
 
+  // ⛔ Idioma no disponible -> SOLO EmptyState (opcional: listar idiomas disponibles)
   if (idiomaNoDisponible) {
+    const disponiblesTexto =
+      idiomasDisponibles.length > 0
+        ? ` (${tc.availableLanguages}: ${idiomasDisponibles
+            .map((code) => tc.languageNames[code.toLowerCase()] || code)
+            .join(" / ")})`
+        : "";
+
     return (
       <EmptyState
         title={`😢 ${tc.unavailableTitle}`}
-        subtitle={tc.unavailable.replace(
-          "{{lang}}",
-          tc.languageNames[lang] || lang.toUpperCase()
-        )}
+        subtitle={
+          `${tc.unavailable.replace(
+            "{{lang}}",
+            tc.languageNames[lang] || lang.toUpperCase()
+          )}${disponiblesTexto}`
+        }
       />
     );
   }
 
-  if (!course) return <LoadingSpinner texto={tc.loading} />;
+  // ⏳ Cargando
+  if (loading || !course) return <LoadingSpinner texto={tc.loading} />;
 
-  const embedUrl = course.video?.[lang]
-    ? getYoutubeEmbedUrl(course.video[lang])
-    : null;
+  // 🎬 Solo contenido del idioma actual (sin fallbacks)
+  const promoVideoRaw = (course.video?.[lang] || "").trim();
+  const embedUrl = promoVideoRaw ? getVideoEmbedUrl(promoVideoRaw) : null;
+
+  const imageSrc =
+    (course.image?.[lang] && course.image[lang].trim()) || "/placeholder.png";
 
   return (
     <>
@@ -110,6 +167,7 @@ function CourseDetail() {
           endDate={bonoDelCurso.endDate}
         />
       )}
+
       <div className="detalle-container">
         <div className="left-section">
           <h1 className="detalle-title">{course.title?.[lang]}</h1>
@@ -141,15 +199,18 @@ function CourseDetail() {
             <iframe
               className="video-iframe"
               src={embedUrl}
-              title="Video del curso"
+              title="Video promocional del curso"
               frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
-            ></iframe>
+            />
           ) : (
             <img
-              src={course.image?.[lang] || "/placeholder.png"}
+              src={imageSrc}
               alt={course.title?.[lang] || "Imagen del curso"}
               className="formation-detail-image"
+              loading="lazy"
             />
           )}
         </div>

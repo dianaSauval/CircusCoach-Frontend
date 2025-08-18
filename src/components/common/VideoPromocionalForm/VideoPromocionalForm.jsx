@@ -69,21 +69,28 @@ const VideoPromocionalForm = ({
     setError(null);
 
     try {
-      const publicUrl = await subirVideoPromocional(
+      const resp = await subirVideoPromocional(
         videoFile,
         titles[activeTab],
         "",
         (progress) => setUploadProgress(progress)
       );
 
+      // resp: { id, url, player_embed_url, processing }
+      const playerUrl =
+        resp.url ||
+        resp.player_embed_url ||
+        `https://player.vimeo.com/video/${resp.id}`;
+
       setFormData((prev) => ({
         ...prev,
         video: {
           ...(prev?.video || {}),
-          [activeTab]: publicUrl,
+          [activeTab]: playerUrl,
         },
       }));
-      onTempUpload?.(publicUrl);
+      // si querés seguir diferenciando “temporal”, seguimos pasando la URL de player
+      onTempUpload?.(playerUrl);
     } catch (err) {
       console.error("❌ Error al subir video:", err);
       setError("Error al subir el video. Intenta nuevamente.");

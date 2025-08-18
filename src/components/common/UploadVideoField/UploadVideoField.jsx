@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import "./UploadVideoField.css";
 import { v4 as uuidv4 } from "uuid";
-import { subirVideoPrivado } from "../../../services/uploadVimeoService";
+import {
+  esperarDisponibilidadVimeo,
+  subirVideoPrivado,
+} from "../../../services/uploadVimeoService";
 import { FaTrashAlt, FaCheckCircle, FaFileVideo } from "react-icons/fa";
 
 const UploadVideoField = ({
@@ -64,7 +67,6 @@ const UploadVideoField = ({
           await onDeleteTempNow(url);
         } catch {
           console.log("error");
-          
         }
       } else {
         // 🏷️ persistente → marcar para borrar al Guardar
@@ -168,7 +170,7 @@ const SingleVideoUploader = ({
     setUploadProgress(0);
 
     try {
-      const rawUrl = await subirVideoPrivado(
+      const resp = await subirVideoPrivado(
         videoFile,
         title,
         description,
@@ -177,22 +179,34 @@ const SingleVideoUploader = ({
         }
       );
 
+      // resp: { id, url, player_embed_url, processing }
+      // si aún procesa, armamos el player URL con el id (el iframe cargará apenas esté "available")
+      const playerUrl =
+        resp.url ||
+        resp.player_embed_url ||
+        `https://player.vimeo.com/video/${resp.id}`;
       setUploadProgress(100);
-      const publicUrl = rawUrl;
 
       const videoPartial = {
         _id: video._id,
-        url: { [activeLang]: publicUrl },
+        url: { [activeLang]: playerUrl },
         title: { [activeLang]: title },
         description: { [activeLang]: description },
       };
 
       onUploadSuccess(videoPartial);
-       // 👇 IMPORTANTE: trackearlo como “temporal”
-      onTempUpload(publicUrl);
+      // 👇 trackear como “temporal” (seguís usando la URL como hacías antes)
+      onTempUpload(playerUrl);
 
-      setVideoUrl(publicUrl);
+      setVideoUrl(playerUrl);
       setVideoFile(null);
+      // OPCIONAL: si querés esperar acá a que quede "available" y evitar parpadeos
+      if (resp.processing && resp.id) {
+        const ok = await esperarDisponibilidadVimeo(resp.id);
+        if (!ok) {
+          console.warn("El video tardó más de lo esperado en estar disponible");
+        }
+      }
     } catch (err) {
       console.error("❌ Error subiendo video:", err);
       setError("Error al subir el video. Intenta nuevamente.");
