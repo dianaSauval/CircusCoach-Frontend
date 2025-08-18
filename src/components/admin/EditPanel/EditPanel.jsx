@@ -160,161 +160,87 @@ const EditPanel = ({
       pdf_public_id: ensureLangs(data.pdf_public_id),
     };
   };
-  const handleSave = async () => {
-    const selectedItem = selectedClass || selectedModule || selectedFormation;
-    if (!selectedItem) return;
+const handleSave = async () => {
+  const selectedItem = selectedClass || selectedModule || selectedFormation;
+  if (!selectedItem) return;
 
-    try {
-      if (selectedClass) {
-        const { updateClass } = await import(
-          "../../../services/formationService"
-        );
-        await updateClass(selectedClass._id, formData); // 👈 el payload ya viene con url/lang vacíos para los que quitaste
+  try {
+    if (selectedClass) {
+      const { updateClass } = await import("../../../services/formationService");
+      // El payload ya tiene vacíos los campos del idioma donde sacaste PDF/video
+      await updateClass(selectedClass._id, formData);
+    // ❌ NO borres aquí (duplicaba), lo hacemos una sola vez más abajo
+    } else if (selectedModule) {
+      const { updateModule } = await import("../../../services/formationService");
+      await updateModule(selectedModule._id, formData);
+    } else if (selectedFormation) {
+      const { updateFormation } = await import("../../../services/formationService");
+      const cleanedData = prepareFormationDataForSave(formData);
 
-        // 🎥 Videos persistentes marcados para borrar (Vimeo)
-        if (
-          Array.isArray(tempUploads.videosAEliminar) &&
-          tempUploads.videosAEliminar.length
-        ) {
-          const urlsUnicas = Array.from(
-            new Set(tempUploads.videosAEliminar.filter(Boolean))
-          );
-          for (const url of urlsUnicas) {
-            try {
-              await eliminarVideoDeVimeo(url);
-            } catch (err) {
-              console.warn(
-                "⚠️ No se pudo eliminar el video:",
-                url,
-                err?.message
-              );
+      // Si marcaste PDFs para borrar, asegurate de vaciar por idioma correspondiente
+      if (Array.isArray(tempUploads.pdfsAEliminar) && tempUploads.pdfsAEliminar.length) {
+        for (const item of tempUploads.pdfsAEliminar) {
+          const id = typeof item === "string" ? item : item?.public_id;
+          const langHint = typeof item === "object" ? item?.lang : null;
+          const langs = langHint ? [langHint] : ["es", "en", "fr"];
+
+          for (const lang of langs) {
+            const currentId = formData?.pdf_public_id?.[lang];
+            const originalId = originalRef.current?.pdf_public_id?.[lang];
+            if (id && (id === currentId || id === originalId)) {
+              cleanedData.pdf[lang] = "";
+              cleanedData.pdf_public_id[lang] = "";
             }
           }
         }
-
-        // 📄 PDFs persistentes marcados para borrar (Cloudinary raw)
-        if (
-          Array.isArray(tempUploads.pdfsAEliminar) &&
-          tempUploads.pdfsAEliminar.length
-        ) {
-          const idsUnicos = Array.from(
-            new Set(tempUploads.pdfsAEliminar.filter(Boolean))
-          );
-          for (const id of idsUnicos) {
-            try {
-              await eliminarArchivoDesdeFrontend(id, "raw");
-            } catch (err) {
-              console.warn("⚠️ No se pudo eliminar el PDF:", id, err?.message);
-            }
-          }
-        }
-      } else if (selectedModule) {
-        const { updateModule } = await import(
-          "../../../services/formationService"
-        );
-        await updateModule(selectedModule._id, formData);
-      } else if (selectedFormation) {
-        const { updateFormation } = await import(
-          "../../../services/formationService"
-        );
-        const cleanedData = prepareFormationDataForSave(formData);
-
-        // 🧽 Limpiar por idioma los PDFs marcados para borrar (acepta string u objeto)
-        if (
-          Array.isArray(tempUploads.pdfsAEliminar) &&
-          tempUploads.pdfsAEliminar.length
-        ) {
-          for (const item of tempUploads.pdfsAEliminar) {
-            const id = typeof item === "string" ? item : item?.public_id;
-            const langHint = typeof item === "object" ? item?.lang : null;
-            const langs = langHint ? [langHint] : ["es", "en", "fr"];
-
-            for (const lang of langs) {
-              const currentId = formData?.pdf_public_id?.[lang];
-              const originalId = originalRef.current?.pdf_public_id?.[lang];
-              if (id && (id === currentId || id === originalId)) {
-                cleanedData.pdf[lang] = "";
-                cleanedData.pdf_public_id[lang] = "";
-              }
-            }
-          }
-        }
-
-        await updateFormation(selectedFormation._id, cleanedData);
       }
 
-      // ——— Si llegamos acá, el update fue OK. Recién ahora borramos en origen ———
-
-      // 🎥 Videos (Vimeo)
-      if (
-        Array.isArray(tempUploads.videosAEliminar) &&
-        tempUploads.videosAEliminar.length
-      ) {
-        for (const vimeoUrl of tempUploads.videosAEliminar) {
-          try {
-            await eliminarVideoDeVimeo(vimeoUrl);
-            console.log("🗑️ Video eliminado tras guardar:", vimeoUrl);
-          } catch (err) {
-            console.warn(
-              "⚠️ No se pudo eliminar el video:",
-              vimeoUrl,
-              err?.message
-            );
-          }
-        }
-      }
-
-      // 📄 PDFs (Cloudinary raw) — dedupe por si se marcó dos veces
-      if (
-        Array.isArray(tempUploads.pdfsAEliminar) &&
-        tempUploads.pdfsAEliminar.length
-      ) {
-        const idsUnicos = Array.from(
-          new Set(
-            tempUploads.pdfsAEliminar
-              .map((x) => (typeof x === "string" ? x : x?.public_id))
-              .filter(Boolean)
-          )
-        );
-        for (const id of idsUnicos) {
-          try {
-            await eliminarArchivoDesdeFrontend(id, "raw");
-            console.log("🗑️ PDF eliminado tras guardar:", id);
-          } catch (err) {
-            console.warn("⚠️ No se pudo eliminar el PDF:", id, err?.message);
-          }
-        }
-      }
-
-      // 🖼️ Imágenes (Cloudinary image) — dedupe
-      if (
-        Array.isArray(tempUploads.imagenesAEliminar) &&
-        tempUploads.imagenesAEliminar.length
-      ) {
-        const idsUnicosImg = Array.from(
-          new Set(tempUploads.imagenesAEliminar.filter(Boolean))
-        );
-        for (const id of idsUnicosImg) {
-          try {
-            await eliminarArchivoDesdeFrontend(id, "image");
-            console.log("🗑️ Imagen eliminada tras guardar:", id);
-          } catch (err) {
-            console.warn("⚠️ No se pudo eliminar la imagen:", id, err?.message);
-          }
-        }
-      }
-
-      // ——— Fin: refresco y salida de edición ———
-      onUpdate?.();
-      setTempUploads(EMPTY_UPLOADS);
-      setIsEditing(false);
-    } catch (error) {
-      console.error(
-        "❌ Error al guardar cambios:",
-        error.response?.data || error
-      );
+      await updateFormation(selectedFormation._id, cleanedData);
     }
-  };
+
+    // ✅ Si llegamos acá, el update fue OK. Recién ahora borramos en origen UNA SOLA VEZ.
+
+    // 🎥 Vimeo (videos persistentes marcados)
+    if (Array.isArray(tempUploads.videosAEliminar) && tempUploads.videosAEliminar.length) {
+      const uniqueUrls = Array.from(new Set(tempUploads.videosAEliminar.filter(Boolean)));
+      for (const url of uniqueUrls) {
+        try { await eliminarVideoDeVimeo(url); }
+        catch (err) { console.warn("⚠️ No se pudo eliminar el video:", url, err?.message); }
+      }
+    }
+
+    // 📄 Cloudinary RAW (PDFs persistentes marcados)
+    if (Array.isArray(tempUploads.pdfsAEliminar) && tempUploads.pdfsAEliminar.length) {
+      const uniqueIds = Array.from(
+        new Set(
+          tempUploads.pdfsAEliminar
+            .map((x) => (typeof x === "string" ? x : x?.public_id))
+            .filter(Boolean)
+        )
+      );
+      for (const id of uniqueIds) {
+        try { await eliminarArchivoDesdeFrontend(id, "raw"); }
+        catch (err) { console.warn("⚠️ No se pudo eliminar el PDF:", id, err?.message); }
+      }
+    }
+
+    // 🖼️ Cloudinary IMAGE (si aplicara)
+    if (Array.isArray(tempUploads.imagenesAEliminar) && tempUploads.imagenesAEliminar.length) {
+      const uniqueImgIds = Array.from(new Set(tempUploads.imagenesAEliminar.filter(Boolean)));
+      for (const id of uniqueImgIds) {
+        try { await eliminarArchivoDesdeFrontend(id, "image"); }
+        catch (err) { console.warn("⚠️ No se pudo eliminar la imagen:", id, err?.message); }
+      }
+    }
+
+    onUpdate?.();
+    setTempUploads(EMPTY_UPLOADS);
+    setIsEditing(false);
+  } catch (error) {
+    console.error("❌ Error al guardar cambios:", error.response?.data || error);
+  }
+};
+
 
   const toggleVisibility = async () => {
     let endpoint = null;

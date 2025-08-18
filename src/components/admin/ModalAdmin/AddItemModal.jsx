@@ -498,6 +498,15 @@ const AddItemModal = ({ type, parentId, closeModal, onAdd }) => {
                     prev.includes(url) ? prev : [...prev, url]
                   )
                 }
+                isTempVideoUrl={(url) => isTempVideo(url)} // ✅ Dile qué URLs son temporales
+                onDeleteTempNow={async (url) => {
+                  // ✅ Cómo borrar YA en Vimeo
+                  try {
+                    await deleteTempVideoNow(url); // llama a eliminarVideoDeVimeo(url)
+                  } catch (e) {
+                    console.warn("No se pudo eliminar video temp:", e?.message);
+                  }
+                }}
               />
             </>
           )}

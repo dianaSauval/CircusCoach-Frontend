@@ -11,6 +11,14 @@ const ClassForm = ({
   tempUploads,
   setTempUploads,
 }) => {
+  // ¿es un PDF/Video temporal subido en esta edición?
+  const isTempPdfPublicId = (id) =>
+    !!id && Array.isArray(tempUploads?.pdfs) && tempUploads.pdfs.includes(id);
+  const isTempVideoUrl = (url) =>
+    !!url &&
+    Array.isArray(tempUploads?.videos) &&
+    tempUploads.videos.includes(url);
+
   // 🟡 Campos comunes (título, contenido, etc.)
   const handleTextChange = (field, value) => {
     setFormData({
@@ -21,12 +29,6 @@ const ClassForm = ({
       },
     });
   };
-
-  // 📌 Detectores de “temporal” (subido en esta edición)
-  const isTempPdfPublicId = (id) =>
-    !!id && Array.isArray(tempUploads?.pdfs) && tempUploads.pdfs.includes(id);
-  const isTempVideoUrl = (url) =>
-    !!url && Array.isArray(tempUploads?.videos) && tempUploads.videos.includes(url);
 
   return (
     <div className="class-form-container">
@@ -93,22 +95,22 @@ const ClassForm = ({
             pdfs: [...(prev?.pdfs || []), publicId],
           }))
         }
-        // ⚖️ decidir si borrar YA o marcar para borrar al Guardar
+        // 👇 clave: decidir si borrar YA (temporal) o marcar para borrar al Guardar (persistente)
         isTempPublicId={isTempPdfPublicId}
-        onDeleteTempNow={async (publicId) => {
+        onDeleteTempNow={async (id) => {
           try {
-            await eliminarArchivoDesdeFrontend(publicId, "raw");
+            await eliminarArchivoDesdeFrontend(id, "raw");
           } finally {
             setTempUploads((prev) => ({
               ...prev,
-              pdfs: (prev.pdfs || []).filter((x) => x !== publicId),
+              pdfs: (prev.pdfs || []).filter((x) => x !== id),
             }));
           }
         }}
-        onMarkForDeletion={(publicId) =>
+        onMarkForDeletion={(id) =>
           setTempUploads((prev) => ({
             ...prev,
-            pdfsAEliminar: [...(prev.pdfsAEliminar || []), publicId],
+            pdfsAEliminar: [...(prev.pdfsAEliminar || []), id], // ← acá se marca el public_id
           }))
         }
       />
@@ -128,7 +130,6 @@ const ClassForm = ({
             videos: [...(prev.videos || []), url],
           }))
         }
-        // ⚖️ idem: si es temporal → borrar YA, si no → marcar para Guardar
         isTempVideoUrl={isTempVideoUrl}
         onDeleteTempNow={async (url) => {
           try {

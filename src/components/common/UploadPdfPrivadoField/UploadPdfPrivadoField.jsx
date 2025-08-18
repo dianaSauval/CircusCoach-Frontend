@@ -5,6 +5,39 @@ import { FaFilePdf, FaTrashAlt } from "react-icons/fa";
 import { subirPdfPrivado } from "../../../services/uploadCloudinary";
 import "./UploadPdfPrivadoField.css";
 
+// 🔧 Deriva el public_id desde la URL de Cloudinary (soporta /raw/upload y /upload)
+const getPublicIdFromUrl = (url) => {
+  if (!url) return "";
+  try {
+    const clean = url.split("?")[0]; // quita querystring
+
+    const candidates = ["/raw/upload/", "/upload/"];
+    let pivot = -1;
+    for (const seg of candidates) {
+      const idx = clean.indexOf(seg);
+      if (idx >= 0) {
+        pivot = idx + seg.length;
+        break;
+      }
+    }
+    if (pivot < 0) return "";
+
+    // Ej: https://res.cloudinary.com/<cloud>/raw/upload/v1699999/carpeta/archivo.pdf
+    let path = clean.substring(pivot);
+    const parts = path.split("/");
+
+    // quita versión v123456 si aparece
+    if (parts[0] && /^v\d+$/i.test(parts[0])) parts.shift();
+
+    path = parts.join("/");
+
+    // quita extensión (.pdf)
+    return path.replace(/\.[^/.]+$/, ""); // carpeta/archivo (sin extensión)
+  } catch {
+    return "";
+  }
+};
+
 const UploadPdfPrivadoField = ({
   activeTab,
   onPdfUploaded,
@@ -78,17 +111,19 @@ const UploadPdfPrivadoField = ({
 
   const eliminarPdf = async (pdfId) => {
     const pdf = existingPdfs.find((p) => p._id === pdfId);
-    const publicId = pdf?.public_id?.[activeTab];
 
-    // ¿Es un archivo nuevo subido en esta edición?
-    const esTemp = publicId && isTempPublicId(publicId);
+    // 1) obtener un public_id confiable (del estado o derivado de la URL)
+    const publicId =
+      pdf?.public_id?.[activeTab] ||
+      getPublicIdFromUrl(pdf?.url?.[activeTab] || "");
+
+    // 2) decidir: si es temporal → borrar YA; si es persistente → marcar para borrar al Guardar
     if (publicId) {
       try {
+        const esTemp = isTempPublicId(publicId);
         if (esTemp) {
-          // 💥 borrar YA (Cloudinary raw)
           await onDeleteTempNow(publicId);
         } else {
-          // 🏷️ persistente → marcar para borrar al guardar
           onMarkForDeletion(publicId);
         }
       } catch (error) {
@@ -96,7 +131,7 @@ const UploadPdfPrivadoField = ({
       }
     }
 
-    // ✅ Construimos la nueva lista desde la prop `existingPdfs`
+    // 3) limpiar visualmente SOLO el idioma activo
     const listaActual = Array.isArray(existingPdfs) ? existingPdfs : [];
     const actualizada = listaActual.map((p) => {
       if (p._id !== pdfId) return p;
@@ -134,12 +169,12 @@ const UploadPdfPrivadoField = ({
                   </a>
                 </div>
                 <button
-                  type="button" // 👈 evita el submit del formulario
+                  type="button"
                   className="boton-eliminar"
                   onClick={(e) => {
                     e.preventDefault();
                     eliminarPdf(pdf._id);
-                  }} // 👈 extra seguro
+                  }}
                 >
                   <FaTrashAlt />
                 </button>
