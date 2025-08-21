@@ -10,12 +10,12 @@
   top: 0;
   z-index: 1000;
   width: 100%;
-  height: 80px;
+  height: var(--header-height);
   box-sizing: border-box;
 }
 
 .header-logo img {
-  height: 65px;
+  height: calc(var(--header-height) - 16px);
   transform: scale(1.8);
   transform-origin: left center;
   max-height: 80px;
@@ -206,15 +206,17 @@
   font-size: 1.2rem;
 }
 
-
 /* 🌐 Responsive */
 @media (max-width: 768px) {
+  :root {
+    --header-height: 64px;
+  }
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
-    height: auto;
+    height: var(--header-height);
     gap: 0.5rem;
   }
 
@@ -248,7 +250,7 @@
   /* Menú desplegable */
   .header-nav {
     position: absolute;
-    top: 80px;
+    top: var(--header-height);
     left: 0;
     right: 0;
     background-color: var(--color-petroleo);
@@ -272,12 +274,15 @@
 
 /* 📱 Tablets */
 @media (min-width: 769px) and (max-width: 1024px) {
+  :root {
+    --header-height: 64px;
+  }
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
-    height: auto;
+    height: var(--header-height);
     gap: 0.5rem;
   }
 
@@ -313,7 +318,7 @@
   /* Menú desplegable */
   .header-nav {
     position: absolute;
-    top: 80px;
+    top: var(--header-height);
     left: 0;
     right: 0;
     background-color: var(--color-petroleo);

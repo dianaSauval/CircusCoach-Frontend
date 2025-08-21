@@ -209,7 +209,7 @@ useEffect(() => {
             <img
               src={imageSrc}
               alt={course.title?.[lang] || "Imagen del curso"}
-              className="formation-detail-image"
+              className="course-detail-image"
               loading="lazy"
             />
           )}

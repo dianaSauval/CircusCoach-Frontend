@@ -27,6 +27,11 @@
   --font-texto: "Lato", sans-serif;
 }
 
+:root {
+  /* ...tus variables */
+  --header-height: 80px;
+}
+
 body {
   font-family: var(--font-texto);
   background-color: var(--color-blanco);
@@ -200,9 +205,9 @@ body {
     padding: 0 1rem;
   }
 
-  .texto {
-    font-size: 0.95rem;
-    padding: 0 1.5rem;
+   .texto {
+    font-size: 1rem;         /* un pelín más grande para lectura */
+    line-height: 1.7;
   }
 
   .firma {

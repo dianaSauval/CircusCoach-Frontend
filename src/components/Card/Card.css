@@ -8,7 +8,7 @@
   justify-content: flex-start;
   max-width: 350px;
   min-width: 260px;
-    width: 100%;  
+  width: 100%;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -22,10 +22,14 @@
   height: 300px;
   object-fit: cover;
   object-position: center;
+  display: block; /* ✅ evita inline-gap */
+  vertical-align: bottom; /* ✅ extra por compatibilidad */
+  border: 0;
 }
 
 .custom-card-description {
-    font-family: var(--font-texto); /* Lato */
+  margin: 0;
+  font-family: var(--font-texto); /* Lato */
   font-size: 1rem;
   font-weight: 500;
   line-height: 1.8;
@@ -75,6 +79,8 @@
 .card-image-wrapper {
   position: relative;
   width: 100%;
+  line-height: 0; /* ✅ mata el espacio de línea */
+  font-size: 0; /* ✅ por si hay nodos inline */
 }
 
 .tiempo-restante-badge {
@@ -87,12 +93,12 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 10;
 }
 
 .rebuy-button {
-    margin: 0.5rem auto 0 auto;
+  margin: 0.5rem auto 0 auto;
   padding: 0.4rem 1rem;
   font-size: 0.95rem;
 }
@@ -100,8 +106,6 @@
 .rebuy-button:hover {
   background-color: #4ac2af;
 }
-
-
 
 /* Responsive ajustes */
 @media (max-width: 600px) {

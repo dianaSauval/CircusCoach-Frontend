@@ -1,5 +1,5 @@
 .course-detail-container {
-  padding-top: 40px;
+  padding-top: calc(var(--header-height) + 16px);
 }
 
 .course-price {
@@ -14,3 +14,25 @@
   font-family: var(--font-texto);
   color: var(--color-azul-profundo);
 }
+
+/* 🎬 SOLO VIDEO: mantener marco 16:9 */
+.video-iframe {
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 16 / 9;   /* ⬅️ solo en video */
+  height: auto;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* 🖼️ SOLO IMAGEN: sin marco forzado */
+.course-detail-image {
+  width: 100%;
+  max-width: 250px;
+  height: auto;             /* ⬅️ mantiene proporción original */
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  object-fit: contain;      /* ⬅️ muestra la foto completa */
+}
+

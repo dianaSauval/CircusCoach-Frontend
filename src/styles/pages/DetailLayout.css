@@ -1,65 +1,70 @@
 .detalle-container {
   display: flex;
   justify-content: space-between;
-  width: 90%;
-  padding: 40px;
-  gap: 30px;
+  width: min(1100px, 92%); /* ⬅️ centrado y fluido */
+  margin: 0 auto;
+  padding: clamp(16px, 2.5vw, 40px);
+  gap: clamp(16px, 3vw, 30px);
   flex-wrap: wrap;
   background-color: var(--color-blanco);
 }
 
 .left-section {
-  flex: 1;
-  min-width: 300px;
+  flex: 1 1 320px; /* ⬅️ base flexible */
+  min-width: 280px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 
 .right-column {
-  flex: 1;
+  flex: 1 1 320px;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 0.75rem;
+   max-width: 720px;     /* ⬅️ contenedor cómodo */
+  margin-inline: auto;
 }
 
 .formation-detail-image {
   width: 100%;
-  max-width: 450px;
-  height: auto;
+  max-width: clamp(320px, 48vw, 680px);  /* ancho fluido como el video */
+  max-height: clamp(220px, 60vh, 520px); /* altura razonable */
+  height: auto;                           /* respeta proporción original */
+  object-fit: contain;                    /* no recorta la foto */
+  display: block;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  object-fit: cover;
 }
 
 
 .detalle-title {
   font-family: var(--font-titulo);
-  font-size: 3rem;
+  font-size: clamp(1.8rem, 5vw, 3rem); /* ⬅️ fluido */
   color: var(--color-petroleo);
   margin-bottom: 20px;
 }
 
 .detalle-description {
   font-family: var(--font-texto);
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.3vw, 1.2rem); /* ⬅️ fluido */
   color: var(--color-azul-profundo);
   margin-bottom: 30px;
   line-height: 1.6;
 }
 
+/* Botones */
 .inscribite-button,
 .descargar-button {
   background-color: var(--color-petroleo);
   color: white;
-  padding: 12px 24px;
-  font-size: 1rem;
+  padding: 12px 20px;
+  font-size: clamp(0.95rem, 2.2vw, 1rem);
   font-weight: bold;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   transition: background-color 0.3s ease;
 }
 
@@ -103,20 +108,24 @@
   pointer-events: none;
 }
 
+/* ⬇️ video 16:9 responsivo */
 .video-iframe {
   width: 100%;
-  max-width: 650px;
-  height: 370px;
+  max-width: 700px;
+  aspect-ratio: 16 / 9; /* ⬅️ relación fija */
+  height: auto; /* ⬅️ deja que lo calcule aspect-ratio */
+  border: 0;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
+/* Bloque de características */
 .detalle-caracteristicas {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 30px;
-  margin: 60px 0;
+  gap: clamp(16px, 4vw, 30px);
+  margin: clamp(32px, 6vw, 60px) 0;
   text-align: center;
 }
 
@@ -124,13 +133,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 140px;
+  width: min(140px, 48%);
   gap: 10px;
   color: var(--color-azul-profundo);
 }
 
 .caracteristica i {
-  font-size: 2.5rem;
+  font-size: clamp(1.6rem, 5vw, 2.5rem);
   color: var(--color-azul-profundo);
 }
 
@@ -138,16 +147,15 @@
 @media (max-width: 768px) {
   .detalle-container {
     flex-direction: column;
-    padding: 20px;
   }
 
-  .left-section,
-  .right-column {
+  .left-section {
     width: 100%;
   }
 
   .detalle-title {
     font-size: 2.5rem;
+    margin-top: 10px;
   }
 
   .play-overlay {
@@ -163,4 +171,27 @@
     width: 100%;
     max-width: 300px;
   }
+   .right-column { max-width: 100%; }
+
+  .video-iframe,
+  .formation-detail-image {
+    max-width: 100%;
+    max-height: min(56vh, 520px);
+  }
+}
+
+/* Ajustes móviles adicionales */
+@media (max-width: 768px) {
+  .left-section,
+  .right-column { width: 100%; }
+
+  .formation-detail-image { max-width: 100%; }
+
+  /* Si haces anchor links a títulos, evita que queden ocultos bajo el header */
+  .detalle-title { scroll-margin-top: calc(var(--header-height) + 8px); }
+}
+
+/* Scroll seguro para todo el documento (por si hay #anclas) */
+html {
+  scroll-padding-top: calc(var(--header-height) + 8px);
 }
