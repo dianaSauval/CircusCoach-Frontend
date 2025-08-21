@@ -11,6 +11,7 @@ import EmptyState from "../components/EmptyState/EmptyState";
 import "../styles/pages/PagoEmbedPage.css"; // mismo estilo que CartPage
 import { FaTrash } from "react-icons/fa";
 import { Helmet } from "react-helmet";
+import { formatPrice } from "../utils/formatPrice";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -21,6 +22,10 @@ const PagoEmbedPage = () => {
   const { cart, cartCount, setCart } = useCart();
   const { language } = useLanguage();
   const t = translations.cart[language];
+
+  const CURRENCY = "EUR";
+  const localeMap = { es: "es-ES", en: "en-GB", fr: "fr-FR" };
+  const lang = localeMap[language] || "es-ES";
 
   const calcularPrecioConDescuento = (item) => {
     if (!item.discount || !item.discount.percentage) return item.price;
@@ -63,7 +68,7 @@ const PagoEmbedPage = () => {
   };
 
   const appearance = { theme: "stripe" };
-  const options = { clientSecret, appearance };
+  const options = { clientSecret, appearance, locale: language || "es" };
 
   if (cartCount === 0) {
     return (
@@ -98,17 +103,23 @@ const PagoEmbedPage = () => {
                 {item.discount ? (
                   <div className="precio-con-descuento">
                     <span className="precio-final">
-                      USD {calcularPrecioConDescuento(item).toFixed(2)}
+                      {formatPrice(
+                        calcularPrecioConDescuento(item),
+                        CURRENCY,
+                        lang
+                      )}
                     </span>
                     <span className="precio-original">
-                      USD {item.price.toFixed(2)}
+                      {formatPrice(item.price, CURRENCY, lang)}
                     </span>
                     <span className="nombre-descuento">
                       🎁 {item.discount.name} - {item.discount.percentage}% OFF
                     </span>
                   </div>
                 ) : (
-                  <p className="precio-normal">USD {item.price.toFixed(2)}</p>
+                  <p className="precio-normal">
+                    {formatPrice(item.price, CURRENCY, lang)}
+                  </p>
                 )}
 
                 <button
@@ -124,7 +135,7 @@ const PagoEmbedPage = () => {
 
         <div className="cart-summary">
           <p className="label-formulario">{t.total}:</p>
-          <p className="texto">USD {totalPrice.toFixed(2)}</p>
+          <p className="texto">{formatPrice(totalPrice, CURRENCY, lang)}</p>
         </div>
 
         <TermsCheckbox

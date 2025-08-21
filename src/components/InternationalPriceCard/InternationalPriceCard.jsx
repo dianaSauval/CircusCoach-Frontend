@@ -3,7 +3,8 @@ import { useLanguage } from "../../context/LanguageContext";
 import translations from "../../i18n/translations";
 import { useCart } from "../../context/CartContext";
 import { useDiscount } from "../../context/DiscountContext";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { formatPrice } from "../../utils/formatPrice";
 
 export default function InternationalPriceCard({
   isCourse = false,
@@ -14,40 +15,52 @@ export default function InternationalPriceCard({
   const { language } = useLanguage();
   const t = translations.detail[language];
   const { addToCart } = useCart();
-  const { activeDiscount } = useDiscount(); 
+  const { activeDiscount } = useDiscount();
   const [showMsg, setShowMsg] = useState(false);
 
   const item = isCourse ? course : formation;
 
+  // ⚙️ Config moneda/locale (EUR por defecto)
+  const CURRENCY = "EUR";
+  const localeMap = { es: "es-ES", en: "en-GB", fr: "fr-FR" };
+  const fmt = useMemo(
+    () =>
+      new Intl.NumberFormat(localeMap[language] || "es-ES", {
+        style: "currency",
+        currency: CURRENCY,
+        minimumFractionDigits: 2,
+      }),
+    [language]
+  );
+
+  const effectiveDiscount = discount || activeDiscount || null;
+
   const handleAdd = () => {
     if (!item) return;
-
     addToCart({
       type: isCourse ? "course" : "formation",
       id: item._id,
       title: item.title,
       image: item.image,
-      price: item.price,
-     discount: discount || activeDiscount || null,
-
+      price: Number(item.price) || 0, // precio base sin descuento
+      discount: effectiveDiscount, // lo usa el carrito para calcular
     });
-
     setShowMsg(true);
     setTimeout(() => setShowMsg(false), 2000);
   };
 
   const getPrecioFinal = () => {
-    if (!discount) return item?.price || 0;
+    const base = Number(item?.price) || 0;
+    const d = effectiveDiscount;
+    if (!d) return base;
 
-    if (discount.percentage > 0) {
-      return item.price - (item.price * discount.percentage) / 100;
+    if (d.percentage > 0) {
+      return base - (base * d.percentage) / 100;
     }
-
-    if (discount.amount > 0) {
-      return Math.max(0, item.price - discount.amount);
+    if (d.amount > 0) {
+      return Math.max(0, base - d.amount);
     }
-
-    return item.price;
+    return base;
   };
 
   const precioFinal = getPrecioFinal();
@@ -55,26 +68,33 @@ export default function InternationalPriceCard({
   return (
     <div className="international-card">
       <h3 className="card-title">{t.priceTitle}</h3>
-      {discount && (
-  <p className="nombre-del-bono">
-    🎉 {discount.name?.toUpperCase()} 🎉
-  </p>
-)}
+
+      {effectiveDiscount && (
+        <p className="nombre-del-bono">
+          🎉 {effectiveDiscount.name?.toUpperCase()} 🎉
+        </p>
+      )}
 
       <div className="precio-contenedor">
-        {discount && (
+        {effectiveDiscount && (
           <>
-            <p className="precio-original">USD {item.price}</p>
+            <p className="precio-original">
+              {formatPrice(
+                Number(item?.price) || 0,
+                "EUR",
+                localeMap[language] || "es-ES"
+              )}
+            </p>
             <p className="etiqueta-descuento">
-              {discount.percentage
-                ? `-${discount.percentage}%`
-                : `-${discount.amount} USD`}
+              {effectiveDiscount.percentage
+                ? `-${effectiveDiscount.percentage}%`
+                : `-${fmt.format(Number(effectiveDiscount.amount) || 0)}`}
             </p>
           </>
         )}
 
         <p className="card-price">
-          USD {precioFinal}
+          {formatPrice(precioFinal, "EUR", localeMap[language] || "es-ES")}
         </p>
       </div>
 
