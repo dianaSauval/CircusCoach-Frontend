@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import "./Header.css";
 import logo from "../../assets/img/Logo.png";
 import {
@@ -19,16 +19,58 @@ import { useCart } from "../../context/CartContext";
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [languageMenuOpen, setLanguageMenuOpen] = useState(false);
-  const { cartCount } = useCart();
-
-  const { language, setLanguage } = useLanguage();
-  const t = translations.header[language];
-
-  const { user, isAuthenticated, logout } = useAuth();
-
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { cartCount } = useCart();
+  const { language, setLanguage } = useLanguage();
+  const t = translations.header[language];
+  const { user, isAuthenticated, logout } = useAuth();
+
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll helper
+const scrollTopAll = (smooth = true) => {
+  const behavior = smooth ? "smooth" : "auto";
+  const targets = [
+    window,
+    document.scrollingElement || document.documentElement,
+    document.body,
+    document.querySelector(".app-container"),
+  ].filter(Boolean);
+
+  targets.forEach((t) => {
+    try {
+      if (t === window) {
+        window.scrollTo({ top: 0, behavior });
+      } else if (typeof t.scrollTo === "function") {
+        t.scrollTo({ top: 0, behavior });
+      } else if ("scrollTop" in t) {
+        t.scrollTop = 0;
+      }
+    } catch {}
+  });
+};
+
+
+  // Navegación inteligente: si ya estás en la ruta, sólo scrollea arriba
+  const handleSmartNav = (e, path) => {
+  if (location.pathname === path) {
+    e.preventDefault();
+    setMenuOpen(false);
+    // Esperamos a que cierre el menú y se re‑pinte el layout
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        scrollTopAll(true);
+      });
+    });
+  } else {
+    setMenuOpen(false);
+    navigate(path);
+  }
+};
+
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -36,12 +78,13 @@ export default function Header() {
       navigate(`/buscar?q=${encodeURIComponent(searchTerm)}`);
       setSearchOpen(false);
       setSearchTerm("");
+      scrollTopAll(false);
     }
   };
 
   const handleSearchToggle = () => {
     setSearchOpen((prev) => !prev);
-    setSearchTerm(""); // limpiamos si se cierra
+    setSearchTerm("");
   };
 
   const changeLanguage = (lang) => {
@@ -60,51 +103,66 @@ export default function Header() {
       </button>
 
       <nav className={`header-nav ${menuOpen ? "open" : ""}`}>
-        <NavLink to="/" className="nav-link" onClick={() => setMenuOpen(false)}>
+        {/* Home */}
+        <NavLink
+          to="/"
+          className="nav-link"
+          onClick={(e) => handleSmartNav(e, "/")}
+        >
           <p>{t.home}</p>
         </NavLink>
+
+        {/* Cursos */}
         <NavLink
           to="/cursos"
           className="nav-link"
-          onClick={() => setMenuOpen(false)}
+          onClick={(e) => handleSmartNav(e, "/cursos")}
         >
           {t.courses}
         </NavLink>
+
+        {/* Formaciones */}
         <NavLink
           to="/formaciones"
           className="nav-link"
-          onClick={() => setMenuOpen(false)}
+          onClick={(e) => handleSmartNav(e, "/formaciones")}
         >
           {t.formations}
         </NavLink>
+
+        {/* Biografía */}
         <NavLink
           to="/biografia"
           className="nav-link"
-          onClick={() => setMenuOpen(false)}
+          onClick={(e) => handleSmartNav(e, "/biografia")}
         >
           {t.aboutUs}
         </NavLink>
 
         {isAuthenticated && (
           <>
+            {/* Mis cursos */}
             <NavLink
               to="/mis-cursos"
               className="nav-link"
-              onClick={() => setMenuOpen(false)}
+              onClick={(e) => handleSmartNav(e, "/mis-cursos")}
             >
               {t.myCourses}
             </NavLink>
+
+            {/* Admin */}
             {user?.role === "admin" && (
               <NavLink
                 to="/admin"
                 className="nav-link"
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => handleSmartNav(e, "/admin")}
               >
                 {t.admin}
               </NavLink>
             )}
           </>
         )}
+
         {menuOpen && (
           <div className="header-icons">
             <div className="language-selector">
@@ -138,25 +196,21 @@ export default function Header() {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     autoFocus
                   />
-                  <FaTimes
-                    className="close-search"
-                    onClick={handleSearchToggle}
-                  />
+                  <FaTimes className="close-search" onClick={handleSearchToggle} />
                 </form>
               ) : (
-                <FaSearch
-                  className="header-icon"
-                  onClick={handleSearchToggle}
-                />
+                <FaSearch className="header-icon" onClick={handleSearchToggle} />
               )}
             </div>
 
-            <NavLink to="/mantenimiento" className="cart-icon-container">
+            {/* Carrito / mantenimiento: navegación normal */}
+            <NavLink to="/mantenimiento" className="cart-icon-container" onClick={() => setMenuOpen(false)}>
               <FaShoppingBag className="header-icon" />
               {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
             </NavLink>
           </div>
         )}
+
         {isAuthenticated ? (
           <NavLink to="/" className="nav-link mobile-only" onClick={logout}>
             {t.logout}
@@ -167,6 +221,7 @@ export default function Header() {
           </NavLink>
         )}
       </nav>
+
       {!menuOpen && (
         <div className="header-icons outside-menu">
           <div className="language-selector">
@@ -198,10 +253,7 @@ export default function Header() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   autoFocus
                 />
-                <FaTimes
-                  className="close-search"
-                  onClick={handleSearchToggle}
-                />
+                <FaTimes className="close-search" onClick={handleSearchToggle} />
               </form>
             ) : (
               <FaSearch className="header-icon" onClick={handleSearchToggle} />
