@@ -28,89 +28,101 @@ function CourseDetail() {
   const [loading, setLoading] = useState(true);
 
   // Normaliza booleans por si vienen como string
-const toBool = (v) => v === true || v === "true";
+  const toBool = (v) => v === true || v === "true";
 
-useEffect(() => {
-  let cancelled = false;
+  useEffect(() => {
+    let cancelled = false;
 
-  // 🔄 limpiar estado al cambiar id/lang para evitar flashes del idioma previo
-  setLoading(true);
-  setCourse(null);
-  setIdiomaNoDisponible(false);
-  setIdiomasDisponibles([]);
-  setBonoDelCurso(null);
+    // 🔄 limpiar estado al cambiar id/lang para evitar flashes del idioma previo
+    setLoading(true);
+    setCourse(null);
+    setIdiomaNoDisponible(false);
+    setIdiomasDisponibles([]);
+    setBonoDelCurso(null);
 
-  const fetchCourse = async () => {
-    try {
-      const data = await getCourseById(id, lang);
-      if (cancelled) return;
+    const fetchCourse = async () => {
+      try {
+        const data = await getCourseById(id, lang);
+        if (cancelled) return;
 
-      // idiomas visibles (true/"true")
-      const visibles = Object.entries(data.visible || {})
-        .filter(([, v]) => toBool(v))
-        .map(([k]) => k.toUpperCase());
-      setIdiomasDisponibles(visibles);
+        // idiomas visibles (true/"true")
+        const visibles = Object.entries(data.visible || {})
+          .filter(([, v]) => toBool(v))
+          .map(([k]) => k.toUpperCase());
+        setIdiomasDisponibles(visibles);
 
-      // ⛔ si NO está visible en el idioma actual => solo EmptyState
-      if (!toBool(data.visible?.[lang])) {
-        setIdiomaNoDisponible(true);
-        return;
-      }
-
-      // ✅ visible en el idioma actual => setear curso + descuentos
-      setCourse(data);
-
-      const descuentos = await getActiveDiscounts();
-      if (cancelled) return;
-      const bonoAplicable = descuentos.find(
-        (d) =>
-          (d.type === "course" || d.type === "both") &&
-          d.targetItems?.some((item) => item._id === data._id)
-      );
-      setBonoDelCurso(bonoAplicable || null);
-    } catch (err) {
-      if (cancelled) return;
-
-      const status = err?.response?.status;
-
-      if (status === 403) {
-        // 🔐 El backend te está diciendo "no visible en este idioma"
-        // Intentamos leer idiomas visibles si el backend los manda:
-        const visibleFromError = err.response?.data?.visible;
-        if (visibleFromError && typeof visibleFromError === "object") {
-          const visibles = Object.entries(visibleFromError)
-            .filter(([, v]) => toBool(v))
-            .map(([k]) => k.toUpperCase());
-          setIdiomasDisponibles(visibles);
+        // ⛔ si NO está visible en el idioma actual => solo EmptyState
+        if (!toBool(data.visible?.[lang])) {
+          setIdiomaNoDisponible(true);
+          return;
         }
 
-        setIdiomaNoDisponible(true);
-      } else if (status === 404) {
-        // Curso inexistente: podés redirigir a 404 si tenés ruta
-        // navigate("/404", { replace: true });
-        setIdiomaNoDisponible(true);
-      } else {
-        console.error("Error al obtener detalles del curso:", err);
-        // Si querés, mostrar un EmptyState genérico:
-        setIdiomaNoDisponible(true);
-      }
-    } finally {
-      if (!cancelled) setLoading(false);
-    }
-  };
+        // ✅ visible en el idioma actual => setear curso + descuentos
+        setCourse(data);
 
-  fetchCourse();
-  return () => {
-    cancelled = true;
-  };
-}, [id, lang]);
+        const descuentos = await getActiveDiscounts();
+
+        const matchById = (d, courseId) => {
+          const cid = String(courseId);
+          const inItems =
+            Array.isArray(d.targetItems) &&
+            d.targetItems.some((it) => String(it?._id) === cid);
+          const inIds =
+            Array.isArray(d.targetIds) &&
+            d.targetIds.some((id) => String(id) === cid);
+          return inItems || inIds;
+        };
+
+        const bonoAplicable = descuentos.find(
+          (d) =>
+            (d.type === "course" || d.type === "both") && matchById(d, data._id)
+        );
+
+        setBonoDelCurso(bonoAplicable || null);
+      } catch (err) {
+        if (cancelled) return;
+
+        const status = err?.response?.status;
+
+        if (status === 403) {
+          // 🔐 El backend te está diciendo "no visible en este idioma"
+          // Intentamos leer idiomas visibles si el backend los manda:
+          const visibleFromError = err.response?.data?.visible;
+          if (visibleFromError && typeof visibleFromError === "object") {
+            const visibles = Object.entries(visibleFromError)
+              .filter(([, v]) => toBool(v))
+              .map(([k]) => k.toUpperCase());
+            setIdiomasDisponibles(visibles);
+          }
+
+          setIdiomaNoDisponible(true);
+        } else if (status === 404) {
+          // Curso inexistente: podés redirigir a 404 si tenés ruta
+          // navigate("/404", { replace: true });
+          setIdiomaNoDisponible(true);
+        } else {
+          console.error("Error al obtener detalles del curso:", err);
+          // Si querés, mostrar un EmptyState genérico:
+          setIdiomaNoDisponible(true);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    fetchCourse();
+    return () => {
+      cancelled = true;
+    };
+  }, [id, lang]);
 
   // Redirección de slug SOLO si hay título en el idioma actual (o sea, visible)
   useEffect(() => {
     if (course?.title?.[lang]) {
       const expectedSlug = course.title[lang]
         .toLowerCase()
-        .normalize("NFD").replace(/\p{Diacritic}/gu, "")
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
         .replace(/\s+/g, "-")
         .replace(/[^a-z0-9-]/g, "");
 
@@ -139,12 +151,10 @@ useEffect(() => {
     return (
       <EmptyState
         title={`😢 ${tc.unavailableTitle}`}
-        subtitle={
-          `${tc.unavailable.replace(
-            "{{lang}}",
-            tc.languageNames[lang] || lang.toUpperCase()
-          )}${disponiblesTexto}`
-        }
+        subtitle={`${tc.unavailable.replace(
+          "{{lang}}",
+          tc.languageNames[lang] || lang.toUpperCase()
+        )}${disponiblesTexto}`}
       />
     );
   }
