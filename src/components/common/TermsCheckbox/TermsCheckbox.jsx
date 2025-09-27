@@ -1,45 +1,77 @@
+// src/components/common/TermsCheckbox/TermsCheckbox.jsx
+import "./TermsCheckbox.css";
 import React from "react";
-import "./TermsCheckbox.css"; // Podés poner los estilos ahí
+import TermsInlinePanel from "../../legal/TermsInlinePanel"; // ✅ importamos el panel inline
 
-const TermsCheckbox = ({ checked, onChange }) => {
+const LABELS = {
+  es: {
+    title: "Términos y Condiciones de Compra",
+    accept: "He leído y acepto los Términos y Condiciones",
+    privacy: "He leído la Política de Privacidad",
+    viewFull: "Ver texto completo",
+  },
+  fr: {
+    title: "Conditions Générales d’Achat",
+    accept: "J’ai lu et j’accepte les Conditions Générales",
+    privacy: "J’ai lu la Politique de Confidentialité",
+    viewFull: "Voir le texte complet",
+  },
+};
+
+export default function TermsCheckbox({
+  checkedTerms,
+  onChangeTerms,
+  checkedPrivacy,
+  onChangePrivacy,
+  language = "es",
+  termsUrl = "/terminos",
+  privacyUrl = "/privacidad",
+}) {
+  const t = LABELS[language] || LABELS.es;
+
   return (
     <div className="terms-container">
       <div className="terms-box">
-        <h3>Términos y Condiciones de Compra</h3>
-        <p>
-          1. El acceso a los cursos queda habilitado por un período de 1 año
-          desde el momento de la compra.
-        </p>
-        <p>
-          2. No se admiten reembolsos una vez confirmada la compra, salvo error
-          técnico demostrado.
-        </p>
-        <p>
-          3. Los contenidos están protegidos por derechos de autor. Está
-          prohibido compartir, distribuir o descargar el material sin permiso.
-        </p>
-        <p>
-          4. La plataforma no se responsabiliza por problemas técnicos derivados
-          del dispositivo o conexión del usuario.
-        </p>
-        <p>5. El acceso a los cursos es personal e intransferible.</p>
-        {/* Podés seguir agregando puntos aquí o cargar desde un archivo si preferís */}
+        <h3>{t.title}</h3>
+
+        {/* ✅ En vez del botón, mostramos directamente los términos inline */}
+        <div style={{ marginTop: ".5rem", marginBottom: "1rem" }}>
+          <TermsInlinePanel language={language} />
+        </div>
+
+      {/*   {/* Links extra (opcional, podés quitarlos si ya no los querés) 
+        <p style={{ marginTop: ".5rem" }}>
+          <a href={termsUrl} target="_blank" rel="noopener noreferrer">
+            {t.title}
+          </a>
+          {" · "}
+          <a href={privacyUrl} target="_blank" rel="noopener noreferrer">
+            {t.privacy}
+          </a>
+        </p> */}
       </div>
 
       <div className="terms-checkbox">
-        <label htmlFor="acceptTerms">
-          He leído y acepto los Términos y Condiciones
-        </label>
+        <label htmlFor="acceptTerms">{t.accept}</label>
         <input
           type="checkbox"
           id="acceptTerms"
-          checked={checked}
-          onChange={onChange}
+          checked={checkedTerms}
+          onChange={onChangeTerms}
+          required
+        />
+      </div>
+
+      <div className="terms-checkbox">
+        <label htmlFor="acceptPrivacy">{t.privacy}</label>
+        <input
+          type="checkbox"
+          id="acceptPrivacy"
+          checked={checkedPrivacy}
+          onChange={onChangePrivacy}
           required
         />
       </div>
     </div>
   );
-};
-
-export default TermsCheckbox;
+}

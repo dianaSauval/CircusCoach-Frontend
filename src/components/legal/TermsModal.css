@@ -1,0 +1,52 @@
+/* components/legal/TermsModal.css */
+.mcc-modal-backdrop{
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 10000;
+  display: flex; align-items: center; justify-content: center;
+}
+.mcc-modal-card{
+  background: #fff;
+  color: #151515;
+  border-radius: 12px;
+  max-width: 960px;
+  width: 94vw;
+  max-height: 88vh;
+  overflow: auto;
+  padding: 28px 24px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+  position: relative;
+}
+.mcc-modal-close{
+  position: sticky; top: 0; left: 100%;
+  margin-left: auto;
+  background: transparent; border: none;
+  font-size: 1.2rem; cursor: pointer;
+}
+
+
+/* QUITAR pre-wrap para que no "amplifique" líneas */
+.legal-md { 
+  white-space: normal;
+  line-height: 1.65;
+}
+
+/* Márgenes más chicos */
+.legal-md h1, .legal-md h2, .legal-md h3 {
+  margin: 20px 0 8px;
+}
+.legal-md h2 { border-top: 1px solid #e5e7eb; padding-top: 10px; }
+.legal-md p { margin: 8px 0; }
+
+/* Listas un poco más cerradas */
+.legal-md ul, .legal-md ol { margin: 6px 0 12px 1.2rem; }
+.legal-md li { margin: 2px 0; }
+
+/* MODO COMPACTO (para el modal) */
+.legal-md.compact { line-height: 1.55; }
+.legal-md.compact h1, 
+.legal-md.compact h2, 
+.legal-md.compact h3 { margin: 14px 0 6px; }
+.legal-md.compact p { margin: 6px 0; }
+.legal-md.compact ul, 
+.legal-md.compact ol { margin: 4px 0 8px 1.15rem; }

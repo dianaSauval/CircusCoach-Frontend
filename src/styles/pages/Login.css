@@ -118,6 +118,85 @@
   padding-left: 4px;
 }
 
+/* -------- Password checklist -------- */
+.password-field {
+  position: relative;
+  width: 100%;
+}
+
+.toggle-pass-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid var(--color-menta);
+  background: var(--color-blanco);
+  color: var(--color-azul-profundo);
+  font-family: var(--font-texto);
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.toggle-pass-btn:hover {
+  background: #e6f8f5; /* suave menta */
+}
+
+.password-reqs {
+  width: 100%;
+  background: #f7fbfb; /* muy suave */
+  border: 1px solid #e2f0ee;
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  margin-top: 0.25rem;
+}
+
+.reqs-title {
+  margin: 0 0 0.4rem 0;
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  color: var(--color-azul-profundo);
+  font-weight: 600;
+}
+
+.reqs-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.req-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  padding: 2px 0;
+}
+
+.req-icon {
+  display: inline-flex;
+  width: 1.2rem;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* Estados */
+.req-item.bad {
+  color: #cc3d3d; /* rojo error */
+}
+.req-item.ok {
+  color: #2e7d32; /* verde legible en claro */
+}
+
+/* Si querés usar menta para el OK (queda más brand) puedes añadir: */
+/*
+.req-item.ok { color: var(--color-menta); }
+.req-item.ok .req-icon { color: var(--color-menta); }
+*/
+
+
 /* Responsive */
 @media (max-width: 768px) {
   .login-container {

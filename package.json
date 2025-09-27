@@ -21,8 +21,11 @@
     "react-dom": "^19.0.0",
     "react-helmet": "^6.1.0",
     "react-icons": "^5.5.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.30.0",
     "react-world-flags": "^1.6.0",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
     "slugify": "^1.6.6",
     "uuid": "^11.1.0"
   },

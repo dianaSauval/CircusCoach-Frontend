@@ -32,6 +32,7 @@ import PagoExitoso from "./pages/pago-exitoso";
 import PagoEmbedPage from "./pages/PagoEmbedPage";
 import SearchResults from "./pages/SearchResults";
 import ComingSoonPage from "./pages/ComingSoonPage";
+import LegalTermsPage from "./pages/LegalTermsPage";
 
 function App() {
   return (
@@ -60,11 +61,13 @@ function App() {
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
 
           <Route path="/pago-embed" element={<PagoEmbedPage />} />
+
+          <Route path="/terminos" element={<LegalTermsPage />} />
+
           <Route path="/formaciones/:id/:slug" element={<FormationDetails />} />
           <Route path="/courses/:id/:slug" element={<CourseDetail />} />
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/mantenimiento" element={<ComingSoonPage />} />
-
 
           {/* 🔒 Rutas protegidas para admins */}
           <Route element={<RequireAdmin />}>

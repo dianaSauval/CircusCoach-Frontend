@@ -1,0 +1,54 @@
+/* Contenedor tipo hoja A4 */
+.pdf-legal {
+  font-family: "Times New Roman", Times, Georgia, serif;
+  color: #111;
+  max-width: 820px;              /* ~A4 a 96dpi */
+  margin: 0 auto;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+/* Título principal centrado y subrayado (como el PDF) */
+.pdf-legal h1 {
+  text-align: center;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  margin: 0 0 18px;
+}
+
+/* Secciones: 1. DESCRIPCIÓN */
+.pdf-legal h2 {
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  margin: 16px 0 10px;
+}
+
+/* Subapartados 1.1 1.2 (el número en negrita) */
+.pdf-legal p strong.subnum {
+  font-weight: 700;
+}
+
+/* Párrafos compactos y justificados */
+.pdf-legal p {
+  margin: 8px 0;
+  text-align: justify;
+}
+
+/* Listas */
+.pdf-legal ul, .pdf-legal ol { margin: 6px 0 10px 1.2rem; }
+.pdf-legal li { margin: 2px 0; }
+
+/* Enlaces estilo PDF (azul subrayado) */
+.pdf-legal a {
+  color: #0b63c2;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Dentro del modal: un poco más denso */
+.pdf-legal.compact { line-height: 1.55; }

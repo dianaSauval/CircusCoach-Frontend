@@ -18,6 +18,9 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const PagoEmbedPage = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  // ✅ NUEVO: mostrar/ocultar el panel inline
+  const [showTermsBox, setShowTermsBox] = useState(false);
 
   const { cart, cartCount, setCart } = useCart();
   const { language } = useLanguage();
@@ -44,9 +47,13 @@ const PagoEmbedPage = () => {
           id: item.id || item._id,
           type: item.type,
           price: calcularPrecioConDescuento(item), // 👈 Incluí el precio
+          title: item.title, // útil para el email post-compra en el backend
         }));
 
-        const res = await crearPaymentIntent(itemsParaPago);
+        const res = await crearPaymentIntent({
+          items: itemsParaPago,
+          language,
+        }); // 👈
         setClientSecret(res.clientSecret);
       } catch (err) {
         console.error("Error al obtener clientSecret", err);
@@ -56,7 +63,7 @@ const PagoEmbedPage = () => {
     if (cart.length > 0) {
       obtenerClientSecret();
     }
-  }, [cart]);
+  }, [cart, language]);
 
   const handleRemoveItem = (indexToRemove) => {
     const newCart = cart.filter((_, index) => index !== indexToRemove);
@@ -69,6 +76,16 @@ const PagoEmbedPage = () => {
 
   const appearance = { theme: "stripe" };
   const options = { clientSecret, appearance, locale: language || "es" };
+
+  // ✅ NUEVO: reemplaza la apertura de modal por toggle + scroll
+  const handleOpenTermsInline = () => {
+    setShowTermsBox((prev) => !prev);
+    // Hacemos scroll suave al contenedor en el próximo tick
+    setTimeout(() => {
+      const el = document.getElementById("terms-box");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  };
 
   if (cartCount === 0) {
     return (
@@ -137,20 +154,24 @@ const PagoEmbedPage = () => {
           <p className="label-formulario">{t.total}:</p>
           <p className="texto">{formatPrice(totalPrice, CURRENCY, lang)}</p>
         </div>
-
         <TermsCheckbox
-          checked={termsAccepted}
-          onChange={(e) => setTermsAccepted(e.target.checked)}
-          termsUrl="https://docs.google.com/document/d/1FSbvt75QDQxrmPJVhnGuCZPLCp7vkE3Zi341OFJtLWw/edit"
+          checkedTerms={termsAccepted}
+          onChangeTerms={(e) => setTermsAccepted(e.target.checked)}
+          checkedPrivacy={privacyAccepted}
+          onChangePrivacy={(e) => setPrivacyAccepted(e.target.checked)}
+          language={language}
+          onOpenTermsModal={handleOpenTermsInline}
+          termsUrl="/terminos"
+          privacyUrl="/privacidad"
         />
 
-        {!termsAccepted && (
+        {(!termsAccepted || !privacyAccepted) && (
           <p style={{ color: "red", marginTop: "0.5rem" }}>
             {t.acceptTermsWarning ||
-              "Debes aceptar los términos para continuar."}
+              "Debes aceptar los términos y la privacidad para continuar."}
           </p>
         )}
-
+       
         <div className="cart-buttons">
           <button onClick={handleClearCart} className="boton-secundario">
             {t.clear || "Vaciar carrito"}
@@ -160,7 +181,7 @@ const PagoEmbedPage = () => {
         <div className="payment-form-section">
           {!clientSecret && <p>Cargando formulario de pago...</p>}
 
-          {clientSecret && termsAccepted && (
+          {clientSecret && termsAccepted && privacyAccepted && (
             <Elements options={options} stripe={stripePromise}>
               <CheckoutForm />
             </Elements>
