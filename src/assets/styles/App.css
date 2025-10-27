@@ -44,6 +44,14 @@ html, body {
   width: 100%;
 }
 
+:root {
+  --header-height: 80px; /* ajustalo si tu header mide otro valor en desktop/mobile */
+}
+
+.section {
+  scroll-margin-top: var(--header-height);
+}
+
 /* 📱 Mobile (≤ 480px) */
 @media (max-width: 480px) {
   .main-content {

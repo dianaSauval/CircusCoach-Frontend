@@ -1,4 +1,4 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { NavLink, useNavigate, useLocation, Link } from "react-router-dom";
 import "./Header.css";
 import logo from "../../assets/img/Logo.png";
 import {
@@ -94,9 +94,16 @@ const scrollTopAll = (smooth = true) => {
 
   return (
     <header className="header">
-      <div className="header-logo">
-        <img src={logo} alt="Circus Coach Logo" />
-      </div>
+     <div className="header-logo">
+    <Link
+      to="/"
+      onClick={(e) => handleSmartNav(e, "/")}
+      className="header-logo-link"
+      aria-label={t.home}
+    >
+      <img src={logo} alt="Circus Coach Logo" />
+    </Link>
+  </div>
 
       <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         {menuOpen ? <FaTimes /> : <FaBars />}

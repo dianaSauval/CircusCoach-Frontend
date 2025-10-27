@@ -15,9 +15,19 @@ export default function FormationPage() {
   const { language } = useLanguage(); // ✅ traemos del context
   const t = translations.formations[language];
 
-  const scrollToSection = (ref) => {
-    ref.current?.scrollIntoView({ behavior: "smooth" });
-  };
+const scrollToSection = (ref) => {
+  const el = ref.current;
+  if (!el) return;
+
+  // Usa la compensación que pondremos en CSS (scroll-margin-top)
+  try {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  } catch {
+    // Fallback muy viejo
+    el.scrollIntoView();
+  }
+};
+
 
   return (
     <>
