@@ -74,34 +74,56 @@ const UploadPdfPublicoField = ({
     }
   };
 
-  const handleDelete = async (e) => {
-    e?.preventDefault?.();
-    e?.stopPropagation?.();
+ const handleDelete = async (e) => {
+  e?.preventDefault?.();
+  e?.stopPropagation?.();
 
-    const id = publicId?.[activeLang];
-    if (!id) return;
+  // 🧭 Log de contexto
+  console.log("[UploadPdfPublicoField] handleDelete", {
+    activeLang,
+    publicIdMap: publicId,
+    pdfUrlMap: pdfUrl,
+    originalPublicId,
+  });
 
-    const isOriginal = originalPublicId?.[activeLang] === id;
-    const isTemp = isTempPublicId?.(id);
+  let id = publicId?.[activeLang];
+  const rawCurrent = pdfUrl?.[activeLang];
+  const current = typeof rawCurrent === "string" ? { url: rawCurrent, title: "" } : rawCurrent;
+  const url = current?.url || "";
 
-    if (isTemp && !isOriginal) {
-      // 🧽 nuevo en esta edición → borrar YA de Cloudinary y limpiar estado padre
-      await onDeleteTempNow?.(id);
-      setPdfUrl((prev) => ({ ...prev, [activeLang]: null }));
-      setPublicId((prev) => ({ ...prev, [activeLang]: "" }));
-      setTitulo("");
-      setFile(null);
-      setUploadProgress(0);
+  // Si no tenemos public_id, lo derivamos de la URL:
+  if (!id && url.includes("cloudinary.com")) {
+    const match = url.match(/\/upload\/(?:v\d+\/)?PDFsPublicos\/(.+)\.pdf/i);
+    if (match?.[1]) {
+      id = `PDFsPublicos/${match[1]}.pdf`;
+      console.log("[UploadPdfPublicoField] Derivado public_id desde URL:", id);
     } else {
-      // 🏷️ existente → marcar para borrar al guardar y VACÍAR en el padre
-      onMarkForDeletion(id);
-      // Vaciar el estado para que prepareDataForSave mande string vacío
-      setPdfUrl((prev) => ({ ...prev, [activeLang]: "" }));
-      setPublicId((prev) => ({ ...prev, [activeLang]: "" }));
-      // (Opcional) mantener el ocultado visual por si tenés UI condicionada:
-      setHiddenByLang((prev) => ({ ...prev, [activeLang]: true }));
+      console.warn("[UploadPdfPublicoField] No pude derivar public_id desde URL:", url);
     }
-  };
+  }
+
+  const isOriginal = originalPublicId?.[activeLang] === id;
+  const isTemp = isTempPublicId?.(id);
+
+  console.log("[UploadPdfPublicoField] Decisión de borrado:", { id, isOriginal, isTemp, url });
+
+  if (isTemp && !isOriginal) {
+    await onDeleteTempNow?.(id);
+    setPdfUrl((prev) => ({ ...prev, [activeLang]: null }));
+    setPublicId((prev) => ({ ...prev, [activeLang]: "" }));
+  } else {
+    if (id) {
+      onMarkForDeletion(id);
+      console.log("[UploadPdfPublicoField] Marcado para borrar al Guardar:", id);
+    } else {
+      console.warn("[UploadPdfPublicoField] No hay id para marcar (¿URL sin patrón de Cloudinary?)");
+    }
+    setPdfUrl((prev) => ({ ...prev, [activeLang]: "" }));
+    setPublicId((prev) => ({ ...prev, [activeLang]: "" }));
+    setHiddenByLang((prev) => ({ ...prev, [activeLang]: true }));
+  }
+};
+
 
   // Normalizamos: si el valor viene como string, lo convertimos a objeto
   const rawCurrent = pdfUrl?.[activeLang];

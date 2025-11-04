@@ -219,6 +219,7 @@ const handleSave = async () => {
         )
       );
       for (const id of uniqueIds) {
+         console.log("[EditPanel] Eliminando PDFs en Cloudinary", tempUploads.pdfsAEliminar);
         try { await eliminarArchivoDesdeFrontend(id, "raw"); }
         catch (err) { console.warn("⚠️ No se pudo eliminar el PDF:", id, err?.message); }
       }
