@@ -1,9 +1,10 @@
+// Card.jsx
 import "./Card.css";
 import { useLanguage } from "../../context/LanguageContext";
 import translations from "../../i18n/translations";
 
 const Card = ({
-  data = {}, // ✅ Fallback seguro
+  data = {},
   onClick,
   visible = true,
   expirado = false,
@@ -32,30 +33,24 @@ const Card = ({
     return truncated.slice(0, lastSpace) + "...";
   }
 
-  function getTiempoRestanteTexto(fechaExpiracion) {
-    if (!fechaExpiracion || expirado) return null;
-
+  function getTiempoRestanteTexto(fechaExp) {
+    if (!fechaExp || expirado) return null;
     const ahora = new Date();
-    const expira = new Date(fechaExpiracion);
-    const msRestantes = expira - ahora;
-
-    if (msRestantes <= 0) return null;
-
-    const dias = Math.floor(msRestantes / (1000 * 60 * 60 * 24));
+    const exp = new Date(fechaExp);
+    const ms = exp - ahora;
+    if (ms <= 0) return null;
+    const dias = Math.floor(ms / (1000 * 60 * 60 * 24));
     if (dias > 30) return null;
-
     if (dias >= 28) return t.timeLeft_oneMonth;
     if (dias >= 21) return t.timeLeft_threeWeeks;
     if (dias >= 14) return t.timeLeft_twoWeeks;
     if (dias >= 7) return t.timeLeft_oneWeek;
     if (dias > 1) return t.timeLeft_days.replace("{{days}}", dias);
     if (dias === 1) return t.timeLeft_lastDay;
-
     return null;
   }
 
   const tiempoRestante = fechaExpiracion ? getTiempoRestanteTexto(fechaExpiracion) : null;
-
   const mostrarOverlay = (expirado || !visible) && (t.expiredMessage || t.notAvailableInLanguage);
   const overlayTexto = expirado ? t.expiredMessage : t.notAvailableInLanguage;
 
@@ -63,9 +58,7 @@ const Card = ({
     <div
       className={`custom-card ${!visible || expirado ? "card-disabled" : ""}`}
       onClick={visible && !expirado ? onClick : undefined}
-      style={{
-        cursor: visible && !expirado && onClick ? "pointer" : "default",
-      }}
+      style={{ cursor: visible && !expirado && onClick ? "pointer" : "default" }}
     >
       <div className="card-image-wrapper">
         {selectedImage && (
@@ -73,12 +66,13 @@ const Card = ({
             src={selectedImage}
             alt="Imagen del curso o formación"
             className="custom-card-img"
+            loading="lazy"
+            decoding="async"
+            width="1000"   // orientación de tamaño para el navegador
+            height="1500"  // 2:3
           />
         )}
-
-        {tiempoRestante && (
-          <div className="tiempo-restante-badge">{tiempoRestante}</div>
-        )}
+        {tiempoRestante && <div className="tiempo-restante-badge">{tiempoRestante}</div>}
       </div>
 
       <div className="custom-card-description">

@@ -63,6 +63,8 @@ const VideoPromocionalForm = ({
 
   const handleUpload = async () => {
     if (!videoFile || !titles[activeTab]) return;
+    const lang = activeTab; // ← congelamos el idioma
+    if (!videoFile || !titles[lang]) return;
 
     setUploading(true);
     setUploadProgress(0);
@@ -71,7 +73,7 @@ const VideoPromocionalForm = ({
     try {
       const resp = await subirVideoPromocional(
         videoFile,
-        titles[activeTab],
+        titles[lang],
         "",
         (progress) => setUploadProgress(progress)
       );
@@ -86,7 +88,7 @@ const VideoPromocionalForm = ({
         ...prev,
         video: {
           ...(prev?.video || {}),
-          [activeTab]: playerUrl,
+          [lang]: playerUrl,
         },
       }));
       // si querés seguir diferenciando “temporal”, seguimos pasando la URL de player
@@ -100,18 +102,20 @@ const VideoPromocionalForm = ({
   };
 
   const handleLinkSubmit = () => {
-    const url = tempUrls[activeTab];
+    const lang = activeTab;
+    const url = tempUrls[lang];
     if (!url) return;
 
     setFormData((prev) => ({
       ...prev,
-      video: { ...(prev?.video || {}), [activeTab]: url },
+      video: { ...(prev?.video || {}), [lang]: url },
     }));
     // No marcamos como TEMP porque no lo subimos nosotros
   };
 
   const handleRemove = async () => {
-    const url = formData?.video?.[activeTab];
+    const lang = activeTab;
+    const url = formData?.video?.[lang];
     if (!url) return;
 
     const isTemp = isTempVideoUrl?.(url) === true;
@@ -129,14 +133,14 @@ const VideoPromocionalForm = ({
     // Limpiar la UI
     setFormData((prev) => ({
       ...prev,
-      video: { ...(prev?.video || {}), [activeTab]: "" },
+      video: { ...(prev?.video || {}), [lang]: "" },
     }));
 
     // limpiar estado local
     setVideoFile(null);
-    setTitles((prev) => ({ ...prev, [activeTab]: "" }));
-    setTempUrls((prev) => ({ ...prev, [activeTab]: "" }));
-    setUploadModeForLang(activeTab, null);
+    setTitles((prev) => ({ ...prev, [lang]: "" }));
+    setTempUrls((prev) => ({ ...prev, [lang]: "" }));
+    setUploadModeForLang(lang, null);
   };
 
   return (
