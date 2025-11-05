@@ -1,5 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "../styles/pages/MyFormationDetail.css";
 import {
@@ -19,11 +18,21 @@ import PdfPrivadoViewer from "../components/common/PdfPrivadoViewer/PdfPrivadoVi
 import VideoPrivadoViewer from "../components/common/VideoPrivadoViewer/VideoPrivadoViewer";
 import { Helmet } from "react-helmet";
 
+function withTimeout(promise, ms, label = "") {
+  return Promise.race([
+    promise,
+    new Promise((_, rej) =>
+      setTimeout(() => rej(new Error(`Timeout ${label} ${ms}ms`)), ms)
+    ),
+  ]);
+}
+
 function MyFormationDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { language } = useLanguage();
   const t = translations.myFormationDetail[language];
+  const location = useLocation();
 
   const [formacion, setFormacion] = useState(null);
   const [modules, setModules] = useState([]);
@@ -33,7 +42,6 @@ function MyFormationDetail() {
   const [claseCompleta, setClaseCompleta] = useState(null);
   const [userId, setUserId] = useState(null);
   const [formacionNoDisponible, setFormacionNoDisponible] = useState(false);
-  const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
 
   const visible = location.state?.visible;
@@ -51,7 +59,6 @@ function MyFormationDetail() {
   const getTiempoRestanteTexto = () => {
     if (diasRestantes === null) return null;
     if (diasRestantes > 30) return null;
-
     if (diasRestantes >= 28) return t.timeLeft_long_oneMonth;
     if (diasRestantes >= 21) return t.timeLeft_long_threeWeeks;
     if (diasRestantes >= 14) return t.timeLeft_long_twoWeeks;
@@ -64,58 +71,90 @@ function MyFormationDetail() {
 
   const tiempoRestanteTexto = getTiempoRestanteTexto();
 
+  // Carga de perfil + contenido visible (con timeout y estados seguros)
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        setFormacionNoDisponible(false);
-        const user = await getUserProfile();
-        setUserId(user._id);
+    let alive = true;
 
-        const progreso = user.progresoFormaciones?.find(
+    (async () => {
+      setIsLoading(true);
+      setFormacionNoDisponible(false);
+
+      try {
+        const [user, data] = await Promise.all([
+          withTimeout(getUserProfile(), 10000, "perfil"),
+          withTimeout(getFormationVisibleContent(id, language), 10000, "formacion"),
+        ]);
+
+        if (!alive) return;
+
+        setUserId(user?._id || null);
+
+        const progreso = user?.progresoFormaciones?.find(
           (p) => p.formationId === id
         );
-        if (progreso) {
+        if (progreso?.clasesCompletadas?.length) {
           setClasesCompletadas(progreso.clasesCompletadas);
+        } else {
+          setClasesCompletadas([]);
         }
 
-        const data = await getFormationVisibleContent(id, language);
-        setFormacion(data.formation);
-        setModules(data.modules);
+        setFormacion(data?.formation || null);
+        setModules(Array.isArray(data?.modules) ? data.modules : []);
       } catch (err) {
-        if (err.response?.status === 403) {
+        // Si backend devuelve 403 para “no visible”
+        if (err?.response?.status === 403) {
           setFormacionNoDisponible(true);
+          setFormacion(null);
+          setModules([]);
         } else {
           console.error("Error al obtener datos visibles o perfil:", err);
+          setFormacion(null);
+          setModules([]);
         }
       } finally {
-        setIsLoading(false);
+        if (alive) setIsLoading(false);
       }
-    };
+    })();
 
-    fetchData();
+    return () => {
+      alive = false;
+    };
   }, [id, language]);
 
+  // Carga/Reset de la clase seleccionada
   useEffect(() => {
-    const fetchClaseCompleta = async () => {
-      const claseId =
-        modules?.[moduloSeleccionado]?.classes?.[claseSeleccionada]?._id;
-      if (claseId) {
-        try {
-          const data = await getClassById(claseId, language);
-          setClaseCompleta(data);
-        } catch (error) {
-          console.error("Error al cargar clase:", error);
-          setClaseCompleta(null);
-        }
-      }
-    };
+    const claseId =
+      modules?.[moduloSeleccionado]?.classes?.[claseSeleccionada]?._id;
 
-    fetchClaseCompleta();
+    if (!claseId) {
+      setClaseCompleta(null);
+      return;
+    }
+
+    let alive = true;
+
+    (async () => {
+      try {
+        const data = await withTimeout(
+          getClassById(claseId, language),
+          10000,
+          "clase"
+        );
+        if (alive) setClaseCompleta(data || null);
+      } catch (error) {
+        console.error("Error al cargar clase:", error);
+        if (alive) setClaseCompleta(null);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
   }, [moduloSeleccionado, claseSeleccionada, modules, language]);
 
   const handleMarcarClase = async () => {
     try {
+      if (!userId || !claseCompleta?._id) return;
       await marcarClaseFormacion(userId, id, claseCompleta._id);
       setClasesCompletadas((prev) => [...prev, claseCompleta._id]);
     } catch (err) {
@@ -125,6 +164,7 @@ function MyFormationDetail() {
 
   const handleDesmarcarClase = async () => {
     try {
+      if (!userId || !claseCompleta?._id) return;
       await desmarcarClaseFormacion(userId, id, claseCompleta._id);
       setClasesCompletadas((prev) =>
         prev.filter((cid) => cid !== claseCompleta._id)
@@ -134,6 +174,13 @@ function MyFormationDetail() {
     }
   };
 
+  const getLocalizedText = (field) => {
+    if (typeof field === "string") return field;
+    return field?.[language] || field?.es || "";
+    // si no hay nada, devuelve ""
+  };
+
+  // ====== GUARDS de render ======
   if (isLoading) {
     return <LoadingSpinner texto={t.loading} />;
   }
@@ -147,37 +194,53 @@ function MyFormationDetail() {
     );
   }
 
-  if (!formacion || modules.length === 0)
-    return <LoadingSpinner texto={t.loading} />;
+  if (!formacion) {
+    return (
+      <EmptyState
+        title={t.notAvailableTitle}
+        subtitle={t.notAvailableSubtitle}
+      />
+    );
+  }
 
-  const totalClases = modules.reduce((acc, mod) => acc + mod.classes.length, 0);
-  const clasesHechas = clasesCompletadas.length;
-  const porcentaje = Math.round((clasesHechas / totalClases) * 100);
+  if (!Array.isArray(modules) || modules.length === 0) {
+    return (
+      <EmptyState
+        title={t.noContentTitle || t.notAvailableTitle}
+        subtitle={t.noContentSubtitle || t.notAvailableSubtitle}
+      />
+    );
+  }
 
-  const totalModulos = modules.length;
-  const modulosCompletados = modules.filter((mod) =>
-    mod.classes.every((c) => clasesCompletadas.includes(c._id))
+  // Progresos seguros
+  const totalClases = modules.reduce(
+    (acc, mod) => acc + (mod.classes?.length || 0),
+    0
+  );
+  const clasesHechas = clasesCompletadas?.length || 0;
+  const porcentaje =
+    totalClases > 0 ? Math.round((clasesHechas / totalClases) * 100) : 0;
+
+  const totalModulos = modules.length || 0;
+  const modulosCompletados = modules.filter(
+    (mod) => (mod.classes || []).every((c) => clasesCompletadas.includes(c._id))
   ).length;
-  const progresoModulos = Math.round((modulosCompletados / totalModulos) * 100);
-
-  const getLocalizedText = (field) => {
-    if (typeof field === "string") return field;
-    return field?.[language] || field?.es || "";
-  };
+  const progresoModulos =
+    totalModulos > 0 ? Math.round((modulosCompletados / totalModulos) * 100) : 0;
 
   return (
     <>
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
+
       <div className="my-course-detail">
-        <button
-          className="volver-button"
-          onClick={() => navigate("/mis-cursos")}
-        >
+        <button className="volver-button" onClick={() => navigate("/mis-cursos")}>
           {t.back}
         </button>
+
         <h1 className="formation-title">{getLocalizedText(formacion.title)}</h1>
+
         {tiempoRestanteTexto && (
           <div className="aviso-tiempo-restante">{tiempoRestanteTexto}</div>
         )}
@@ -224,9 +287,7 @@ function MyFormationDetail() {
           {modules.map((mod, i) => (
             <button
               key={mod._id}
-              className={`module-pill ${
-                i === moduloSeleccionado ? "active" : ""
-              }`}
+              className={`module-pill ${i === moduloSeleccionado ? "active" : ""}`}
               onClick={() => {
                 setModuloSeleccionado(i);
                 setClaseSeleccionada(0);
@@ -241,29 +302,27 @@ function MyFormationDetail() {
           {modules[moduloSeleccionado].classes?.map((cl, j) => (
             <button
               key={cl._id}
-              className={`class-pill ${
-                j === claseSeleccionada ? "active" : ""
-              }`}
+              className={`class-pill ${j === claseSeleccionada ? "active" : ""}`}
               onClick={() => setClaseSeleccionada(j)}
             >
               {t.class} {j + 1}
             </button>
           ))}
         </div>
+
         <div className="module-content">
           {modules[moduloSeleccionado] ? (
             <>
               <h2>{getLocalizedText(modules[moduloSeleccionado].title)}</h2>
               {modules[moduloSeleccionado].description && (
-                <p>
-                  {getLocalizedText(modules[moduloSeleccionado].description)}
-                </p>
+                <p>{getLocalizedText(modules[moduloSeleccionado].description)}</p>
               )}
             </>
           ) : (
             <p>{t.noContent}</p>
           )}
         </div>
+
         <div className="class-content">
           {claseCompleta ? (
             <>
@@ -280,18 +339,16 @@ function MyFormationDetail() {
                 </p>
               )}
 
-              {claseCompleta.pdfs?.some((pdf) => pdf.url?.[language]) && (
+              {claseCompleta.pdfs?.some((pdf) => pdf?.url?.[language]) && (
                 <div className="pdf-list">
                   <h4>{t.pdfsTitle}</h4>
                   {claseCompleta.pdfs
                     .map((pdf, index) => ({ pdf, index }))
-                    .filter(({ pdf }) => pdf.url?.[language])
+                    .filter(({ pdf }) => pdf?.url?.[language])
                     .map(({ pdf, index }) => (
                       <div className="resource-card" key={index}>
                         <h4>{pdf.title?.[language] || `PDF ${index + 1}`}</h4>
-                        <p className="texto">
-                          {pdf.description?.[language] || ""}
-                        </p>
+                        <p className="texto">{pdf.description?.[language] || ""}</p>
                         <PdfPrivadoViewer
                           classId={claseCompleta._id}
                           index={index}
@@ -307,15 +364,11 @@ function MyFormationDetail() {
                   <h4>{t.videosTitle}</h4>
                   {claseCompleta.videos
                     .map((video, index) => ({ video, index }))
-                    .filter(({ video }) => video.url?.[language])
+                    .filter(({ video }) => video?.url?.[language])
                     .map(({ video, index }) => (
                       <div className="resource-card" key={index}>
-                        <h4>
-                          {video.title?.[language] || `Video ${index + 1}`}
-                        </h4>
-                        <p className="texto">
-                          {video.description?.[language] || ""}
-                        </p>
+                        <h4>{video.title?.[language] || `Video ${index + 1}`}</h4>
+                        <p className="texto">{video.description?.[language] || ""}</p>
                         <VideoPrivadoViewer
                           classId={claseCompleta._id}
                           index={index}
@@ -334,10 +387,7 @@ function MyFormationDetail() {
                   {t.unmark}
                 </button>
               ) : (
-                <button
-                  className="mark-done-button"
-                  onClick={handleMarcarClase}
-                >
+                <button className="mark-done-button" onClick={handleMarcarClase}>
                   {t.markAsDone}
                 </button>
               )}
