@@ -4,11 +4,10 @@ import {
   getPresentialFormations,
   deletePresentialFormation,
   updatePresentialFormation,
-  
 } from "../../services/presentialService";
 import PresentialFormationForm from "../../components/admin/Form/PresentialFormationForm";
 import AddPresentialFormationModal from "../../components/admin/ModalAdmin/AddPresentialFormationModal";
-
+import ConfirmModal from "../../components/common/ConfirmModal"
 import "../../styles/admin/ManagePresentialFormations.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
 
@@ -18,6 +17,8 @@ const ManagePresentialFormations = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activeTab, setActiveTab] = useState("es");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [formationToDelete, setFormationToDelete] = useState(null);
 
   useEffect(() => {
     fetchFormations();
@@ -32,15 +33,36 @@ const ManagePresentialFormations = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (confirm("¿Seguro que querés eliminar esta formación?")) {
-      try {
-        await deletePresentialFormation(id);
-        if (selected?._id === id) setSelected(null);
-        fetchFormations();
-      } catch (err) {
-        console.error("Error al eliminar:", err);
+  const openDeleteModal = (formation) => {
+    setFormationToDelete(formation);
+    setShowDeleteModal(true);
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setFormationToDelete(null);
+  };
+
+  const confirmDelete = async () => {
+    if (!formationToDelete) return;
+
+    try {
+      await deletePresentialFormation(formationToDelete._id);
+
+      // Si la formación eliminada es la que está seleccionada, la limpiamos
+      if (selected?._id === formationToDelete._id) {
+        setSelected(null);
+        setIsEditing(false);
       }
+
+      // Actualizamos la lista en memoria sin necesidad de refetch si querés
+      setFormations((prev) =>
+        prev.filter((f) => f._id !== formationToDelete._id)
+      );
+    } catch (err) {
+      console.error("Error al eliminar:", err);
+    } finally {
+      closeDeleteModal();
     }
   };
 
@@ -51,9 +73,9 @@ const ManagePresentialFormations = () => {
   const handleSave = async (data) => {
     try {
       const updated = await updatePresentialFormation(selected._id, data);
-      
+
       setIsEditing(false);
-  
+
       // ✅ Actualizamos en memoria tanto la lista como la formación seleccionada
       setFormations((prev) =>
         prev.map((f) => (f._id === updated._id ? updated : f))
@@ -63,7 +85,6 @@ const ManagePresentialFormations = () => {
       console.error("Error al guardar:", err);
     }
   };
-  
 
   return (
     <div className="manage-courses-container">
@@ -72,25 +93,38 @@ const ManagePresentialFormations = () => {
       <div className="courses-layout">
         <div className="courses-list">
           <h2 className="titulo-principal">Formaciones presenciales</h2>
-          <button className="boton-agregar" onClick={() => setShowAddModal(true)}>
-            <FaPlus/> Agregar formación
+          <button
+            className="boton-agregar"
+            onClick={() => setShowAddModal(true)}
+          >
+            <FaPlus /> Agregar formación
           </button>
 
           {formations.map((f) => (
             <div
-            key={f._id}
-            className={`course-card ${selected?._id === f._id ? "selected" : ""}`}
-          >
-          
-              <div className="titulo-principal course-title" onClick={() => setSelected(f)}>
+              key={f._id}
+              className={`course-card ${
+                selected?._id === f._id ? "selected" : ""
+              }`}
+            >
+              <div
+                className="titulo-principal course-title"
+                onClick={() => setSelected(f)}
+              >
                 {f.title?.es}
               </div>
               <div className="course-actions">
-                <button className="boton-agregar editar" onClick={() => handleEdit(f)}>
+                <button
+                  className="boton-agregar editar"
+                  onClick={() => handleEdit(f)}
+                >
                   ✏️ Editar
                 </button>
-                <button className="boton-eliminar" onClick={() => handleDelete(f._id)}>
-                  <FaTrash/> Eliminar
+                <button
+                  className="boton-eliminar"
+                  onClick={() => openDeleteModal(f)}
+                >
+                  <FaTrash /> Eliminar
                 </button>
               </div>
             </div>
@@ -122,31 +156,32 @@ const ManagePresentialFormations = () => {
                   ))}
                 </div>
 
-                <h2 className="titulo-principal">{selected.title?.[activeTab]}</h2>
+                <h2 className="titulo-principal">
+                  {selected.title?.[activeTab]}
+                </h2>
                 <p className="texto">{selected.description?.[activeTab]}</p>
-                    <div className="informationPresential">
-                <p>
-                  <strong>Ubicación:</strong> {selected.location?.[activeTab]}
-                </p>
-                <p>
-                  <strong>Horario:</strong> {selected.time}
-                </p>
-                <p>
-                  <strong>Fecha:</strong>{" "}
-                  {selected.dateType === "single"
-                    ? new Date(selected.singleDate).toLocaleDateString()
-                    : `${new Date(
-                        selected.dateRange?.start
-                      ).toLocaleDateString()} - ${new Date(
-                        selected.dateRange?.end
-                      ).toLocaleDateString()}`}
-                </p>
-                <p>
-                  <strong>Link de inscripción:</strong>{" "}
-                  {selected.registrationLink}
-                </p>
-</div>
- 
+                <div className="informationPresential">
+                  <p>
+                    <strong>Ubicación:</strong> {selected.location?.[activeTab]}
+                  </p>
+                  <p>
+                    <strong>Horario:</strong> {selected.time}
+                  </p>
+                  <p>
+                    <strong>Fecha:</strong>{" "}
+                    {selected.dateType === "single"
+                      ? new Date(selected.singleDate).toLocaleDateString()
+                      : `${new Date(
+                          selected.dateRange?.start
+                        ).toLocaleDateString()} - ${new Date(
+                          selected.dateRange?.end
+                        ).toLocaleDateString()}`}
+                  </p>
+                  <p>
+                    <strong>Link de inscripción:</strong>{" "}
+                    {selected.registrationLink}
+                  </p>
+                </div>
               </div>
             )}
           </div>
@@ -159,6 +194,22 @@ const ManagePresentialFormations = () => {
           onAdded={(newFormation) => {
             setFormations((prev) => [...prev, newFormation]);
           }}
+        />
+      )}
+
+      {showDeleteModal && (
+        <ConfirmModal
+          isOpen={showDeleteModal}
+          onClose={closeDeleteModal}
+          onConfirm={confirmDelete}
+          title="¿Eliminar formación presencial?"
+          message={
+            formationToDelete
+              ? `Estás por eliminar "${
+                  formationToDelete.title?.es || "esta formación"
+                }". Esta acción no se puede deshacer.`
+              : "Esta acción no se puede deshacer."
+          }
         />
       )}
     </div>

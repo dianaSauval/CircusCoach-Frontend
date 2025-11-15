@@ -2,7 +2,7 @@ const translations = {
   header: {
     es: {
       home: "INICIO",
-      courses: "CURSOS",
+      courses: "TUTORIALES",
       formations: "FORMACIONES",
       aboutUs: "NOSOTROS",
       myCourses: "MIS CURSOS",
@@ -13,7 +13,7 @@ const translations = {
     },
     en: {
       home: "HOME",
-      courses: "COURSES",
+      courses: "TUTORIALS",
       formations: "FORMATIONS",
       aboutUs: "ABOUT US",
       myCourses: "MY COURSES",
@@ -24,7 +24,7 @@ const translations = {
     },
     fr: {
       home: "ACCUEIL",
-      courses: "COURS",
+      courses: "TUTORIELS",
       formations: "FORMATIONS",
       aboutUs: "NOUS",
       myCourses: "MES COURS",

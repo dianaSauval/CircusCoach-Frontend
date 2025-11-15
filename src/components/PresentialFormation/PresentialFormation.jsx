@@ -74,7 +74,7 @@ const PresentialFormationCard = ({ formation }) => {
 
 const PresentialFormationsList = () => {
   const [formations, setFormations] = useState([]);
-  const { language } = useLanguage(); // ✅ traemos del context
+  const { language } = useLanguage();
   const t = translations.formations[language];
 
   useEffect(() => {
@@ -90,19 +90,46 @@ const PresentialFormationsList = () => {
     fetchFormations();
   }, [language]);
 
+  // ✅ Solo mostramos las formaciones que estén completas en este idioma
+  const isFormationComplete = (formation) => {
+    if (!formation) return false;
+
+    const { title, location, dateType, singleDate, dateRange } = formation;
+
+    if (!title || !location || !dateType) return false;
+
+    if (dateType === "single") {
+      return Boolean(singleDate);
+    }
+
+    if (dateType === "range") {
+      return Boolean(
+        dateRange &&
+          dateRange.start &&
+          dateRange.end
+      );
+    }
+
+    // Por si algún día aparece otro tipo de dateType raro
+    return false;
+  };
+
+  const visibleFormations = formations.filter(isFormationComplete);
+
   return (
     <div className="formations-wrapper">
       <h2 className="formations-title">{t.upcomingTitle}</h2>
 
-      {formations.length === 0 ? (
+      {visibleFormations.length === 0 ? (
         <EmptyState title={t.noPresentialTitle} subtitle={t.noPresentialText} />
       ) : (
-        formations.map((formation) => (
+        visibleFormations.map((formation) => (
           <PresentialFormationCard key={formation._id} formation={formation} />
         ))
       )}
     </div>
   );
 };
+
 
 export default PresentialFormationsList;

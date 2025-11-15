@@ -63,46 +63,40 @@ const PresentialFormationForm = ({
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const { errors: newErrors, missingLanguages } =
-      validatePresentialFormationForm(formData);
+  const { errors: newErrors } = validatePresentialFormationForm(formData);
 
-    setErrors(newErrors);
+  setErrors(newErrors);
 
-    // Auto-focus al primer error encontrado
-    const firstErrorKey = Object.keys(newErrors)[0];
-    const refMap = {
-      [`title-${activeTab}`]: titleRef,
-      [`description-${activeTab}`]: descriptionRef,
-      [`location-${activeTab}`]: locationRef,
-      singleDate: singleDateRef,
-      rangeStart: rangeStartRef,
-      rangeEnd: rangeEndRef,
-    };
+  // Auto-focus al primer error encontrado
+  const firstErrorKey = Object.keys(newErrors)[0];
 
-    const ref = refMap[firstErrorKey];
-    if (ref?.current) {
-      ref.current.focus();
-      ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      if (missingLanguages.length > 0) {
-        const langs = [...new Set(missingLanguages)].map((l) =>
-          l === "es" ? "español" : l === "en" ? "inglés" : "francés"
-        );
-        setGlobalError(`Falta completar la información en: ${langs.join(", ")}`);
-      } else {
-        setGlobalError("");
-      }
-      return;
-    }
-
-    setGlobalError("");
-    setErrors({});
-    onSave(formData);
+  const refMap = {
+    [`title-${activeTab}`]: titleRef,
+    [`description-${activeTab}`]: descriptionRef,
+    [`location-${activeTab}`]: locationRef,
+    singleDate: singleDateRef,
+    rangeStart: rangeStartRef,
+    rangeEnd: rangeEndRef,
   };
+
+  const ref = refMap[firstErrorKey];
+  if (ref?.current) {
+    ref.current.focus();
+    ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  if (Object.keys(newErrors).length > 0) {
+    setGlobalError("Revisa los campos marcados en rojo.");
+    return;
+  }
+
+  setGlobalError("");
+  setErrors({});
+  onSave(formData);
+};
+
 
   return (
     <form onSubmit={handleSubmit} className="presential-form">
