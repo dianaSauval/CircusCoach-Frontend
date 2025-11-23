@@ -23,6 +23,34 @@
   color: var(--color-azul-profundo);
 }
 
+/* Descripción del curso (arriba del progreso) */
+.formation-description {
+  white-space: pre-line;
+}
+
+/* Textos dentro del contenido de la clase / módulo */
+.class-content p,
+.module-content p {
+  white-space: pre-line;
+}
+
+/* Si el subtítulo (h3) puede traer saltos de línea */
+.class-content h3,
+.module-content h3 {
+  white-space: pre-line;
+}
+
+/* Descripciones dentro de tarjetas de recursos (PDFs/Videos) */
+.resource-card p {
+  white-space: pre-line;
+}
+
+/* Si usás contenido secundario con <p class="secondary-content"> */
+.secondary-content {
+  white-space: pre-line;
+}
+
+
 .progress-title {
   margin-top: 2rem;
   font-family: var(--font-titulo);
