@@ -8,10 +8,12 @@ import { useLanguage } from "../context/LanguageContext";
 import translations from "../i18n/translations";
 import TermsCheckbox from "../components/common/TermsCheckbox/TermsCheckbox";
 import EmptyState from "../components/EmptyState/EmptyState";
-import "../styles/pages/PagoEmbedPage.css"; // mismo estilo que CartPage
+import "../styles/pages/PagoEmbedPage.css";
 import { FaTrash } from "react-icons/fa";
 import { Helmet } from "react-helmet";
 import { formatPrice } from "../utils/formatPrice";
+import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -19,12 +21,11 @@ const PagoEmbedPage = () => {
   const [clientSecret, setClientSecret] = useState(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
-  // ✅ NUEVO: mostrar/ocultar el panel inline
-  const [showTermsBox, setShowTermsBox] = useState(false);
 
   const { cart, cartCount, setCart } = useCart();
+  const { isAuthenticated } = useAuth();
   const { language } = useLanguage();
-  const t = translations.cart[language];
+  const t = translations.cart?.[language] || translations.cart?.es || {};
 
   const CURRENCY = "EUR";
   const localeMap = { es: "es-ES", en: "en-GB", fr: "fr-FR" };
@@ -46,24 +47,28 @@ const PagoEmbedPage = () => {
         const itemsParaPago = cart.map((item) => ({
           id: item.id || item._id,
           type: item.type,
-          price: calcularPrecioConDescuento(item), // 👈 Incluí el precio
-          title: item.title, // útil para el email post-compra en el backend
+          price: calcularPrecioConDescuento(item),
+          title: item.title,
         }));
 
         const res = await crearPaymentIntent({
           items: itemsParaPago,
           language,
-        }); // 👈
+        });
+
         setClientSecret(res.clientSecret);
       } catch (err) {
         console.error("Error al obtener clientSecret", err);
       }
     };
 
-    if (cart.length > 0) {
+    // ✅ Solo creamos payment intent si está logueado (porque si no, no puede pagar)
+    if (cart.length > 0 && isAuthenticated) {
       obtenerClientSecret();
+    } else {
+      setClientSecret(null);
     }
-  }, [cart, language]);
+  }, [cart, language, isAuthenticated]);
 
   const handleRemoveItem = (indexToRemove) => {
     const newCart = cart.filter((_, index) => index !== indexToRemove);
@@ -77,10 +82,7 @@ const PagoEmbedPage = () => {
   const appearance = { theme: "stripe" };
   const options = { clientSecret, appearance, locale: language || "es" };
 
-  // ✅ NUEVO: reemplaza la apertura de modal por toggle + scroll
   const handleOpenTermsInline = () => {
-    setShowTermsBox((prev) => !prev);
-    // Hacemos scroll suave al contenedor en el próximo tick
     setTimeout(() => {
       const el = document.getElementById("terms-box");
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -100,6 +102,7 @@ const PagoEmbedPage = () => {
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
+
       <div className="cart-page-container">
         <h1>{t.title}</h1>
 
@@ -107,24 +110,20 @@ const PagoEmbedPage = () => {
           {cart.map((item, index) => (
             <li key={index} className="cart-item">
               <img
-                src={
-                  item.image?.[language] || item.image?.es || "/placeholder.png"
-                }
+                src={item.image?.[language] || item.image?.es || "/placeholder.png"}
                 alt={item.title?.[language] || item.title?.es || "Curso"}
                 className="cart-item-img"
               />
+
               <div className="cart-item-info">
                 <h3 className="titulo-principal">
                   {item.title?.[language] || item.title?.es}
                 </h3>
+
                 {item.discount ? (
                   <div className="precio-con-descuento">
                     <span className="precio-final">
-                      {formatPrice(
-                        calcularPrecioConDescuento(item),
-                        CURRENCY,
-                        lang
-                      )}
+                      {formatPrice(calcularPrecioConDescuento(item), CURRENCY, lang)}
                     </span>
                     <span className="precio-original">
                       {formatPrice(item.price, CURRENCY, lang)}
@@ -143,7 +142,7 @@ const PagoEmbedPage = () => {
                   className="boton-eliminar small"
                   onClick={() => handleRemoveItem(index)}
                 >
-                  <FaTrash /> Eliminar
+                  <FaTrash /> {t.remove || "Eliminar"}
                 </button>
               </div>
             </li>
@@ -154,39 +153,58 @@ const PagoEmbedPage = () => {
           <p className="label-formulario">{t.total}:</p>
           <p className="texto">{formatPrice(totalPrice, CURRENCY, lang)}</p>
         </div>
-        <TermsCheckbox
-          checkedTerms={termsAccepted}
-          onChangeTerms={(e) => setTermsAccepted(e.target.checked)}
-          checkedPrivacy={privacyAccepted}
-          onChangePrivacy={(e) => setPrivacyAccepted(e.target.checked)}
-          language={language}
-          onOpenTermsModal={handleOpenTermsInline}
-          termsUrl="/terminos"
-          privacyUrl="/privacidad"
-        />
 
-        {(!termsAccepted || !privacyAccepted) && (
-          <p style={{ color: "red", marginTop: "0.5rem" }}>
-            {t.acceptTermsWarning ||
-              "Debes aceptar los términos y la privacidad para continuar."}
-          </p>
+        {/* ✅ Si NO está logueado: mostramos solo el aviso + CTAs */}
+        {!isAuthenticated ? (
+          <EmptyState
+            title={t.loginRequiredTitle}
+            subtitle={t.loginRequiredText}
+          >
+            <Link to="/login" className="boton-ghost">
+              {t.loginCta}
+            </Link>
+            <Link to="/register" className="boton-secundario">
+              {t.registerCta}
+            </Link>
+          </EmptyState>
+        ) : (
+          <>
+            {/* ✅ Si está logueado: recién acá se ven términos y pago */}
+            <TermsCheckbox
+              checkedTerms={termsAccepted}
+              onChangeTerms={(e) => setTermsAccepted(e.target.checked)}
+              checkedPrivacy={privacyAccepted}
+              onChangePrivacy={(e) => setPrivacyAccepted(e.target.checked)}
+              language={language}
+              onOpenTermsModal={handleOpenTermsInline}
+              termsUrl="/terminos"
+              privacyUrl="/privacidad"
+            />
+
+            {(!termsAccepted || !privacyAccepted) && (
+              <p style={{ color: "red", marginTop: "0.5rem" }}>
+                {t.acceptTermsWarning ||
+                  "Debes aceptar los términos y la privacidad para continuar."}
+              </p>
+            )}
+
+            <div className="cart-buttons">
+              <button onClick={handleClearCart} className="boton-secundario">
+                {t.clear || "Vaciar carrito"}
+              </button>
+            </div>
+
+            <div className="payment-form-section">
+              {!clientSecret && <p>{t.loadingPayment || "Cargando formulario de pago..."}</p>}
+
+              {clientSecret && termsAccepted && privacyAccepted && (
+                <Elements options={options} stripe={stripePromise}>
+                  <CheckoutForm />
+                </Elements>
+              )}
+            </div>
+          </>
         )}
-       
-        <div className="cart-buttons">
-          <button onClick={handleClearCart} className="boton-secundario">
-            {t.clear || "Vaciar carrito"}
-          </button>
-        </div>
-
-        <div className="payment-form-section">
-          {!clientSecret && <p>Cargando formulario de pago...</p>}
-
-          {clientSecret && termsAccepted && privacyAccepted && (
-            <Elements options={options} stripe={stripePromise}>
-              <CheckoutForm />
-            </Elements>
-          )}
-        </div>
       </div>
     </>
   );

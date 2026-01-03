@@ -22,13 +22,21 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const { cartCount } = useCart();
+const { cartCount, clearCart } = useCart();
+
   const { language, setLanguage } = useLanguage();
   const t = translations.header[language];
   const { user, isAuthenticated, logout } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
+
+
+  const handleLogout = () => {
+  clearCart();
+  logout();
+};
+
 
   // Scroll helper
 const scrollTopAll = (smooth = true) => {
@@ -219,7 +227,7 @@ const scrollTopAll = (smooth = true) => {
         )}
 
         {isAuthenticated ? (
-          <NavLink to="/" className="nav-link mobile-only" onClick={logout}>
+          <NavLink to="/" className="nav-link mobile-only" onClick={handleLogout}>
             {t.logout}
           </NavLink>
         ) : (
@@ -273,7 +281,7 @@ const scrollTopAll = (smooth = true) => {
           </NavLink>
 
           {isAuthenticated ? (
-            <NavLink to="/" className="nav-link desktop-only" onClick={logout}>
+            <NavLink to="/" className="nav-link desktop-only" onClick={handleLogout}>
               {t.logout}
             </NavLink>
           ) : (

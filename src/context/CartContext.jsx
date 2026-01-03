@@ -1,4 +1,5 @@
 // ✅ CONTEXTO DE CARRITO (context/CartContext.js)
+// context/CartContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 
 const CartContext = createContext();
@@ -17,10 +18,15 @@ export const CartProvider = ({ children }) => {
     setCart((prev) => [...prev, item]);
   };
 
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart"); // 🔥 esto evita que "reviva"
+  };
+
   const cartCount = cart.length;
 
   return (
-    <CartContext.Provider value={{ cart, setCart, addToCart, cartCount }}>
+    <CartContext.Provider value={{ cart, setCart, addToCart, clearCart, cartCount }}>
       {children}
     </CartContext.Provider>
   );

@@ -389,6 +389,12 @@ const translations = {
       purchaseSuccess: "Compra registrada exitosamente",
       purchaseError: "Error al registrar la compra",
       alreadyOwned: "Ya tenías estos cursos/formaciones en tu cuenta",
+      loginRequiredText:
+        "Estos productos son digitales. Al crear una cuenta, podremos asociar tu compra y darte acceso seguro a los videos y PDFs desde la plataforma.",
+      loginCta: "Iniciar sesión",
+      registerCta: "Crear cuenta",
+      remove: "Eliminar",
+      loadingPayment: "Cargando formulario de pago...",
     },
     en: {
       title: "Your Cart",
@@ -405,6 +411,12 @@ const translations = {
       purchaseSuccess: "Purchase successfully registered",
       purchaseError: "An error occurred while registering the purchase",
       alreadyOwned: "You already had these courses/trainings in your account",
+      loginRequiredText:
+        "These are digital products. By creating an account, we can link your purchase and give you secure access to videos and PDFs inside the platform.",
+      loginCta: "Log in",
+      registerCta: "Create account",
+      remove: "Remove",
+      loadingPayment: "Loading payment form...",
     },
     fr: {
       title: "Votre panier",
@@ -423,6 +435,12 @@ const translations = {
       purchaseError:
         "Une erreur s'est produite lors de l'enregistrement de l'achat",
       alreadyOwned: "Vous aviez déjà ces cours/formations dans votre compte",
+      loginRequiredText:
+        "Ce sont des produits numériques. En créant un compte, nous pourrons associer votre achat et vous donner un accès sécurisé aux vidéos et PDFs sur la plateforme.",
+      loginCta: "Connexion",
+      registerCta: "Créer un compte",
+      remove: "Supprimer",
+      loadingPayment: "Chargement du formulaire de paiement...",
     },
   },
   myCourses: {

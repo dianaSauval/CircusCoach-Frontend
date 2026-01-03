@@ -45,6 +45,63 @@
   margin: 0 auto;
 }
 
+.empty-state-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.boton-secundario{
+    text-decoration: none;
+}
+
+/* Botón tipo "ghost" para login (se ve botón pero más suave) */
+.boton-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.55rem 1.2rem;
+  border-radius: 999px;
+
+  background: transparent;
+  border: 2px solid rgba(20, 50, 81, 0.35); /* azul profundo suave */
+  color: var(--color-azul-profundo);
+
+  font-family: var(--font-texto);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+
+  text-decoration: none; /* 🔥 saca subrayado */
+  cursor: pointer;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.boton-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.5);
+  border-color: var(--color-azul-profundo);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
+}
+
+.boton-ghost:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: none;
+}
+
+.boton-ghost:focus-visible {
+  outline: 3px solid rgba(104, 208, 189, 0.6); /* menta */
+  outline-offset: 3px;
+}
+
+
+
 @media (max-width: 600px) {
   .empty-title {
     font-size: 1.8rem;

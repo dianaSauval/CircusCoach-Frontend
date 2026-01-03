@@ -1,17 +1,16 @@
-import React from 'react';
-import './EmptyState.css';
-import { LuMoonStar, LuSquareBottomDashedScissors } from 'react-icons/lu';
-import { PiMagicWandLight } from 'react-icons/pi';
-import { TbMoonStars } from 'react-icons/tb';
+// components/EmptyState/EmptyState.jsx
+import React from "react";
+import "./EmptyState.css";
 
-
-const EmptyState = ({ title, subtitle }) => {
+const EmptyState = ({ title, subtitle, children }) => {
   return (
     <div className="empty-wrapper">
-    <div className="empty-state-container">
-      <h2 className="titulo-principal">{title}</h2>
-      <p>{subtitle}</p>
-    </div>
+      <div className="empty-state-container">
+        <h2 className="titulo-principal">{title}</h2>
+        <p>{subtitle}</p>
+
+        {children && <div className="empty-state-actions">{children}</div>}
+      </div>
     </div>
   );
 };
