@@ -1,9 +1,28 @@
 export default function validateDiscountForm(formData) {
   const errors = {};
 
-  // 🔹 Nombre obligatorio
-  if (!formData.name?.trim()) {
-    errors.name = "El nombre es obligatorio";
+  // ✅ Helper: al menos un idioma con contenido
+  const hasAnyLang = (value) => {
+    if (!value) return false;
+
+    // compatibilidad: si viene string viejo
+    if (typeof value === "string") return value.trim().length > 0;
+
+    // multilenguaje: {es,en,fr}
+    if (typeof value === "object" && !Array.isArray(value)) {
+      return Boolean(
+        (value.es || "").trim() ||
+        (value.en || "").trim() ||
+        (value.fr || "").trim()
+      );
+    }
+
+    return false;
+  };
+
+  // 🔹 Nombre obligatorio (al menos en un idioma)
+  if (!hasAnyLang(formData.name)) {
+    errors.name = "El nombre es obligatorio (al menos en un idioma)";
   }
 
   // 🔹 Fechas requeridas

@@ -1,8 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./DiscountBanner.css";
+import { useLanguage } from "../../../context/LanguageContext";
+
+const pickLangWithSpanishFallback = (value, lang = "es") => {
+  // compat: si viene string viejo
+  if (typeof value === "string") return value;
+
+  if (!value || typeof value !== "object") return "";
+
+  // 1) idioma actual
+  const current = (value?.[lang] || "").trim();
+  if (current) return current;
+
+  // 2) fallback a ES (como pediste)
+  const es = (value?.es || "").trim();
+  if (es) return es;
+
+  // 3) último recurso: cualquier otro
+  const any =
+    (value?.en || "").trim() ||
+    (value?.fr || "").trim();
+
+  return any || "";
+};
 
 const DiscountBanner = ({ name, endDate }) => {
+  const { language: lang } = useLanguage();
   const [timeLeft, setTimeLeft] = useState({});
+
+  const title = useMemo(
+    () => pickLangWithSpanishFallback(name, lang),
+    [name, lang]
+  );
 
   useEffect(() => {
     const updateCountdown = () => {
@@ -11,7 +40,7 @@ const DiscountBanner = ({ name, endDate }) => {
       const diff = end - now;
 
       if (diff <= 0) {
-        setTimeLeft(null); // Ya venció
+        setTimeLeft(null);
         return;
       }
 
@@ -30,17 +59,20 @@ const DiscountBanner = ({ name, endDate }) => {
 
   if (!timeLeft) return null;
 
+  // Si no hay título (raro), no mostramos banner
+  if (!title) return null;
+
   return (
     <div className="discount-banner">
-      <div className="banner-title">🎉 {name} 🎉</div>
+      <div className="banner-title">🎉 {title} 🎉</div>
       <div className="banner-subtitle">¡Por tiempo limitado!</div>
       <div className="countdown">
-        <span>{timeLeft.days}d</span> :
-        <span>{timeLeft.hours}h</span> :
-        <span>{timeLeft.minutes}m</span> :
-        <span>{timeLeft.seconds}s</span>
+        <span>{timeLeft.days}d</span> :<span>{timeLeft.hours}h</span> :
+        <span>{timeLeft.minutes}m</span> :<span>{timeLeft.seconds}s</span>
       </div>
-      <div className="banner-cta">¡Aprovechá el descuento antes de que se termine!</div>
+      <div className="banner-cta">
+        ¡Aprovechá el descuento antes de que se termine!
+      </div>
     </div>
   );
 };

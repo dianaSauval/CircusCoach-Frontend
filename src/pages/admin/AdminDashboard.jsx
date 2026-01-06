@@ -71,6 +71,18 @@ function AdminDashboard() {
               Gestionar Bonos
             </Link>
           </div>
+
+          {/* Productos Físicos */}
+          <div className="admin-card">
+            <h2 className="titulo-principal">Productos Físicos</h2>
+            <p className="texto">
+              Gestioná los productos físicos que recomendás y vendés a través de
+              Amazon: imagen, descripción, precio y stock.
+            </p>
+            <Link to="/admin/productos-fisicos" className="boton-secundario">
+              Ver Productos
+            </Link>
+          </div>
         </div>
       </div>
     </>

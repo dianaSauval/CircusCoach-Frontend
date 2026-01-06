@@ -47,11 +47,14 @@
 .informationPresential {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  align-items: center; 
   gap: 10px;
   margin-bottom: 20px;
   font-size: 1.1rem;
+  width: 100%;
+}
+.informationPresential p {
+  margin: 0;
 }
 
 .language-tabs {
@@ -82,8 +85,55 @@
   cursor: pointer;
 }
 
-.agregar-bono{
+.agregar-bono {
   min-width: 250px;
+}
+
+/* ✅ Mejor layout para el bloque "Aplica a" */
+.aplica-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  margin-top: 6px;
+}
+
+.aplica-label {
+  white-space: nowrap;
+}
+
+/* contenedor de tags */
+.aplica-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+/* tag estilo pill */
+.aplica-tag {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: #fff;
+  font-size: 0.95rem;
+  line-height: 1.1;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+
+  /* para textos largos */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* estado vacío */
+.aplica-empty {
+  opacity: 0.7;
+  font-style: italic;
 }
 
 /* 🔹 Responsivo */
@@ -93,7 +143,7 @@
     text-align: center;
   }
 
-  .main-title{
+  .main-title {
     margin-top: 15px;
   }
 }

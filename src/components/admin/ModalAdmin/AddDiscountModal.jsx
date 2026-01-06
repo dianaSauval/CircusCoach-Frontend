@@ -6,8 +6,8 @@ const AddDiscountModal = ({ onClose, onAdded }) => {
   const handleSave = async (formData) => {
     try {
       const res = await createDiscount(formData);
-      onAdded?.(res); // Actualiza la lista en el panel
-      onClose(); // Cierra el modal
+      onAdded?.(res);
+      onClose();
     } catch (err) {
       console.error("❌ Error al crear bono:", err.response?.data || err.message);
       alert("Error al crear el bono");

@@ -4,25 +4,53 @@ import { getAllCourses } from "../../../services/courseService";
 import { getAllFormations } from "../../../services/formationService";
 import validateDiscountForm from "../../../utils/validations/validateDiscountForm";
 
+const LANGS = ["es", "en", "fr"];
+const emptyLang = { es: "", en: "", fr: "" };
+
+const normalizeLangObj = (val) => {
+  if (val && typeof val === "object" && !Array.isArray(val)) {
+    return {
+      es: val.es || "",
+      en: val.en || "",
+      fr: val.fr || "",
+    };
+  }
+  // compat: si viene string viejo, lo metemos en ES
+  if (typeof val === "string") return { es: val, en: "", fr: "" };
+  return { ...emptyLang };
+};
+
 const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
+  const [activeLang, setActiveLang] = useState("es");
+
   const [formData, setFormData] = useState({
-    name: initialData.name || "",
-    description: initialData.description || "",
+    name: normalizeLangObj(initialData.name),
+    description: normalizeLangObj(initialData.description),
     percentage: initialData.percentage || 0,
     amount: initialData.amount || 0,
     startDate: initialData.startDate ? initialData.startDate.slice(0, 10) : "",
     endDate: initialData.endDate ? initialData.endDate.slice(0, 10) : "",
     active: initialData.active ?? true,
     type: initialData.type || "course",
-    targetItems: initialData.targetItems || [],
+    targetItems: Array.isArray(initialData.targetItems)
+      ? initialData.targetItems.map((it) => ({
+          _id: it._id,
+          title: normalizeLangObj(it.title),
+        }))
+      : [],
   });
 
   const [errors, setErrors] = useState({});
   const [courses, setCourses] = useState([]);
   const [formations, setFormations] = useState([]);
 
-  // Refs para errores
-  const nameRef = useRef(null);
+  // Refs por idioma para name
+  const nameRefs = {
+    es: useRef(null),
+    en: useRef(null),
+    fr: useRef(null),
+  };
+
   const percentageRef = useRef(null);
   const startDateRef = useRef(null);
   const endDateRef = useRef(null);
@@ -33,16 +61,12 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
         if (formData.type === "course" || formData.type === "both") {
           const resCourses = await getAllCourses();
           setCourses(resCourses);
-        } else {
-          setCourses([]);
-        }
+        } else setCourses([]);
 
         if (formData.type === "formation" || formData.type === "both") {
           const resFormations = await getAllFormations();
           setFormations(resFormations);
-        } else {
-          setFormations([]);
-        }
+        } else setFormations([]);
       } catch (error) {
         console.error("Error al cargar cursos/formaciones:", error);
       }
@@ -52,16 +76,51 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
   }, [formData.type]);
 
   const handleChange = (field, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    // Eliminar solo el error de ese campo
+    setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => {
       if (!(field in prev)) return prev;
       const updated = { ...prev };
       delete updated[field];
+      return updated;
+    });
+  };
+
+  const handleLangChange = (field, lang, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: { ...prev[field], [lang]: value },
+    }));
+
+    setErrors((prev) => {
+      if (!(field in prev)) return prev;
+      const updated = { ...prev };
+      delete updated[field];
+      return updated;
+    });
+  };
+
+  const toggleTargetItem = (entity) => {
+    setFormData((prev) => {
+      const exists = prev.targetItems.some((it) => it._id === entity._id);
+      if (!exists) {
+        return {
+          ...prev,
+          targetItems: [
+            ...prev.targetItems,
+            { _id: entity._id, title: normalizeLangObj(entity.title) },
+          ],
+        };
+      }
+      return {
+        ...prev,
+        targetItems: prev.targetItems.filter((it) => it._id !== entity._id),
+      };
+    });
+
+    setErrors((prev) => {
+      if (!("targetItems" in prev)) return prev;
+      const updated = { ...prev };
+      delete updated.targetItems;
       return updated;
     });
   };
@@ -71,37 +130,77 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
     const newErrors = validateDiscountForm(formData);
     setErrors(newErrors);
 
-    // Auto-focus al primer error
     if (Object.keys(newErrors).length > 0) {
-      if (newErrors.name && nameRef.current) nameRef.current.focus();
+      if (newErrors.name && nameRefs[activeLang]?.current) nameRefs[activeLang].current.focus();
       else if (newErrors.percentage && percentageRef.current) percentageRef.current.focus();
       else if (newErrors.startDate && startDateRef.current) startDateRef.current.focus();
       else if (newErrors.endDate && endDateRef.current) endDateRef.current.focus();
       return;
     }
 
-    onSave(formData);
+    onSave({
+      ...formData,
+      percentage: Number(formData.percentage) || 0,
+      amount: Number(formData.amount) || 0,
+      targetItems: formData.targetItems.map((it) => ({
+        _id: it._id,
+        title: normalizeLangObj(it.title),
+      })),
+    });
   };
 
   return (
     <form onSubmit={handleSubmit} className="presential-form">
-      <label className="label-formulario">🎁 Nombre del bono:</label>
+      {/* Tabs idiomas */}
+      <div className="language-tabs">
+        {LANGS.map((l) => (
+          <button
+            key={l}
+            type="button"
+            className={activeLang === l ? "active" : ""}
+            onClick={() => setActiveLang(l)}
+          >
+            {l.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {/* Name multilenguaje */}
+      <label className="label-formulario">
+        🎁 Nombre del bono ({activeLang.toUpperCase()}):
+      </label>
       <input
-        ref={nameRef}
+        ref={nameRefs[activeLang]}
         type="text"
-        placeholder="Ej: Promo Invierno"
-        value={formData.name}
-        onChange={(e) => handleChange("name", e.target.value)}
+        placeholder={
+          activeLang === "es"
+            ? "Ej: Promo Invierno"
+            : activeLang === "en"
+            ? "E.g.: Winter promo"
+            : "Ex : Promo d'hiver"
+        }
+        value={formData.name[activeLang]}
+        onChange={(e) => handleLangChange("name", activeLang, e.target.value)}
       />
       {errors.name && <div className="field-error">{errors.name}</div>}
 
-      <label className="label-formulario">📝 Descripción (opcional):</label>
+      {/* Description multilenguaje */}
+      <label className="label-formulario">
+        📝 Descripción (opcional) ({activeLang.toUpperCase()}):
+      </label>
       <textarea
-        placeholder="Detalle interno o público de la campaña"
-        value={formData.description}
-        onChange={(e) => handleChange("description", e.target.value)}
+        placeholder={
+          activeLang === "es"
+            ? "Detalle interno o público de la campaña"
+            : activeLang === "en"
+            ? "Internal/public campaign details"
+            : "Détails internes/publics de la campagne"
+        }
+        value={formData.description[activeLang]}
+        onChange={(e) => handleLangChange("description", activeLang, e.target.value)}
       />
 
+      {/* Descuentos */}
       <label className="label-formulario">📊 Descuento (%):</label>
       <input
         ref={percentageRef}
@@ -110,12 +209,11 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
         max="100"
         placeholder="Ej: 20"
         value={formData.percentage}
-        onChange={(e) =>
-          handleChange("percentage", parseFloat(e.target.value) || 0)
-        }
+        onChange={(e) => handleChange("percentage", e.target.value)}
       />
       {errors.percentage && <div className="field-error">{errors.percentage}</div>}
 
+      {/* Fechas */}
       <label className="label-formulario">📅 Fecha de inicio:</label>
       <input
         ref={startDateRef}
@@ -134,108 +232,63 @@ const DiscountForm = ({ initialData = {}, onSave, onCancel }) => {
       />
       {errors.endDate && <div className="field-error">{errors.endDate}</div>}
 
+      {/* Tipo */}
       <label className="label-formulario">🎯 Aplica a:</label>
-      <select
-        value={formData.type}
-        onChange={(e) => handleChange("type", e.target.value)}
-      >
+      <select value={formData.type} onChange={(e) => handleChange("type", e.target.value)}>
         <option value="course">Cursos</option>
         <option value="formation">Formaciones</option>
         <option value="both">Ambos</option>
       </select>
 
+      {/* Cursos */}
       {(formData.type === "course" || formData.type === "both") && (
         <>
           <label className="label-formulario">📚 Cursos:</label>
           <div className="checkbox-list">
-            {courses.map((course) => (
-              <label key={course._id}>
-                {course.title?.es || "Curso sin título"}
-                <input
-                  type="checkbox"
-                  checked={formData.targetItems.some(
-                    (item) => item._id === course._id
-                  )}
-                  onChange={(e) => {
-                    const isChecked = e.target.checked;
-                    setFormData((prev) => {
-                      const already = prev.targetItems.find(
-                        (item) => item._id === course._id
-                      );
-                      if (isChecked && !already) {
-                        return {
-                          ...prev,
-                          targetItems: [
-                            ...prev.targetItems,
-                            { _id: course._id, title: course.title?.es },
-                          ],
-                        };
-                      } else if (!isChecked && already) {
-                        return {
-                          ...prev,
-                          targetItems: prev.targetItems.filter(
-                            (item) => item._id !== course._id
-                          ),
-                        };
-                      }
-                      return prev;
-                    });
-                  }}
-                />
-              </label>
-            ))}
+            {courses.map((course) => {
+              const label = course.title?.es || "Curso sin título";
+              const checked = formData.targetItems.some((it) => it._id === course._id);
+              return (
+                <label key={course._id}>
+                  {label}
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleTargetItem(course)}
+                  />
+                </label>
+              );
+            })}
           </div>
         </>
       )}
 
+      {/* Formaciones */}
       {(formData.type === "formation" || formData.type === "both") && (
         <>
           <label className="label-formulario">🎓 Formaciones:</label>
           <div className="checkbox-list">
-            {formations.map((formation) => (
-              <label key={formation._id}>
-                {formation.title?.es || "Formación sin título"}
-                <input
-                  type="checkbox"
-                  checked={formData.targetItems.some(
-                    (item) => item._id === formation._id
-                  )}
-                  onChange={(e) => {
-                    const isChecked = e.target.checked;
-                    setFormData((prev) => {
-                      const already = prev.targetItems.find(
-                        (item) => item._id === formation._id
-                      );
-                      if (isChecked && !already) {
-                        return {
-                          ...prev,
-                          targetItems: [
-                            ...prev.targetItems,
-                            { _id: formation._id, title: formation.title?.es },
-                          ],
-                        };
-                      } else if (!isChecked && already) {
-                        return {
-                          ...prev,
-                          targetItems: prev.targetItems.filter(
-                            (item) => item._id !== formation._id
-                          ),
-                        };
-                      }
-                      return prev;
-                    });
-                  }}
-                />
-              </label>
-            ))}
+            {formations.map((formation) => {
+              const label = formation.title?.es || "Formación sin título";
+              const checked = formData.targetItems.some((it) => it._id === formation._id);
+              return (
+                <label key={formation._id}>
+                  {label}
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleTargetItem(formation)}
+                  />
+                </label>
+              );
+            })}
           </div>
         </>
       )}
 
-      {errors.targetItems && (
-        <div className="field-error">{errors.targetItems}</div>
-      )}
+      {errors.targetItems && <div className="field-error">{errors.targetItems}</div>}
 
+      {/* Estado */}
       <label className="label-formulario">✔️ Estado:</label>
       <select
         value={formData.active ? "true" : "false"}

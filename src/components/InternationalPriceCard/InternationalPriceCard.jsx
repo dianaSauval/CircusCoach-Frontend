@@ -6,6 +6,25 @@ import { useDiscount } from "../../context/DiscountContext";
 import { useState, useMemo } from "react";
 import { formatPrice } from "../../utils/formatPrice";
 
+const pickLangWithSpanishFallback = (value, lang = "es") => {
+  // compat: si viene string viejo
+  if (typeof value === "string") return value;
+
+  if (!value || typeof value !== "object") return "";
+
+  // 1) idioma actual
+  const current = (value?.[lang] || "").trim();
+  if (current) return current;
+
+  // 2) fallback a ES
+  const es = (value?.es || "").trim();
+  if (es) return es;
+
+  // 3) último recurso: cualquier otro
+  const any = (value?.en || "").trim() || (value?.fr || "").trim();
+  return any || "";
+};
+
 export default function InternationalPriceCard({
   isCourse = false,
   course = null,
@@ -23,6 +42,7 @@ export default function InternationalPriceCard({
   // ⚙️ Config moneda/locale (EUR por defecto)
   const CURRENCY = "EUR";
   const localeMap = { es: "es-ES", en: "en-GB", fr: "fr-FR" };
+
   const fmt = useMemo(
     () =>
       new Intl.NumberFormat(localeMap[language] || "es-ES", {
@@ -35,6 +55,11 @@ export default function InternationalPriceCard({
 
   const effectiveDiscount = discount || activeDiscount || null;
 
+  const discountName = useMemo(() => {
+    if (!effectiveDiscount) return "";
+    return pickLangWithSpanishFallback(effectiveDiscount.name, language);
+  }, [effectiveDiscount, language]);
+
   const handleAdd = () => {
     if (!item) return;
     addToCart({
@@ -42,8 +67,8 @@ export default function InternationalPriceCard({
       id: item._id,
       title: item.title,
       image: item.image,
-      price: Number(item.price) || 0, // precio base sin descuento
-      discount: effectiveDiscount, // lo usa el carrito para calcular
+      price: Number(item.price) || 0,
+      discount: effectiveDiscount,
     });
     setShowMsg(true);
     setTimeout(() => setShowMsg(false), 2000);
@@ -54,12 +79,9 @@ export default function InternationalPriceCard({
     const d = effectiveDiscount;
     if (!d) return base;
 
-    if (d.percentage > 0) {
-      return base - (base * d.percentage) / 100;
-    }
-    if (d.amount > 0) {
-      return Math.max(0, base - d.amount);
-    }
+    if (d.percentage > 0) return base - (base * d.percentage) / 100;
+    if (d.amount > 0) return Math.max(0, base - d.amount);
+
     return base;
   };
 
@@ -71,7 +93,7 @@ export default function InternationalPriceCard({
 
       {effectiveDiscount && (
         <p className="nombre-del-bono">
-          🎉 {effectiveDiscount.name?.toUpperCase()} 🎉
+          🎉 {(discountName || "(BONO)").toUpperCase()} 🎉
         </p>
       )}
 
@@ -85,6 +107,7 @@ export default function InternationalPriceCard({
                 localeMap[language] || "es-ES"
               )}
             </p>
+
             <p className="etiqueta-descuento">
               {effectiveDiscount.percentage
                 ? `-${effectiveDiscount.percentage}%`

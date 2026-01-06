@@ -33,6 +33,7 @@ import PagoEmbedPage from "./pages/PagoEmbedPage";
 import SearchResults from "./pages/SearchResults";
 import ComingSoonPage from "./pages/ComingSoonPage";
 import LegalTermsPage from "./pages/LegalTermsPage";
+import ManagePhysicalProducts from "./pages/admin/ManagePhysicalProducts";
 
 function App() {
   return (
@@ -84,6 +85,7 @@ function App() {
               path="/admin/formaciones-presenciales"
               element={<ManagePresentialFormations />}
             />
+            <Route path="/admin/productos-fisicos" element={<ManagePhysicalProducts />} />
           </Route>
         </Routes>
       </div>
