@@ -1,0 +1,230 @@
+.shop-page {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+  padding: clamp(16px, 2.5vw, 40px);
+}
+
+.shop-hero {
+  padding-top: 10px;
+}
+
+.shop-intro {
+  max-width: 900px;
+  margin: 14px auto 0;
+}
+
+.shop-content {
+  margin-top: 26px;
+}
+
+.shop-loading,
+.shop-empty {
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: 30px 0 10px;
+}
+
+/* =========================================================
+   ✅ GRID centrado por filas (flex-wrap)
+   - 1 card: queda al medio
+   - última fila incompleta: también centrada
+========================================================= */
+.shop-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* 🔑 centra cada fila */
+  align-items: stretch;
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: 6px;
+}
+
+/* Card con ancho controlado para que no se estire feo */
+.shop-card {
+  background: var(--color-blanco);
+  border: 1px solid rgba(20, 50, 81, 0.12);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(20, 50, 81, 0.08);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+
+  /* 🔑 comportamiento responsive */
+  flex: 0 1 320px; /* base desktop */
+  max-width: 360px;
+  width: 100%;
+}
+
+.shop-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 35px rgba(20, 50, 81, 0.14);
+}
+
+/* Imagen */
+.shop-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(104, 208, 189, 0.18),
+    rgba(68, 131, 143, 0.1)
+  );
+}
+
+.shop-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 0.35s ease;
+}
+
+.shop-card:hover .shop-img-wrap img {
+  transform: scale(1.08);
+}
+
+/* Badge stock */
+.shop-stock-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-family: var(--font-texto);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.shop-stock-badge.in {
+  background: rgba(104, 208, 189, 0.75);
+  color: var(--color-azul-profundo);
+}
+
+.shop-stock-badge.out {
+  background: rgba(231, 76, 60, 0.78);
+  color: var(--color-blanco);
+}
+
+/* Body */
+.shop-card-body {
+  padding: 16px 16px 18px;
+  display: grid;
+  gap: 10px;
+}
+
+.shop-card-title {
+  margin: 0;
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-azul-profundo);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.shop-card-desc {
+  margin: 0;
+  font-family: var(--font-texto);
+  color: rgba(20, 50, 81, 0.92);
+  line-height: 1.6;
+  font-size: 1.02rem;
+
+  /* clamp a 4 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.shop-card-desc.muted {
+  opacity: 0.5;
+  min-height: 1.2rem;
+}
+
+.shop-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 6px;
+}
+
+.shop-price {
+  display: grid;
+  gap: 2px;
+}
+
+.shop-meta-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  opacity: 0.75;
+  font-weight: 700;
+}
+
+.shop-meta-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-azul-profundo);
+}
+
+.shop-actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.shop-amazon-btn {
+  width: 100%;
+  max-width: 100%;
+}
+
+.shop-amazon-btn.disabled {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* =========================================================
+   ✅ Responsive
+========================================================= */
+
+/* Tablets: cards un poquito más anchas y 2 por fila normalmente */
+@media (max-width: 980px) {
+  .shop-page {
+    width: min(980px, 94%);
+  }
+
+  .shop-card {
+    flex: 0 1 340px;
+    max-width: 380px;
+  }
+
+  .shop-card-title {
+    font-size: 1.3rem;
+  }
+}
+
+/* Mobile: 1 por fila, centrado, full width controlado */
+@media (max-width: 640px) {
+  .shop-grid {
+    gap: 14px;
+  }
+
+  .shop-card {
+    flex: 1 1 100%;
+    max-width: 520px; /* para que no sea una sábana en móviles grandes */
+  }
+
+  .shop-card-title {
+    font-size: 1.22rem;
+  }
+
+  .shop-meta-value {
+    font-size: 1.15rem;
+  }
+}

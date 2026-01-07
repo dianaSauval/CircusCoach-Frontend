@@ -34,6 +34,7 @@ import SearchResults from "./pages/SearchResults";
 import ComingSoonPage from "./pages/ComingSoonPage";
 import LegalTermsPage from "./pages/LegalTermsPage";
 import ManagePhysicalProducts from "./pages/admin/ManagePhysicalProducts";
+import ShopPage from "./pages/ShopPage";
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
           <Route path="/courses/:id/:slug" element={<CourseDetail />} />
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/mantenimiento" element={<ComingSoonPage />} />
+          <Route path="/tienda" element={<ShopPage />} />
 
           {/* 🔒 Rutas protegidas para admins */}
           <Route element={<RequireAdmin />}>

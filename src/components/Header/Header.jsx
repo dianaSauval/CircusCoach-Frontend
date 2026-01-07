@@ -22,7 +22,7 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-const { cartCount, clearCart } = useCart();
+  const { cartCount, clearCart } = useCart();
 
   const { language, setLanguage } = useLanguage();
   const t = translations.header[language];
@@ -31,54 +31,50 @@ const { cartCount, clearCart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
-
   const handleLogout = () => {
-  clearCart();
-  logout();
-};
-
+    clearCart();
+    logout();
+  };
 
   // Scroll helper
-const scrollTopAll = (smooth = true) => {
-  const behavior = smooth ? "smooth" : "auto";
-  const targets = [
-    window,
-    document.scrollingElement || document.documentElement,
-    document.body,
-    document.querySelector(".app-container"),
-  ].filter(Boolean);
+  const scrollTopAll = (smooth = true) => {
+    const behavior = smooth ? "smooth" : "auto";
+    const targets = [
+      window,
+      document.scrollingElement || document.documentElement,
+      document.body,
+      document.querySelector(".app-container"),
+    ].filter(Boolean);
 
-  targets.forEach((t) => {
-    try {
-      if (t === window) {
-        window.scrollTo({ top: 0, behavior });
-      } else if (typeof t.scrollTo === "function") {
-        t.scrollTo({ top: 0, behavior });
-      } else if ("scrollTop" in t) {
-        t.scrollTop = 0;
-      }
-    } catch {}
-  });
-};
-
+    targets.forEach((t) => {
+      try {
+        if (t === window) {
+          window.scrollTo({ top: 0, behavior });
+        } else if (typeof t.scrollTo === "function") {
+          t.scrollTo({ top: 0, behavior });
+        } else if ("scrollTop" in t) {
+          t.scrollTop = 0;
+        }
+      } catch {}
+    });
+  };
 
   // Navegación inteligente: si ya estás en la ruta, sólo scrollea arriba
   const handleSmartNav = (e, path) => {
-  if (location.pathname === path) {
-    e.preventDefault();
-    setMenuOpen(false);
-    // Esperamos a que cierre el menú y se re‑pinte el layout
-    requestAnimationFrame(() => {
+    if (location.pathname === path) {
+      e.preventDefault();
+      setMenuOpen(false);
+      // Esperamos a que cierre el menú y se re‑pinte el layout
       requestAnimationFrame(() => {
-        scrollTopAll(true);
+        requestAnimationFrame(() => {
+          scrollTopAll(true);
+        });
       });
-    });
-  } else {
-    setMenuOpen(false);
-    navigate(path);
-  }
-};
-
+    } else {
+      setMenuOpen(false);
+      navigate(path);
+    }
+  };
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -102,16 +98,16 @@ const scrollTopAll = (smooth = true) => {
 
   return (
     <header className="header">
-     <div className="header-logo">
-    <Link
-      to="/"
-      onClick={(e) => handleSmartNav(e, "/")}
-      className="header-logo-link"
-      aria-label={t.home}
-    >
-      <img src={logo} alt="Circus Coach Logo" />
-    </Link>
-  </div>
+      <div className="header-logo">
+        <Link
+          to="/"
+          onClick={(e) => handleSmartNav(e, "/")}
+          className="header-logo-link"
+          aria-label={t.home}
+        >
+          <img src={logo} alt="Circus Coach Logo" />
+        </Link>
+      </div>
 
       <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
         {menuOpen ? <FaTimes /> : <FaBars />}
@@ -143,6 +139,14 @@ const scrollTopAll = (smooth = true) => {
           onClick={(e) => handleSmartNav(e, "/formaciones")}
         >
           {t.formations}
+        </NavLink>
+        {/* Tienda */}
+        <NavLink
+          to="/tienda"
+          className="nav-link"
+          onClick={(e) => handleSmartNav(e, "/tienda")}
+        >
+          {t.shop}
         </NavLink>
 
         {/* Biografía */}
@@ -211,15 +215,25 @@ const scrollTopAll = (smooth = true) => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     autoFocus
                   />
-                  <FaTimes className="close-search" onClick={handleSearchToggle} />
+                  <FaTimes
+                    className="close-search"
+                    onClick={handleSearchToggle}
+                  />
                 </form>
               ) : (
-                <FaSearch className="header-icon" onClick={handleSearchToggle} />
+                <FaSearch
+                  className="header-icon"
+                  onClick={handleSearchToggle}
+                />
               )}
             </div>
 
             {/* Carrito / mantenimiento: navegación normal */}
-            <NavLink to="/mantenimiento" className="cart-icon-container" onClick={() => setMenuOpen(false)}>
+            <NavLink
+              to="/mantenimiento"
+              className="cart-icon-container"
+              onClick={() => setMenuOpen(false)}
+            >
               <FaShoppingBag className="header-icon" />
               {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
             </NavLink>
@@ -227,7 +241,11 @@ const scrollTopAll = (smooth = true) => {
         )}
 
         {isAuthenticated ? (
-          <NavLink to="/" className="nav-link mobile-only" onClick={handleLogout}>
+          <NavLink
+            to="/"
+            className="nav-link mobile-only"
+            onClick={handleLogout}
+          >
             {t.logout}
           </NavLink>
         ) : (
@@ -268,7 +286,10 @@ const scrollTopAll = (smooth = true) => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   autoFocus
                 />
-                <FaTimes className="close-search" onClick={handleSearchToggle} />
+                <FaTimes
+                  className="close-search"
+                  onClick={handleSearchToggle}
+                />
               </form>
             ) : (
               <FaSearch className="header-icon" onClick={handleSearchToggle} />
@@ -281,7 +302,11 @@ const scrollTopAll = (smooth = true) => {
           </NavLink>
 
           {isAuthenticated ? (
-            <NavLink to="/" className="nav-link desktop-only" onClick={handleLogout}>
+            <NavLink
+              to="/"
+              className="nav-link desktop-only"
+              onClick={handleLogout}
+            >
               {t.logout}
             </NavLink>
           ) : (

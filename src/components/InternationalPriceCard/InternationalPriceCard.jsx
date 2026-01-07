@@ -5,25 +5,9 @@ import { useCart } from "../../context/CartContext";
 import { useDiscount } from "../../context/DiscountContext";
 import { useState, useMemo } from "react";
 import { formatPrice } from "../../utils/formatPrice";
+import { pickLangWithSpanishFallback } from "../../utils/pickLang";
 
-const pickLangWithSpanishFallback = (value, lang = "es") => {
-  // compat: si viene string viejo
-  if (typeof value === "string") return value;
 
-  if (!value || typeof value !== "object") return "";
-
-  // 1) idioma actual
-  const current = (value?.[lang] || "").trim();
-  if (current) return current;
-
-  // 2) fallback a ES
-  const es = (value?.es || "").trim();
-  if (es) return es;
-
-  // 3) último recurso: cualquier otro
-  const any = (value?.en || "").trim() || (value?.fr || "").trim();
-  return any || "";
-};
 
 export default function InternationalPriceCard({
   isCourse = false,

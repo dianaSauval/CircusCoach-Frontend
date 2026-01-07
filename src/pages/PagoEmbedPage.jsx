@@ -14,6 +14,7 @@ import { Helmet } from "react-helmet";
 import { formatPrice } from "../utils/formatPrice";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { pickLangWithSpanishFallback } from "../utils/pickLang";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
@@ -30,6 +31,8 @@ const PagoEmbedPage = () => {
   const CURRENCY = "EUR";
   const localeMap = { es: "es-ES", en: "en-GB", fr: "fr-FR" };
   const lang = localeMap[language] || "es-ES";
+
+  
 
   const calcularPrecioConDescuento = (item) => {
     if (!item.discount || !item.discount.percentage) return item.price;
@@ -110,7 +113,9 @@ const PagoEmbedPage = () => {
           {cart.map((item, index) => (
             <li key={index} className="cart-item">
               <img
-                src={item.image?.[language] || item.image?.es || "/placeholder.png"}
+                src={
+                  item.image?.[language] || item.image?.es || "/placeholder.png"
+                }
                 alt={item.title?.[language] || item.title?.es || "Curso"}
                 className="cart-item-img"
               />
@@ -123,13 +128,28 @@ const PagoEmbedPage = () => {
                 {item.discount ? (
                   <div className="precio-con-descuento">
                     <span className="precio-final">
-                      {formatPrice(calcularPrecioConDescuento(item), CURRENCY, lang)}
+                      {formatPrice(
+                        calcularPrecioConDescuento(item),
+                        CURRENCY,
+                        lang
+                      )}
                     </span>
                     <span className="precio-original">
                       {formatPrice(item.price, CURRENCY, lang)}
                     </span>
                     <span className="nombre-descuento">
-                      🎁 {item.discount.name} - {item.discount.percentage}% OFF
+                      🎁{" "}
+                      {pickLangWithSpanishFallback(
+                        item.discount?.name,
+                        language
+                      )}{" "}
+                      - {item.discount.percentage}%{" "}
+                      {t.off ||
+                        (language === "en"
+                          ? "OFF"
+                          : language === "fr"
+                          ? "DE RÉDUCTION"
+                          : "OFF")}
                     </span>
                   </div>
                 ) : (
@@ -195,7 +215,9 @@ const PagoEmbedPage = () => {
             </div>
 
             <div className="payment-form-section">
-              {!clientSecret && <p>{t.loadingPayment || "Cargando formulario de pago..."}</p>}
+              {!clientSecret && (
+                <p>{t.loadingPayment || "Cargando formulario de pago..."}</p>
+              )}
 
               {clientSecret && termsAccepted && privacyAccepted && (
                 <Elements options={options} stripe={stripePromise}>

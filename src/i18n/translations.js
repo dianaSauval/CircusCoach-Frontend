@@ -10,6 +10,7 @@ const translations = {
       login: "INICIAR SESIÓN",
       logout: "CERRAR SESIÓN",
       language: "LENGUAJE",
+      shop: "Tienda",
     },
     en: {
       home: "HOME",
@@ -21,6 +22,7 @@ const translations = {
       login: "LOGIN",
       logout: "LOGOUT",
       language: "LANGUAGE",
+      shop: "Shop",
     },
     fr: {
       home: "ACCUEIL",
@@ -32,6 +34,7 @@ const translations = {
       login: "CONNEXION",
       logout: "DÉCONNEXION",
       language: "LANGUE",
+      shop: "Boutique",
     },
   },
 
@@ -898,6 +901,51 @@ const translations = {
       title: "Résultats de recherche",
       noResults: "Aucun résultat trouvé.",
       noResultsSubtitle: "Aucun résultat trouvé. Essayez un autre mot-clé ? ✨",
+    },
+  },
+  // i18n/translations.js
+  shop: {
+    es: {
+      title: "Tienda",
+      intro:
+        "En esta tienda vas a encontrar mis productos: materiales para entrenar, libros y otros proyectos en los que estoy trabajando. Todo lo que creo y uso en mi propio camino, disponible para vos.\n\nEste espacio va a seguir transformándose, igual que mi enseñanza y práctica. Volvé cada tanto —seguro hay algo nuevo esperándote.",
+      loading: "Cargando productos…",
+      empty: "Todavía no hay productos disponibles.",
+      priceFrom: "Precio",
+      stock: "Stock",
+      outOfStock: "Sin stock",
+      viewOnAmazon: "Ver en Amazon",
+      emptyTitle: "Tienda en construcción",
+      emptySubtitle:
+        "Todavía no hay productos disponibles para comprar, pero estamos trabajando en ello. Volvé pronto — seguro aparece algo nuevo 🙂",
+    },
+    en: {
+      title: "Shop",
+      intro:
+        "In this shop you’ll find my products: training materials, books, and other projects I’m working on. Everything I create and use on my own path, available for you.\n\nThis space will keep evolving, just like my teaching and practice. Check back from time to time — there may be something new waiting for you.",
+      loading: "Loading products…",
+      empty: "No products available yet.",
+      priceFrom: "Price",
+      stock: "Stock",
+      outOfStock: "Out of stock",
+      viewOnAmazon: "View on Amazon",
+      emptyTitle: "Shop coming soon",
+      emptySubtitle:
+        "There are no products available to buy yet, but we’re working on it. Check back soon — something new will be waiting 🙂",
+    },
+    fr: {
+      title: "Boutique",
+      intro:
+        "Dans cette boutique, tu trouveras mes produits : matériel d’entraînement, livres et autres projets sur lesquels je travaille. Tout ce que je crée et utilise sur mon propre chemin, disponible pour toi.\n\nCet espace va continuer d’évoluer, tout comme mon enseignement et ma pratique. Reviens de temps en temps — il y aura sûrement quelque chose de nouveau qui t’attend.",
+      loading: "Chargement des produits…",
+      empty: "Aucun produit disponible pour le moment.",
+      priceFrom: "Prix",
+      stock: "Stock",
+      outOfStock: "Rupture de stock",
+      viewOnAmazon: "Voir sur Amazon",
+      emptyTitle: "Boutique bientôt disponible",
+      emptySubtitle:
+        "Il n’y a pas encore de produits disponibles à l’achat, mais nous y travaillons. Reviens bientôt — quelque chose de nouveau t’attend 🙂",
     },
   },
 };

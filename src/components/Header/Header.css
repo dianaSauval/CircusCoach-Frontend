@@ -1,9 +1,15 @@
+/* =========================================================
+   HEADER — Desktop prolijo (sin pisarse) + Mobile intacto
+   * NO se modifica el estilo del logo (.header-logo img)
+========================================================= */
+
 /* 🔹 Estilos Generales */
 .header {
   background-color: var(--color-petroleo);
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto minmax(0, 1fr) auto; /* 🔑 centro no desborda */
   align-items: center;
+  gap: 0.75rem;
   padding: 0.5rem 1rem;
   color: var(--color-blanco);
   position: fixed;
@@ -14,6 +20,7 @@
   box-sizing: border-box;
 }
 
+/* ✅ LOGO: NO TOCAR */
 .header-logo img {
   height: calc(var(--header-height) - 16px);
   transform: scale(1.8);
@@ -22,18 +29,25 @@
   margin-right: 15px;
 }
 
-/* 🔹 Menú de navegación */
+/* 🔹 Menú de navegación (DESKTOP) */
 .header-nav {
+  min-width: 0; /* 🔑 permite que el centro se adapte */
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+
+  /* 🔑 si hay muchos links, baja a otra línea en vez de pisarse */
+  flex-wrap: wrap;
+  column-gap: 1.2rem;
+  row-gap: 0.4rem;
+
+  padding: 0 0.5rem;
 }
 
 .nav-link {
   font-family: var(--font-titulo);
-  font-size: 1.4rem;
-  letter-spacing: 1.5px;
+  font-size: 1.18rem; /* un toque menor para que entre mejor */
+  letter-spacing: 1.2px;
   color: var(--color-blanco);
   text-decoration: none;
   background: none;
@@ -41,6 +55,7 @@
   position: relative;
   transition: color 0.3s ease;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 /* Línea inferior al hacer hover o estar activa */
@@ -65,15 +80,17 @@
   width: 100%;
 }
 
-/* 🔹 Íconos y Sesión */
+/* 🔹 Íconos y Sesión (DESKTOP) */
 .header-icons {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  justify-content: flex-end;
+  gap: 1rem;
+  min-width: max-content;
 }
 
 .header-icon {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   cursor: pointer;
   transition: transform 0.3s ease, color 0.3s ease;
 }
@@ -103,31 +120,45 @@
   display: none;
 }
 
+/* =========================================================
+   Language selector (DESKTOP + MOBILE, pero sin romper tu lógica)
+========================================================= */
 .language-selector {
   position: relative;
-  margin-left: 1rem;
+  margin-left: 0; /* en desktop no hace falta empujar */
   display: inline-block;
 }
 
 .language-button {
   font-family: var(--font-titulo);
   background: none;
-  border: none;
-  display: flex;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   cursor: pointer;
   color: var(--color-blanco);
   text-transform: uppercase;
-  font-size: 1.5rem;
-  line-height: 1.3;
+
+  font-size: 1.35rem;
+  line-height: 1;
+
   letter-spacing: 1px;
   margin: 0;
   text-align: center;
+
+  /* ✅ más "cuerpo" (lo que pediste) */
+  padding: 0.45rem 0.65rem;
+  border-radius: 999px;
+
+  transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .language-button:hover {
-  color: var(--color-menta); /* o el color principal de tu web */
+  color: var(--color-menta);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
 }
 
 .language-dropdown {
@@ -136,27 +167,28 @@
   left: 0;
   background: var(--color-petroleo);
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.18);
   list-style: none;
   padding: 8px 0;
-  margin: 4px 0 0;
-  width: 150px;
+  margin: 8px 0 0;
+  width: 160px;
   z-index: 999;
+  border: 1px solid rgba(255, 255, 255, 0.14);
 }
 
 .language-dropdown li {
-  font-family: var(--font-texto); /* Lato */
-  font-size: 1.2rem;
+  font-family: var(--font-texto);
   font-weight: bold;
   color: var(--color-blanco);
-  margin-bottom: 1rem;
-  padding: 0 1rem;
-  padding: 8px 12px;
   cursor: pointer;
-  font-size: 14px;
+
   display: flex;
   align-items: center;
   gap: 8px;
+
+  padding: 10px 14px;
+  margin: 0;
+  font-size: 0.95rem;
 }
 
 .language-dropdown li:hover {
@@ -167,6 +199,9 @@
   font-size: 18px;
 }
 
+/* =========================================================
+   Carrito
+========================================================= */
 .cart-icon-container {
   color: var(--color-blanco);
   position: relative;
@@ -184,6 +219,9 @@
   font-size: 0.8rem;
 }
 
+/* =========================================================
+   Search
+========================================================= */
 .search-container {
   position: relative;
 }
@@ -197,9 +235,11 @@
 .search-form input {
   padding: 6px 10px;
   font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   outline: none;
+  width: 170px;
+  max-width: 30vw;
 }
 
 .close-search {
@@ -207,11 +247,15 @@
   font-size: 1.2rem;
 }
 
-/* 🌐 Responsive */
+/* =========================================================
+   🌐 Responsive — MOBILE (VUELVE a tu estructura original)
+   -> Nada fuera del hamburguesa: mantenemos tu diseño
+========================================================= */
 @media (max-width: 768px) {
   :root {
     --header-height: 64px;
   }
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -236,6 +280,9 @@
     gap: 1rem;
     z-index: 1000;
   }
+
+  /* ✅ clave: en mobile se oculta la barra de iconos “outside-menu”
+     para que idioma/login NO queden por fuera */
   .outside-menu {
     display: none;
   }
@@ -261,6 +308,9 @@
     padding: 1.5rem 1rem;
     display: none;
     z-index: 999;
+
+    /* ✅ importante: volvemos a tu lógica de menú vertical */
+    flex-wrap: nowrap;
   }
 
   .header-nav.open {
@@ -271,13 +321,32 @@
     text-align: center;
     font-size: 1.1rem;
   }
+
+  /* en mobile el input puede ser un poco más ancho */
+  .search-form input {
+    width: 220px;
+    max-width: 70vw;
+  }
+
+  /* botón de idioma con buen padding también en mobile */
+  .language-button {
+    font-size: 1.2rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .language-dropdown {
+    width: 170px;
+  }
 }
 
-/* 📱 Tablets */
+/* =========================================================
+   📱 Tablets (tu estructura original; mantiene hamburger)
+========================================================= */
 @media (min-width: 769px) and (max-width: 1024px) {
   :root {
     --header-height: 64px;
   }
+
   .header {
     display: flex;
     justify-content: space-between;
@@ -304,6 +373,8 @@
     gap: 1rem;
     z-index: 1000;
   }
+
+  /* ✅ igual que mobile: nada afuera */
   .outside-menu {
     display: none;
   }
@@ -329,6 +400,8 @@
     padding: 1.5rem 1rem;
     display: none;
     z-index: 999;
+
+    flex-wrap: nowrap;
   }
 
   .header-nav.open {
@@ -338,5 +411,14 @@
   .header-nav .nav-link {
     text-align: center;
     font-size: 1.1rem;
+  }
+
+  .search-form input {
+    width: 240px;
+    max-width: 60vw;
+  }
+
+  .language-button {
+    padding: 0.5rem 0.8rem;
   }
 }
