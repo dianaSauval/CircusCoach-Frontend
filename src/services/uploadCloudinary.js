@@ -148,3 +148,41 @@ export const obtenerUrlPdfPrivadoCurso = async (classId, index, lang) => {
     throw new Error("No se pudo cargar el PDF del curso");
   }
 };
+
+
+// 📘 Subida de PDF de libro
+export const subirPdfLibro = async (archivo, titulo) => {
+  const data = new FormData();
+  data.append("pdf", archivo);
+
+  const extension = archivo.name.split(".").pop(); // pdf
+  const nombreNormalizado = titulo
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "_")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const publicId = `${nombreNormalizado}-${uuidv4()}.${extension}`;
+  data.append("public_id", publicId);
+
+  console.log("📤 Subiendo PDF de libro:", archivo.name, "como", publicId);
+
+  try {
+    const res = await api.post("/cloudinary/upload-pdf-libro", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    return {
+      url: res.data.url,
+      public_id: res.data.public_id,
+    };
+  } catch (error) {
+    console.error(
+      "❌ Error al subir PDF de libro:",
+      error.response?.data || error.message
+    );
+    throw new Error("No se pudo subir el PDF del libro");
+  }
+};
+

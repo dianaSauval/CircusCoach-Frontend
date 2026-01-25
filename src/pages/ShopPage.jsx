@@ -1,3 +1,4 @@
+// pages/ShopPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Helmet } from "react-helmet";
 import { useLanguage } from "../context/LanguageContext";
@@ -6,27 +7,36 @@ import { getAllPhysicalProducts } from "../services/physicalProductService";
 import LoadingSpinner from "../components/LoadingSpinner/LoadingSpinner";
 import EmptyState from "../components/EmptyState/EmptyState";
 import "../styles/pages/ShopPage.css";
+import { getBooks } from "../services/bookService";
+import { useCart } from "../context/CartContext";
 
-const pickLangText = (field, lang) => {
-  if (!field || typeof field !== "object") return "";
-  const current = (field[lang] || "").trim();
-  if (current) return current;
-
-  // fallback: es -> en -> fr (o el orden que prefieras)
-  return (
-    (field.es || "").trim() ||
-    (field.en || "").trim() ||
-    (field.fr || "").trim() ||
-    ""
-  );
-};
+// ✅ nuevos componentes
+import ShopProductCard from "../components/shop/ShopProductCard";
+import ShopBookCard from "../components/shop/ShopBookCard";
 
 export default function ShopPage() {
   const { language } = useLanguage();
+  const { addToCart } = useCart();
   const t = translations.shop?.[language] || translations.shop?.es;
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [books, setBooks] = useState([]);
+  const [loadingBooks, setLoadingBooks] = useState(true);
+
+  const fetchBooks = async () => {
+    try {
+      setLoadingBooks(true);
+      const data = await getBooks();
+      setBooks(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("❌ Error getBooks:", err);
+      setBooks([]);
+    } finally {
+      setLoadingBooks(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -43,7 +53,18 @@ export default function ShopPage() {
 
   useEffect(() => {
     fetchProducts();
+    fetchBooks();
   }, []);
+
+  const handleAddBook = (book) => {
+    addToCart({
+      type: "book",
+      id: book._id,
+      title: book.title,
+      image: book.coverImage?.url || "",
+      price: Number(book.price) || 0,
+    });
+  };
 
   const hasProducts = products.length > 0;
 
@@ -79,6 +100,9 @@ export default function ShopPage() {
         </p>
       </section>
 
+      {/* =========================
+          🛍️ Productos físicos
+         ========================= */}
       <section className="shop-content">
         {loading ? (
           <div className="shop-loading">
@@ -91,68 +115,55 @@ export default function ShopPage() {
           </div>
         ) : (
           <div className="shop-grid">
-            {products.map((p) => {
-              const title = pickLangText(p.title, language);
-              const description = pickLangText(p.description, language);
-              const inStock = Number(p.stock || 0) > 0;
+            {products.map((p) => (
+              <ShopProductCard
+                key={p._id}
+                product={p}
+                language={language}
+                t={t}
+              />
+            ))}
+          </div>
+        )}
+      </section>
 
-              return (
-                <article className="shop-card" key={p._id}>
-                  <div className="shop-img-wrap">
-                    <img
-                      src={p.imageUrl}
-                      alt={title || "Producto"}
-                      loading="lazy"
-                    />
+      {/* =========================
+          📚 Libros (eBooks)
+         ========================= */}
+      <section className="shop-content shop-books" style={{ marginTop: 36 }}>
+        <h2 className="titulo-principal" style={{ fontSize: "1.8rem" }}>
+          {t?.booksTitle || "Libros"}
+        </h2>
 
-                    <div
-                      className={`shop-stock-badge ${inStock ? "in" : "out"}`}
-                      title={
-                        inStock ? `${t?.stock}: ${p.stock}` : t?.outOfStock
-                      }
-                    >
-                      {inStock ? `${t?.stock}: ${p.stock}` : t?.outOfStock}
-                    </div>
-                  </div>
+        <p className="texto" style={{ marginTop: 8 }}>
+          {t?.booksSubtitle || "eBooks en PDF para ver online o descargar."}
+        </p>
 
-                  <div className="shop-card-body">
-                    <h2 className="shop-card-title">{title}</h2>
-
-                    {description ? (
-                      <p className="shop-card-desc">{description}</p>
-                    ) : (
-                      <p className="shop-card-desc muted"> </p>
-                    )}
-
-                    <div className="shop-meta">
-                      <div className="shop-price">
-                        <span className="shop-meta-label">{t?.priceFrom}</span>
-                        <span className="shop-meta-value">
-                          €{Number(p.priceEur || 0).toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="shop-actions">
-                      <a
-                        className={`boton-principal shop-amazon-btn ${
-                          !p.amazonUrl ? "disabled" : ""
-                        }`}
-                        href={p.amazonUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-disabled={!p.amazonUrl}
-                        onClick={(e) => {
-                          if (!p.amazonUrl) e.preventDefault();
-                        }}
-                      >
-                        {t?.viewOnAmazon}
-                      </a>
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+        {loadingBooks ? (
+          <div className="shop-loading">
+            <LoadingSpinner />
+            <p className="texto">{t?.loadingBooks || "Cargando libros..."}</p>
+          </div>
+        ) : books.length === 0 ? (
+          <div className="shop-empty">
+            <EmptyState
+              title={t?.booksEmptyTitle || "Todavía no hay libros disponibles"}
+              subtitle={
+                t?.booksEmptySubtitle ||
+                "Próximamente habrá nuevos títulos disponibles. Revisá esta sección más adelante."
+              }
+            />
+          </div>
+        ) : (
+          <div className="shop-grid">
+            {books.map((b) => (
+              <ShopBookCard
+                key={b._id}
+                book={b}
+                t={t}
+                onAddToCart={handleAddBook}
+              />
+            ))}
           </div>
         )}
       </section>

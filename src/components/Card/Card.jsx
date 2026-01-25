@@ -16,6 +16,7 @@ const Card = ({
 
   const image = data?.image;
   const description = data?.description;
+  const title = data?.title;
 
   const selectedImage =
     typeof image === "string" ? image : image?.[language] || image?.es || null;
@@ -25,12 +26,15 @@ const Card = ({
       ? description
       : description?.[language] || description?.es || "";
 
+  const selectedTitle =
+    typeof title === "string" ? title : title?.[language] || title?.es || "";
+
   function truncateText(text, maxLength = 120) {
     if (!text) return "";
     if (text.length <= maxLength) return text;
     const truncated = text.slice(0, maxLength);
     const lastSpace = truncated.lastIndexOf(" ");
-    return truncated.slice(0, lastSpace) + "...";
+    return truncated.slice(0, Math.max(0, lastSpace)) + "...";
   }
 
   function getTiempoRestanteTexto(fechaExp) {
@@ -50,9 +54,22 @@ const Card = ({
     return null;
   }
 
-  const tiempoRestante = fechaExpiracion ? getTiempoRestanteTexto(fechaExpiracion) : null;
-  const mostrarOverlay = (expirado || !visible) && (t.expiredMessage || t.notAvailableInLanguage);
+  const tiempoRestante = fechaExpiracion
+    ? getTiempoRestanteTexto(fechaExpiracion)
+    : null;
+
+  const mostrarOverlay =
+    (expirado || !visible) && (t.expiredMessage || t.notAvailableInLanguage);
+
   const overlayTexto = expirado ? t.expiredMessage : t.notAvailableInLanguage;
+
+  // para accesibilidad y copy
+  const itemLabel =
+    data?.type === "book"
+      ? "Libro"
+      : data?.type === "formation"
+      ? "Formación"
+      : "Curso";
 
   return (
     <div
@@ -61,28 +78,44 @@ const Card = ({
       style={{ cursor: visible && !expirado && onClick ? "pointer" : "default" }}
     >
       <div className="card-image-wrapper">
-        {selectedImage && (
+        {selectedImage ? (
           <img
             src={selectedImage}
-            alt="Imagen del curso o formación"
+            alt={selectedTitle ? `${itemLabel}: ${selectedTitle}` : itemLabel}
             className="custom-card-img"
             loading="lazy"
             decoding="async"
-            width="1000"   // orientación de tamaño para el navegador
-            height="1500"  // 2:3
+            width="1000"
+            height="1500"
           />
+        ) : (
+          <div className="card-image-placeholder" aria-label="Sin imagen">
+            <span>📘</span>
+          </div>
         )}
-        {tiempoRestante && <div className="tiempo-restante-badge">{tiempoRestante}</div>}
+
+        {tiempoRestante && (
+          <div className="tiempo-restante-badge">{tiempoRestante}</div>
+        )}
       </div>
 
-      <div className="custom-card-description">
-        {truncateText(selectedDescription)}
+      <div className="custom-card-body">
+        {selectedTitle && <h3 className="custom-card-title">{selectedTitle}</h3>}
+
+        {selectedDescription ? (
+          <div className="custom-card-description">
+            {truncateText(selectedDescription)}
+          </div>
+        ) : (
+          <div className="custom-card-description muted">&nbsp;</div>
+        )}
       </div>
 
       {mostrarOverlay && (
         <div className="card-overlay">
           <div>
             <p>{overlayTexto}</p>
+
             {expirado && typeof onRebuy === "function" && (
               <button
                 className="boton-secundario rebuy-button"

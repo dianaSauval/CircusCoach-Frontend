@@ -1,3 +1,4 @@
+// pages/MyCourses.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
@@ -9,21 +10,25 @@ import "../styles/pages/MyCourses.css";
 import Card from "../components/Card/Card";
 import EmptyState from "../components/EmptyState/EmptyState";
 import { getMisCompras } from "../services/userService";
-import { useCart } from "../context/CartContext"; // ✅ agregado
+import { useCart } from "../context/CartContext";
 import { Helmet } from "react-helmet";
+import { getAllBooksAdmin } from "../services/bookService";
 
 function MyCourses() {
   const [formations, setFormations] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [books, setBooks] = useState([]);
+
   const [expiredFormations, setExpiredFormations] = useState([]);
   const [expiredCourses, setExpiredCourses] = useState([]);
+  const [expiredBooks, setExpiredBooks] = useState([]);
 
   const navigate = useNavigate();
   const { language } = useLanguage();
   const { isAuthenticated, isAdmin, loading } = useAuth();
-  const { cart, setCart } = useCart(); // ✅ agregado
+  const { cart, setCart } = useCart();
 
-  const t = translations.myCourses[language];
+  const t = translations.myCourses?.[language] || translations.myCourses?.es;
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -34,65 +39,129 @@ function MyCourses() {
     const fetchData = async () => {
       try {
         if (isAdmin) {
-          const [formationsData, coursesData] = await Promise.all([
+          const [formationsData, coursesData, booksData] = await Promise.all([
             getVisibleFormations(language),
             getCourses(language),
+            getAllBooksAdmin(), // ✅ todos los libros (admin)
           ]);
-          setFormations(formationsData);
-          setCourses(coursesData);
-        } else {
-          const { cursos, formaciones } = await getMisCompras();
-          const ahora = new Date();
 
-          const cursosActivos = [];
-          const cursosExpirados = [];
-          for (const c of cursos) {
-            const data = {
-              ...c.courseId,
-              _id: c.courseId._id,
-              fechaExpiracion: c.fechaExpiracion,
-              type: "course",
-            };
-            if (new Date(c.fechaExpiracion) > ahora) {
-              cursosActivos.push(data);
-            } else {
-              cursosExpirados.push(data);
-            }
-          }
+          setFormations(Array.isArray(formationsData) ? formationsData : []);
+          setCourses(Array.isArray(coursesData) ? coursesData : []);
 
-          const formacionesActivas = [];
-          const formacionesExpiradas = [];
-          for (const f of formaciones) {
-            const data = {
-              ...f.formationId,
-              _id: f.formationId._id,
-              fechaExpiracion: f.fechaExpiracion,
-              type: "formation",
-            };
-            if (new Date(f.fechaExpiracion) > ahora) {
-              formacionesActivas.push(data);
-            } else {
-              formacionesExpiradas.push(data);
-            }
-          }
+          // ✅ como admin NO hay expiración
+          const normalizeBooks = (
+            Array.isArray(booksData) ? booksData : []
+          ).map((b) => ({
+            ...b,
+            type: "book",
+            // Card espera image como string o objeto
+            image: b.coverImage?.url || "",
+            // Card acepta title string perfecto
+            title: b.title || "",
+            // description string ok
+            description: b.description || "",
+            price: Number(b.price) || 0,
+          }));
+          setBooks(normalizeBooks);
 
-          setFormations(formacionesActivas);
-          setCourses(cursosActivos);
-          setExpiredFormations(formacionesExpiradas);
-          setExpiredCourses(cursosExpirados);
+          // opcional: vaciar expirados
+          setExpiredBooks([]);
+          setExpiredCourses([]);
+          setExpiredFormations([]);
+
+          return;
         }
+        // 👤 USUARIO NORMAL
+        const { cursos, formaciones, libros } = await getMisCompras();
+        const ahora = new Date();
+
+        /* =====================
+   📘 CURSOS
+===================== */
+        const cursosActivos = [];
+        const cursosExpirados = [];
+
+        for (const c of cursos) {
+          const data = {
+            ...c.courseId,
+            _id: c.courseId._id,
+            fechaExpiracion: c.fechaExpiracion,
+            type: "course",
+          };
+
+          if (new Date(c.fechaExpiracion) > ahora) {
+            cursosActivos.push(data);
+          } else {
+            cursosExpirados.push(data);
+          }
+        }
+
+        /* =====================
+   🎪 FORMACIONES
+===================== */
+        const formacionesActivas = [];
+        const formacionesExpiradas = [];
+
+        for (const f of formaciones) {
+          const data = {
+            ...f.formationId,
+            _id: f.formationId._id,
+            fechaExpiracion: f.fechaExpiracion,
+            type: "formation",
+          };
+
+          if (new Date(f.fechaExpiracion) > ahora) {
+            formacionesActivas.push(data);
+          } else {
+            formacionesExpiradas.push(data);
+          }
+        }
+
+        /* =====================
+   📚 LIBROS
+===================== */
+        // los libros NO expiran (por ahora)
+        const librosActivos = (libros || []).map((l) => ({
+          ...l.bookId,
+          _id: l.bookId._id,
+          type: "book",
+          image: l.bookId.coverImage?.url || "",
+          title: l.bookId.title || "",
+          description: l.bookId.description || "",
+          price: Number(l.bookId.price) || 0,
+        }));
+
+        setCourses(cursosActivos);
+        setExpiredCourses(cursosExpirados);
+        setFormations(formacionesActivas);
+        setExpiredFormations(formacionesExpiradas);
+        setBooks(librosActivos);
+        setExpiredBooks([]); // por ahora vacío
       } catch (error) {
-        console.error("Error al cargar cursos/formaciones:", error);
+        console.error("Error al cargar compras:", error);
       }
     };
 
     if (isAuthenticated) fetchData();
-  }, [language, isAuthenticated, isAdmin, loading]);
+  }, [language, isAuthenticated, isAdmin, loading, navigate]);
 
   const onRebuy = (item) => {
-    const yaEsta = cart.find((c) => c._id === item._id && c.type === item.type);
+    // Normalizo el item al formato de carrito (id, title, image, price, type)
+    const id = item._id;
+    const yaEsta = cart.find(
+      (c) => (c.id || c._id) === id && c.type === item.type,
+    );
     if (!yaEsta) {
-      setCart([...cart, item]);
+      setCart([
+        ...cart,
+        {
+          type: item.type,
+          id,
+          title: item.title, // book: string | course/formation: obj multilang
+          image: typeof item.image === "string" ? item.image : (item.coverImage?.url || ""), // book usa coverImage
+          price: Number(item.price) || 0,
+        },
+      ]);
     }
     navigate("/pago-embed");
   };
@@ -102,6 +171,7 @@ function MyCourses() {
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
+
       <div className="my-courses-page">
         {/* FORMACIONES ACTIVAS */}
         <h2 className="titulo-principal">{t.titleFormations}</h2>
@@ -211,6 +281,60 @@ function MyCourses() {
                   visible={course.visible?.[language]}
                   onRebuy={!isAdmin ? onRebuy : undefined}
                   onClick={() => navigate(`/detalle/curso/${course._id}`)}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* =========================
+            📚 LIBROS ACTIVOS
+           ========================= */}
+        <h2 className="titulo-principal">{t.titleBooks || "Mis libros"}</h2>
+        <div className="formaciones-grid">
+          {books.length > 0 ? (
+            books.map((book) => (
+              <Card
+                key={book._id}
+                data={book}
+                fechaExpiracion={book.fechaExpiracion}
+                expirado={false}
+                // para libros no hay visible por idioma; dejamos true
+                visible={true}
+                onClick={() =>
+                  navigate(`/mis-cursos/libro/${book._id}`, {
+                    state: { fechaExpiracion: book.fechaExpiracion },
+                  })
+                }
+              />
+            ))
+          ) : (
+            <EmptyState
+              title={t.emptyBooksTitleUser || "Aún no tenés libros"}
+              subtitle={
+                t.emptyBooksSubtitleUser ||
+                "Cuando compres un libro, lo vas a encontrar aquí para verlo online o descargarlo."
+              }
+            />
+          )}
+        </div>
+
+        {/* LIBROS EXPIRADOS */}
+        {expiredBooks.length > 0 && (
+          <>
+            <h3 className="subtitulo-expirado">
+              {t.titleExpiredBooks || "Libros expirados"}
+            </h3>
+            <div className="formaciones-grid">
+              {expiredBooks.map((book) => (
+                <Card
+                  key={book._id}
+                  data={book}
+                  fechaExpiracion={book.fechaExpiracion}
+                  expirado={true}
+                  visible={true}
+                  onRebuy={!isAdmin ? onRebuy : undefined}
+                  onClick={() => navigate(`/tienda/libros/${book.slug}`)}
                 />
               ))}
             </div>

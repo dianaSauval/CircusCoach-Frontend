@@ -35,6 +35,9 @@ import ComingSoonPage from "./pages/ComingSoonPage";
 import LegalTermsPage from "./pages/LegalTermsPage";
 import ManagePhysicalProducts from "./pages/admin/ManagePhysicalProducts";
 import ShopPage from "./pages/ShopPage";
+import ManageBooks from "./pages/admin/ManageBooks";
+import MyBookDetail from "./pages/MyBookDetail";
+import BookDetail from "./pages/BookDetail";
 
 function App() {
   return (
@@ -51,6 +54,7 @@ function App() {
             element={<MyFormationDetail />}
           />
           <Route path="/mis-cursos/curso/:id" element={<MyCourseDetail />} />
+          <Route path="/mis-cursos/libro/:id" element={<MyBookDetail />} />
 
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -68,6 +72,8 @@ function App() {
 
           <Route path="/formaciones/:id/:slug" element={<FormationDetails />} />
           <Route path="/courses/:id/:slug" element={<CourseDetail />} />
+          <Route path="/tienda/libros/:slug" element={<BookDetail />} />
+
           <Route path="/buscar" element={<SearchResults />} />
           <Route path="/mantenimiento" element={<ComingSoonPage />} />
           <Route path="/tienda" element={<ShopPage />} />
@@ -88,6 +94,8 @@ function App() {
               element={<ManagePresentialFormations />}
             />
             <Route path="/admin/productos-fisicos" element={<ManagePhysicalProducts />} />
+            <Route path="/admin/libros" element={<ManageBooks />} />
+
           </Route>
         </Routes>
       </div>

@@ -1,3 +1,4 @@
+// src/pages/PagoEmbedPage.jsx
 import { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -16,6 +17,13 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { pickLangWithSpanishFallback } from "../utils/pickLang";
 
+// ✅ NUEVO util
+import {
+  getCartItemTitle,
+  getCartItemImage,
+  getCartItemId,
+} from "../utils/cartItemView";
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 const PagoEmbedPage = () => {
@@ -32,8 +40,6 @@ const PagoEmbedPage = () => {
   const localeMap = { es: "es-ES", en: "en-GB", fr: "fr-FR" };
   const lang = localeMap[language] || "es-ES";
 
-  
-
   const calcularPrecioConDescuento = (item) => {
     if (!item.discount || !item.discount.percentage) return item.price;
     return item.price - (item.price * item.discount.percentage) / 100;
@@ -48,10 +54,10 @@ const PagoEmbedPage = () => {
     const obtenerClientSecret = async () => {
       try {
         const itemsParaPago = cart.map((item) => ({
-          id: item.id || item._id,
+          id: getCartItemId(item),
           type: item.type,
           price: calcularPrecioConDescuento(item),
-          title: item.title,
+          title: getCartItemTitle(item, language), // ✅ SIEMPRE string
         }));
 
         const res = await crearPaymentIntent({
@@ -110,63 +116,64 @@ const PagoEmbedPage = () => {
         <h1>{t.title}</h1>
 
         <ul className="cart-list">
-          {cart.map((item, index) => (
-            <li key={index} className="cart-item">
-              <img
-                src={
-                  item.image?.[language] || item.image?.es || "/placeholder.png"
-                }
-                alt={item.title?.[language] || item.title?.es || "Curso"}
-                className="cart-item-img"
-              />
+          {cart.map((item, index) => {
+            const title = getCartItemTitle(item, language);
+            const image = getCartItemImage(item, language);
 
-              <div className="cart-item-info">
-                <h3 className="titulo-principal">
-                  {item.title?.[language] || item.title?.es}
-                </h3>
+            return (
+              <li key={index} className="cart-item">
+                <img
+                  src={image}
+                  alt={title || "Producto"}
+                  className="cart-item-img"
+                />
 
-                {item.discount ? (
-                  <div className="precio-con-descuento">
-                    <span className="precio-final">
-                      {formatPrice(
-                        calcularPrecioConDescuento(item),
-                        CURRENCY,
-                        lang
-                      )}
-                    </span>
-                    <span className="precio-original">
+                <div className="cart-item-info">
+                  <h3 className="titulo-principal">{title}</h3>
+
+                  {item.discount ? (
+                    <div className="precio-con-descuento">
+                      <span className="precio-final">
+                        {formatPrice(
+                          calcularPrecioConDescuento(item),
+                          CURRENCY,
+                          lang
+                        )}
+                      </span>
+                      <span className="precio-original">
+                        {formatPrice(item.price, CURRENCY, lang)}
+                      </span>
+                      <span className="nombre-descuento">
+                        🎁{" "}
+                        {pickLangWithSpanishFallback(
+                          item.discount?.name,
+                          language
+                        )}{" "}
+                        - {item.discount.percentage}%{" "}
+                        {t.off ||
+                          (language === "en"
+                            ? "OFF"
+                            : language === "fr"
+                            ? "DE RÉDUCTION"
+                            : "OFF")}
+                      </span>
+                    </div>
+                  ) : (
+                    <p className="precio-normal">
                       {formatPrice(item.price, CURRENCY, lang)}
-                    </span>
-                    <span className="nombre-descuento">
-                      🎁{" "}
-                      {pickLangWithSpanishFallback(
-                        item.discount?.name,
-                        language
-                      )}{" "}
-                      - {item.discount.percentage}%{" "}
-                      {t.off ||
-                        (language === "en"
-                          ? "OFF"
-                          : language === "fr"
-                          ? "DE RÉDUCTION"
-                          : "OFF")}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="precio-normal">
-                    {formatPrice(item.price, CURRENCY, lang)}
-                  </p>
-                )}
+                    </p>
+                  )}
 
-                <button
-                  className="boton-eliminar small"
-                  onClick={() => handleRemoveItem(index)}
-                >
-                  <FaTrash /> {t.remove || "Eliminar"}
-                </button>
-              </div>
-            </li>
-          ))}
+                  <button
+                    className="boton-eliminar small"
+                    onClick={() => handleRemoveItem(index)}
+                  >
+                    <FaTrash /> {t.remove || "Eliminar"}
+                  </button>
+                </div>
+              </li>
+            );
+          })}
         </ul>
 
         <div className="cart-summary">

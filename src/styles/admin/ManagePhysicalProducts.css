@@ -1,0 +1,290 @@
+/* styles/admin/ManagePhysicalProducts.css */
+
+.mpp-container {
+  width: min(1200px, 92%);
+  margin: 0 auto;
+  padding: 1.2rem 0 2.8rem;
+}
+
+.mpp-main-title {
+  font-size: 2rem;
+  color: #222;
+  text-align: center;
+  margin: 0.2rem 0 1.2rem;
+}
+
+.mpp-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ===== Left list ===== */
+.mpp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.mpp-section-title {
+  margin: 0;
+  text-align: center;
+}
+
+.mpp-add-btn {
+  min-width: 250px;
+  width: fit-content;
+  margin: 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  border: 2px solid rgba(20, 50, 81, 0.18);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--color-azul-profundo);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.mpp-add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 1);
+}
+
+/* Card */
+.mpp-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid rgba(20, 50, 81, 0.14 reminder); /* fallback if vars missing? */
+  border: 1px solid rgba(20, 50, 81, 0.14);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.mpp-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
+}
+
+.mpp-card.is-selected {
+  border: 2px solid var(--color-petroleo, #007a78);
+  background: #d6f4f0;
+}
+
+.mpp-card-head {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 0.9rem 0.9rem 0.65rem;
+  text-align: left;
+}
+
+.mpp-card-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(20, 50, 81, 0.14);
+  flex-shrink: 0;
+}
+
+.mpp-card-title {
+  font-family: var(--font-titulo, system-ui, sans-serif);
+  letter-spacing: 0.4px;
+  font-size: 1.05rem;
+  color: var(--color-azul-profundo, #143251);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mpp-card-meta {
+  padding: 0 0.9rem 0.8rem;
+  display: grid;
+  gap: 6px;
+  font-size: 1rem;
+  justify-items: start;
+}
+
+.mpp-card-meta p {
+  margin: 0;
+}
+
+/* Actions */
+.mpp-card-actions {
+  padding: 0.85rem 0.9rem 1rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.mpp-btn {
+  border: 0;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.mpp-btn-edit {
+  background: #ffdb7d;
+  color: var(--color-azul-profundo);
+  border: 2px solid #f0b400;
+}
+
+.mpp-btn-edit:hover {
+  color: #f0b400;
+}
+
+.mpp-btn-delete {
+  background: rgba(215, 38, 56, 0.12);
+  color: #b80e22;
+  border: 2px solid rgba(215, 38, 56, 0.25);
+}
+
+.mpp-btn-delete:hover {
+  border-color: rgba(215, 38, 56, 0.45);
+}
+
+/* ===== Right panel ===== */
+.mpp-panel {
+  width: 100%;
+}
+
+.mpp-preview {
+  background: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 14px;
+  border: 1px solid rgba(20, 50, 81, 0.14);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ✅ todo centrado */
+  text-align: center;
+  gap: 0.6rem;
+}
+
+/* Tabs */
+.mpp-tabs {
+  width: 100%;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 0.4rem;
+}
+
+.mpp-tab {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #ccc;
+  background: #eee;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.mpp-tab.active {
+  background-color: #d4eaff;
+  border-color: #0077cc;
+}
+
+/* Preview content */
+.mpp-preview-title {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-titulo, system-ui, sans-serif);
+  letter-spacing: 0.8px;
+  color: var(--color-azul-profundo, #143251);
+  font-size: 1.8rem;
+}
+
+.mpp-preview-desc {
+  margin: 0.25rem 0 0.4rem;
+  max-width: 680px;
+  line-height: 1.55;
+  opacity: 0.95;
+}
+
+/* Missing pills */
+.mpp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 219, 125, 0.45);
+  border: 1px solid rgba(240, 180, 0, 0.6);
+  color: var(--color-azul-profundo, #143251);
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+/* Image (smaller) */
+.mpp-preview-imageWrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 0.55rem 0 0.2rem;
+}
+
+.mpp-preview-image {
+  width: min(380px, 100%);
+  border-radius: 14px;
+  border: 1px solid rgba(20, 50, 81, 0.14);
+  display: block;
+  object-fit: cover;
+}
+
+/* Info */
+.mpp-preview-info {
+  width: 100%;
+  display: grid;
+  gap: 10px;
+  margin-top: 0.6rem;
+  justify-items: center;
+  font-size: 1.05rem;
+}
+
+.mpp-preview-info p {
+  margin: 0;
+}
+
+.mpp-link {
+  word-break: break-word;
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .mpp-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .mpp-add-btn {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .mpp-card-actions {
+    flex-direction: column;
+  }
+
+  .mpp-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

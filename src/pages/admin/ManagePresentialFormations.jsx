@@ -86,6 +86,8 @@ const ManagePresentialFormations = () => {
     }
   };
 
+  
+
   return (
     <div className="manage-courses-container">
       <h1 className="main-title">🏫 Formaciones Presenciales</h1>

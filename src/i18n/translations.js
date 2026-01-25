@@ -917,7 +917,18 @@ const translations = {
       viewOnAmazon: "Ver en Amazon",
       emptyTitle: "Tienda en construcción",
       emptySubtitle:
-        "Todavía no hay productos disponibles para comprar, pero estamos trabajando en ello. Volvé pronto — seguro aparece algo nuevo 🙂",
+        "Todavía no hay productos disponibles para comprar, pero estamos trabajando en ello. Volvé pronto — seguro aparece algo nuevo ",
+      booksTitle: "Libros",
+      booksSubtitle:
+        "Publicaciones digitales en PDF, pensadas para profundizar y acompañar tu práctica.",
+      booksEmptyTitle: "No hay libros disponibles en este momento",
+      booksEmptySubtitle:
+        "Estamos preparando nuevas publicaciones. Pronto vas a poder encontrarlas aquí.",
+      loadingBooks: "Cargando libros…",
+      viewBook: "Ver libro",
+      addToCart: "Agregar al carrito",
+      seeMore: "Ver más",
+      seeLess: "Ver menos",
     },
     en: {
       title: "Shop",
@@ -931,7 +942,19 @@ const translations = {
       viewOnAmazon: "View on Amazon",
       emptyTitle: "Shop coming soon",
       emptySubtitle:
-        "There are no products available to buy yet, but we’re working on it. Check back soon — something new will be waiting 🙂",
+        "There are no products available to buy yet, but we’re working on it. Check back soon — something new will be waiting",
+
+      booksTitle: "Books",
+      booksSubtitle:
+        "Digital PDF publications designed to support and deepen your practice.",
+      booksEmptyTitle: "No books available at the moment",
+      booksEmptySubtitle:
+        "We are currently preparing new publications. Please check back soon.",
+      loadingBooks: "Loading books…",
+      viewBook: "View book",
+      addToCart: "Add to cart",
+      seeMore: "See more",
+      seeLess: "See less",
     },
     fr: {
       title: "Boutique",
@@ -945,7 +968,202 @@ const translations = {
       viewOnAmazon: "Voir sur Amazon",
       emptyTitle: "Boutique bientôt disponible",
       emptySubtitle:
-        "Il n’y a pas encore de produits disponibles à l’achat, mais nous y travaillons. Reviens bientôt — quelque chose de nouveau t’attend 🙂",
+        "Il n’y a pas encore de produits disponibles à l’achat, mais nous y travaillons. Reviens bientôt — quelque chose de nouveau t’attend ",
+      booksTitle: "Livres",
+      booksSubtitle:
+        "Publications numériques en PDF, conçues pour approfondir et accompagner votre pratique.",
+      booksEmptyTitle: "Aucun livre disponible pour le moment",
+      booksEmptySubtitle:
+        "De nouvelles publications sont en cours de préparation. Elles seront bientôt disponibles.",
+      loadingBooks: "Chargement des livres…",
+      viewBook: "Voir le livre",
+      addToCart: "Ajouter au panier",
+      seeMore: "Voir plus",
+      seeLess: "Voir moins",
+    },
+  },
+  bookDetail: {
+    es: {
+      loading: "Cargando libro…",
+
+      notFoundTitle: "No encontramos este libro",
+      notFoundSubtitle:
+        "Es posible que haya sido removido o que el enlace esté mal.",
+
+      back: "Volver",
+
+      fallbackTitle: "Libro",
+      fallbackDesc: "Libro disponible en la tienda de CircusCoach.",
+
+      note: "El PDF se habilita en “Mis cursos” una vez que se confirma la compra.",
+
+      noDescription: "Este libro todavía no tiene descripción.",
+
+      includesTitle: "Qué incluye",
+      includes1: "Acceso al eBook dentro de la plataforma.",
+      includes2: "Opción de descarga del PDF una vez comprado.",
+      includes3: "Acceso inmediato tras confirmación del pago.",
+
+      howWorksTitle: "Cómo funciona",
+      how1: "Comprás el libro desde la tienda o el carrito.",
+      how2: "Se registra automáticamente en tu cuenta.",
+      how3: "Lo encontrás en “Mis cursos” para verlo o descargarlo.",
+
+      privacyTitle: "Nota",
+      privacyText:
+        "Por seguridad, el enlace del PDF no se muestra públicamente hasta que el libro esté comprado.",
+
+      languageLabel: "Idioma",
+      langName: {
+        es: "Español",
+        en: "Inglés",
+        fr: "Francés",
+      },
+    },
+
+    en: {
+      loading: "Loading book…",
+
+      notFoundTitle: "We couldn’t find this book",
+      notFoundSubtitle:
+        "It may have been removed or the link might be incorrect.",
+
+      back: "Back",
+
+      fallbackTitle: "Book",
+      fallbackDesc: "Book available in the CircusCoach shop.",
+
+      note: "The PDF will appear in “My courses” once the purchase is confirmed.",
+
+      noDescription: "This book doesn’t have a description yet.",
+
+      includesTitle: "What’s included",
+      includes1: "Access to the eBook inside the platform.",
+      includes2: "PDF download option once purchased.",
+      includes3: "Instant access after payment confirmation.",
+
+      howWorksTitle: "How it works",
+      how1: "You buy the book from the shop or the cart.",
+      how2: "It’s automatically added to your account.",
+      how3: "You’ll find it in “My courses” to view or download.",
+
+      privacyTitle: "Note",
+      privacyText:
+        "For security reasons, the PDF link isn’t shown publicly until the book has been purchased.",
+      languageLabel: "Language",
+      langName: {
+        es: "Spanish",
+        en: "English",
+        fr: "French",
+      },
+    },
+
+    fr: {
+      loading: "Chargement du livre…",
+
+      notFoundTitle: "Impossible de trouver ce livre",
+      notFoundSubtitle: "Il a peut-être été retiré ou le lien est incorrect.",
+
+      back: "Retour",
+
+      fallbackTitle: "Livre",
+      fallbackDesc: "Livre disponible dans la boutique CircusCoach.",
+
+      note: "Le PDF sera disponible dans « Mes cours » une fois l’achat confirmé.",
+
+      noDescription: "Ce livre n’a pas encore de description.",
+
+      includesTitle: "Ce qui est inclus",
+      includes1: "Accès à l’eBook dans la plateforme.",
+      includes2: "Option de téléchargement du PDF après achat.",
+      includes3: "Accès immédiat après confirmation du paiement.",
+
+      howWorksTitle: "Comment ça marche",
+      how1: "Tu achètes le livre depuis la boutique ou le panier.",
+      how2: "Il est ajouté automatiquement à ton compte.",
+      how3: "Tu le retrouves dans « Mes cours » pour le lire ou le télécharger.",
+
+      privacyTitle: "Note",
+      privacyText:
+        "Pour des raisons de sécurité, le lien du PDF n’est pas affiché publiquement tant que le livre n’a pas été acheté.",
+      languageLabel: "Langue",
+      langName: {
+        es: "Espagnol",
+        en: "Anglais",
+        fr: "Français",
+      },
+    },
+  },
+  myBookDetail: {
+    es: {
+      back: "Volver",
+      download: "Descargar PDF",
+
+      seeMore: "Ver más",
+      seeLess: "Ver menos",
+
+      notFoundTitle: "Libro no encontrado",
+      notFoundSubtitle: "No pudimos cargar la información del libro.",
+
+      noCover: "Sin portada",
+      noDescription: "Sin descripción.",
+
+      expires: "Acceso hasta",
+
+      loadingFile: "Cargando archivo…",
+      downloadDisabled: "La descarga no está habilitada para este contenido.",
+
+      viewerTitle: "Lectura online",
+      viewerDisabledTitle: "Lectura online no disponible",
+      viewerDisabledSubtitle:
+        "Este archivo no está habilitado para visualizarse online.",
+    },
+
+    en: {
+      back: "Back",
+      download: "Download PDF",
+
+      seeMore: "See more",
+      seeLess: "See less",
+
+      notFoundTitle: "Book not found",
+      notFoundSubtitle: "We couldn’t load the book information.",
+
+      noCover: "No cover",
+      noDescription: "No description available.",
+
+      expires: "Access until",
+
+      loadingFile: "Loading file…",
+      downloadDisabled: "Download is not enabled for this content.",
+
+      viewerTitle: "Online reading",
+      viewerDisabledTitle: "Online reading not available",
+      viewerDisabledSubtitle: "This file is not enabled for online viewing.",
+    },
+
+    fr: {
+      back: "Retour",
+      download: "Télécharger le PDF",
+
+      seeMore: "Voir plus",
+      seeLess: "Voir moins",
+
+      notFoundTitle: "Livre introuvable",
+      notFoundSubtitle: "Impossible de charger les informations du livre.",
+
+      noCover: "Pas de couverture",
+      noDescription: "Aucune description disponible.",
+
+      expires: "Accès jusqu’au",
+
+      loadingFile: "Chargement du fichier…",
+      downloadDisabled: "Le téléchargement n’est pas activé pour ce contenu.",
+
+      viewerTitle: "Lecture en ligne",
+      viewerDisabledTitle: "Lecture en ligne indisponible",
+      viewerDisabledSubtitle:
+        "Ce fichier n’est pas disponible pour la lecture en ligne.",
     },
   },
 };

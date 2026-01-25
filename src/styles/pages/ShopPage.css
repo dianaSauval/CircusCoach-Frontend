@@ -189,6 +189,32 @@
   pointer-events: none;
 }
 
+/* Libros */
+.shop-book-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.shop-see-more-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-petroleo);
+  font-weight: 700;
+  cursor: pointer;
+  margin: 6px auto 0 auto;
+  display: block;
+  text-decoration: underline;
+  font-family: var(--font-texto);
+}
+
+.shop-see-more-btn:hover {
+  color: var(--color-azul-profundo);
+}
+
+
 /* =========================================================
    ✅ Responsive
 ========================================================= */

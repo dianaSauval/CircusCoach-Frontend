@@ -83,6 +83,17 @@ function AdminDashboard() {
               Ver Productos
             </Link>
           </div>
+                    {/* Libros / E-books */}
+          <div className="admin-card">
+            <h2 className="titulo-principal">Libros / E-books</h2>
+            <p className="texto">
+              Subí y gestioná tus libros en PDF: título, portada, precio,
+              visibilidad y archivo.
+            </p>
+            <Link to="/admin/libros" className="boton-secundario">
+              Ver Libros
+            </Link>
+          </div>
         </div>
       </div>
     </>

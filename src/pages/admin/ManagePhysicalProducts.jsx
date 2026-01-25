@@ -11,6 +11,7 @@ import AddPhysicalProductModal from "../../components/admin/ModalAdmin/AddPhysic
 
 import { FaPlus, FaTrash } from "react-icons/fa";
 import "../../styles/admin/ManagePresentialFormations.css"; // mismo layout que Bonos
+import "../../styles/admin/ManagePhysicalProducts.css";
 import ConfirmModal from "../../components/common/ConfirmModal";
 
 const ManagePhysicalProducts = () => {
@@ -31,6 +32,21 @@ const ManagePhysicalProducts = () => {
 
   const pickLang = (field) =>
     field?.[language] || field?.es || field?.en || field?.fr || "";
+
+  const hasLangValue = (field, lang) => Boolean(field?.[lang]?.trim());
+
+  const langLabel = (l) =>
+    l === "es" ? "español" : l === "en" ? "inglés" : "francés";
+
+  const titleInLang = selected
+    ? (selected.title?.[activeLangView] || "").trim()
+    : "";
+  const descInLang = selected
+    ? (selected.description?.[activeLangView] || "").trim()
+    : "";
+
+  const titleFallback = selected ? pickLang(selected.title) : ""; // lo dejamos solo para ALT, si querés
+  const showTitle = Boolean(titleInLang); // ✅ solo mostramos si existe en el idioma activo
 
   useEffect(() => {
     fetchProducts();
@@ -76,7 +92,7 @@ const ManagePhysicalProducts = () => {
       setIsEditing(false);
 
       setProducts((prev) =>
-        prev.map((p) => (p._id === updated._id ? updated : p))
+        prev.map((p) => (p._id === updated._id ? updated : p)),
       );
       setSelected(updated);
     } catch (err) {
@@ -188,14 +204,14 @@ const ManagePhysicalProducts = () => {
                 onCancel={() => setIsEditing(false)}
               />
             ) : (
-              <div className="informationCoursePresential">
+              <div className="mpp-preview">
                 {/* Tabs idiomas (vista) */}
-                <div className="language-tabs">
+                <div className="mpp-tabs">
                   {["es", "en", "fr"].map((l) => (
                     <button
                       key={l}
                       type="button"
-                      className={activeLangView === l ? "active" : ""}
+                      className={`mpp-tab ${activeLangView === l ? "active" : ""}`}
                       onClick={() => setActiveLangView(l)}
                     >
                       {l.toUpperCase()}
@@ -203,37 +219,39 @@ const ManagePhysicalProducts = () => {
                   ))}
                 </div>
 
-                {pickLangFrom(selected.description, activeLangView) && (
-                  <p className="texto">
-                    {pickLangFrom(selected.description, activeLangView)}
-                  </p>
+                {/* ✅ TÍTULO */}
+                {showTitle ? (
+                  <h2 className="titulo-principal physical-preview-title">
+                    {titleInLang}
+                  </h2>
+                ) : (
+                  <div className="mpp-pill">
+                    ⚠️ Título aún no cargado en {langLabel(activeLangView)}
+                  </div>
                 )}
 
-                {/* Preview imagen */}
+                {/* ✅ IMAGEN */}
                 {selected.imageUrl && (
-                  <div
-                    style={{
-                      margin: "14px 0",
-                      display: "flex",
-                      justifyContent: "center",
-                    }}
-                  >
+                  <div className="mpp-preview-imageWrap">
                     <img
                       src={selected.imageUrl}
-                      alt={pickLang(selected.title)}
-                      style={{
-                        width: "100%",
-                        maxWidth: 420,
-                        borderRadius: 12,
-                        border: "1px solid #ddd",
-                        display: "block",
-                        objectFit: "cover",
-                      }}
+                      alt={titleFallback || "Producto"}
+                      className="mpp-preview-image"
                     />
                   </div>
                 )}
 
-                <div className="informationPresential">
+                {/* ✅ DESCRIPCIÓN */}
+                {descInLang ? (
+                  <p className="texto mpp-preview-desc">{descInLang}</p>
+                ) : (
+                  <div className="mpp-pill">
+                    ⚠️ Descripción no cargada en {langLabel(activeLangView)}
+                  </div>
+                )}
+
+                {/* ✅ INFO */}
+                <div className="informationPresential physical-preview-info">
                   <p>
                     <strong>Precio:</strong> €
                     {Number(selected.priceEur || 0).toFixed(2)}
@@ -250,7 +268,7 @@ const ManagePhysicalProducts = () => {
                       href={selected.amazonUrl}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ wordBreak: "break-word" }}
+                      className="mpp-link"
                     >
                       Ver en Amazon
                     </a>
@@ -277,7 +295,7 @@ const ManagePhysicalProducts = () => {
         onConfirm={confirmDeleteProduct}
         title="¿Eliminar producto?"
         message={`¿Estás segura/o de eliminar "${pickLang(
-          productToDelete?.title
+          productToDelete?.title,
         )}"? Esta acción no se puede deshacer.`}
       />
     </div>

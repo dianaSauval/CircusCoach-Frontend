@@ -1,0 +1,445 @@
+/* BookForm.css */
+/* Ajustes específicos del form de libros, consistentes con tus variables globales */
+
+.book-form-help {
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--color-azul-profundo);
+  opacity: 0.9;
+  text-align: left;
+  margin-top: 0.35rem;
+}
+
+/* Inputs “premium” y consistentes con tu estética */
+.presential-form input[type="text"],
+.presential-form input[type="number"],
+.presential-form textarea,
+.presential-form select,
+.presential-form input[type="file"] {
+  border: 1px solid rgba(20, 50, 81, 0.22); /* azul profundo suave */
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background-color: var(--color-blanco);
+  color: var(--color-azul-profundo);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Focus */
+.presential-form input:focus,
+.presential-form textarea:focus,
+.presential-form select:focus {
+  outline: none;
+  border-color: var(--color-menta);
+  box-shadow: 0 0 0 4px rgba(104, 208, 189, 0.28);
+}
+
+/* Textarea más cómoda */
+.presential-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+/* Select un poquito más “prolijo” */
+.presential-form select {
+  cursor: pointer;
+}
+
+/* File input: alinearlo con el resto */
+.presential-form input[type="file"] {
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+}
+
+/* Bloque checkbox de visible */
+.book-visible-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.4rem;
+}
+
+.book-visible-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-menta);
+}
+
+/* Preview de portada */
+.book-cover-preview {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+}
+
+.book-cover-preview img {
+  width: 100%;
+  max-width: 320px;
+  border-radius: 14px;
+  border: 1px solid rgba(20, 50, 81, 0.18);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+}
+
+/* Mensajitos */
+.book-upload-hint {
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  color: var(--color-azul-profundo);
+  opacity: 0.9;
+  margin-top: 0.4rem;
+  text-align: left;
+}
+
+/* Ajuste de botones en el form */
+.presential-form .button-group {
+  margin-top: 1.2rem;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   PDF preview (tu estética)
+   ========================= */
+/* =========================
+   PDF preview SOLO LIBROS
+   (namespaced para no pisar ClassForm)
+   ========================= */
+
+.book-pdf-block {
+  background-color: rgba(187, 223, 219, 0.25); /* verde-claro suave */
+  padding: 14px;
+  margin-top: 12px;
+  border-left: 4px solid var(--color-menta);
+  border-radius: 12px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.book-pdf-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap; /* ✅ en mobile se acomoda */
+}
+
+.book-pdf-header strong {
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  letter-spacing: 0.3px;
+}
+
+/* Preview contenedor */
+.book-pdf-preview {
+  margin-top: 10px;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(20, 50, 81, 0.16);
+  background-color: var(--color-blanco);
+}
+
+.book-pdf-preview iframe {
+  width: 100%;
+  height: 520px;
+  border: 0;
+  display: block;
+}
+
+/* Textos “no cargado” */
+.book-pdf-empty {
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  opacity: 0.7;
+  font-size: 0.95rem;
+}
+
+.book-pdf-empty-text {
+  margin: 10px 0 0;
+  font-family: var(--font-texto);
+  color: var(--color-azul-profundo);
+  opacity: 0.85;
+}
+
+/* =========================
+   Botón SOLO LIBROS
+   ========================= */
+
+.book-pdf-btn {
+  appearance: none;
+  border: 2px solid var(--color-azul-profundo);
+  background: var(--color-azul-profundo);
+  color: var(--color-blanco);
+
+  font-family: var(--font-texto);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  width: auto;
+  min-width: 120px;
+  max-width: 100%;
+  white-space: nowrap;
+}
+
+.book-pdf-btn:hover {
+  background: var(--color-blanco);
+  color: var(--color-azul-profundo);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+  border-color: var(--color-azul-profundo);
+}
+
+.book-pdf-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(104, 208, 189, 0.35),
+    0 10px 18px rgba(0, 0, 0, 0.12);
+}
+
+.book-pdf-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================
+   Mini card (PDF / Cover) SOLO LIBROS
+   ========================= */
+
+.book-file-card {
+  margin-top: 10px;
+  border-radius: 14px;
+  border: 1px solid rgba(20, 50, 81, 0.16);
+  background: var(--color-blanco);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+}
+
+.book-file-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.book-file-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: rgba(104, 208, 189, 0.20);
+  border: 1px solid rgba(104, 208, 189, 0.35);
+  color: var(--color-azul-profundo);
+  font-size: 1.2rem;
+}
+
+.book-file-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: rgba(187, 223, 219, 0.25);
+  border: 1px solid rgba(20, 50, 81, 0.14);
+  color: var(--color-azul-profundo);
+}
+
+.book-file-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-file-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.book-file-title {
+  font-family: var(--font-texto);
+  font-weight: 800;
+  color: var(--color-azul-profundo);
+  font-size: 0.98rem;
+  line-height: 1.1;
+}
+
+.book-file-pill {
+  width: fit-content;
+  font-family: var(--font-texto);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  letter-spacing: 0.3px;
+  border: 1px solid transparent;
+}
+
+.book-file-pill.ok {
+  background: rgba(46, 204, 113, 0.16);
+  border-color: rgba(46, 204, 113, 0.35);
+  color: var(--color-azul-profundo);
+}
+
+.book-file-pill.no {
+  background: rgba(20, 50, 81, 0.06);
+  border-color: rgba(20, 50, 81, 0.12);
+  color: var(--color-azul-profundo);
+  opacity: 0.9;
+}
+
+/* acciones */
+.book-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* botón mini */
+.book-file-btn {
+  appearance: none;
+  border: 2px solid var(--color-azul-profundo);
+  background: var(--color-azul-profundo);
+  color: var(--color-blanco);
+  font-family: var(--font-texto);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-size: 0.78rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease, color 0.2s ease;
+  white-space: nowrap;
+}
+
+.book-file-btn:hover {
+  background: var(--color-blanco);
+  color: var(--color-azul-profundo);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.12);
+}
+
+.book-file-btn.danger {
+  border-color: #e74c3c;
+  background: #e74c3c;
+  color: var(--color-blanco);
+  padding-inline: 0.75rem;
+}
+
+.book-file-btn.danger:hover {
+  background: var(--color-blanco);
+  color: #e74c3c;
+}
+
+.book-file-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+.book-cover-empty {
+  margin: 14px 0;
+  padding: 12px;
+  border-radius: 12px;
+  background-color: rgba(187, 223, 219, 0.25);
+  border: 1px dashed rgba(20, 50, 81, 0.25);
+  color: var(--color-azul-profundo);
+  text-align: center;
+  font-family: var(--font-texto);
+  font-weight: 600;
+}
+
+
+
+
+/* Mobile */
+@media (max-width: 768px) {
+  .book-form-help {
+    font-size: 0.9rem;
+  }
+
+  .presential-form input[type="text"],
+  .presential-form input[type="number"],
+  .presential-form textarea,
+  .presential-form select,
+  .presential-form input[type="file"] {
+    border-radius: 10px;
+    padding: 0.7rem 0.85rem;
+  }
+
+  .book-cover-preview img {
+    max-width: 100%;
+  }
+
+  .pdf-preview iframe {
+    height: 380px; /* más razonable en mobile */
+  }
+
+  .book-pdf-btn {
+    width: 100%;
+    min-width: 0;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .book-pdf-preview iframe {
+    height: 380px;
+  }
+
+   .book-file-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .book-file-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .book-file-btn {
+    width: 100%;
+    padding: 0.65rem 1rem;
+    font-size: 0.85rem;
+  }
+}
