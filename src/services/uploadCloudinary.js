@@ -32,7 +32,7 @@ export const subirPdfPublico = async (archivo, titulo) => {
   } catch (error) {
     console.error(
       "❌ Error al subir PDF público:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw new Error("No se pudo subir el PDF público");
   }
@@ -68,7 +68,7 @@ export const subirPdfPrivado = async (archivo, titulo) => {
   } catch (error) {
     console.error(
       "❌ Error al subir PDF privado:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw new Error("No se pudo subir el PDF privado");
   }
@@ -77,7 +77,7 @@ export const subirPdfPrivado = async (archivo, titulo) => {
 // 🗑 Eliminar archivo (cualquier tipo)
 export const eliminarArchivoDesdeFrontend = async (
   public_id,
-  resource_type = "raw"
+  resource_type = "raw",
 ) => {
   try {
     const res = await api.delete("/cloudinary/delete", {
@@ -87,7 +87,7 @@ export const eliminarArchivoDesdeFrontend = async (
   } catch (error) {
     console.error(
       "❌ Error al eliminar archivo:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw new Error("No se pudo eliminar el archivo");
   }
@@ -111,7 +111,7 @@ export const subirImagenCurso = async (archivo, titulo) => {
     "📤 Subiendo imagen de curso:",
     archivo.name,
     "como",
-    nombreNormalizado
+    nombreNormalizado,
   );
 
   try {
@@ -126,21 +126,23 @@ export const subirImagenCurso = async (archivo, titulo) => {
   } catch (error) {
     console.error(
       "❌ Error al subir imagen de curso:",
-      error.response?.data || error.message
+      error.response?.data || error.message,
     );
     throw new Error("No se pudo subir la imagen del curso");
   }
 };
 
 export const obtenerUrlPdfPrivado = async (classId, index, lang) => {
- const response = await api.get(`/cloudinary/privado/${classId}/${index}/${lang}`);
-return response.data.url; // ✅ ahora te devuelve la URL directa del PDF
+  const response = await api.get(
+    `/cloudinary/privado/${classId}/${index}/${lang}`,
+  );
+  return response.data.url; // ✅ ahora te devuelve la URL directa del PDF
 };
 
 export const obtenerUrlPdfPrivadoCurso = async (classId, index, lang) => {
   try {
     const response = await api.get(
-      `/cloudinary/pdf-curso-privado/${classId}/${index}/${lang}`
+      `/cloudinary/pdf-curso-privado/${classId}/${index}/${lang}`,
     );
     return response.data.url;
   } catch (error) {
@@ -148,7 +150,6 @@ export const obtenerUrlPdfPrivadoCurso = async (classId, index, lang) => {
     throw new Error("No se pudo cargar el PDF del curso");
   }
 };
-
 
 // 📘 Subida de PDF de libro
 export const subirPdfLibro = async (archivo, titulo) => {
@@ -178,11 +179,36 @@ export const subirPdfLibro = async (archivo, titulo) => {
       public_id: res.data.public_id,
     };
   } catch (error) {
-    console.error(
-      "❌ Error al subir PDF de libro:",
-      error.response?.data || error.message
-    );
-    throw new Error("No se pudo subir el PDF del libro");
+    const status = error.response?.status;
+    const payload = error.response?.data;
+
+    // ✅ Caso: archivo demasiado grande (backend -> 413)
+    if (status === 413 || payload?.errorCode === "BOOK_PDF_TOO_LARGE") {
+      const maxMb = payload?.maxMb || 10;
+      const msg =
+        payload?.error ||
+        `El PDF supera el máximo permitido (${maxMb} MB). Comprimilo e intentá nuevamente.`;
+
+      const e = new Error(msg);
+      e.code = "BOOK_PDF_TOO_LARGE";
+      e.maxMb = maxMb;
+      e.sizeMb = Number((archivo.size / (1024 * 1024)).toFixed(2));
+      throw e;
+    }
+
+    // ✅ Caso: no es PDF (si lo implementaste en backend)
+    if (payload?.errorCode === "BOOK_PDF_INVALID_TYPE") {
+      const e = new Error(
+        payload?.error || "Archivo inválido. Solo se permiten PDFs.",
+      );
+      e.code = "BOOK_PDF_INVALID_TYPE";
+      throw e;
+    }
+
+    console.error("❌ Error al subir PDF de libro:", payload || error.message);
+
+    const e = new Error(payload?.error || "No se pudo subir el PDF del libro");
+    e.code = "BOOK_PDF_UPLOAD_ERROR";
+    throw e;
   }
 };
-

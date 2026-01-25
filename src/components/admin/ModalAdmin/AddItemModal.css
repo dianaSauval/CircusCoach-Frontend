@@ -138,12 +138,26 @@
 }
 
 /* ⚠️ Mensaje de error individual debajo del campo */
+/* =========================
+   Error de campo (global)
+   ========================= */
+
 .field-error {
-  color: #d72638 !important;
+  margin-top: 6px;
+  padding: 0.55rem 0.75rem;
+
+  border-radius: 10px;
+  border: 1px solid rgba(215, 38, 56, 0.35);
+  background-color: rgba(215, 38, 56, 0.08);
+
+  font-family: var(--font-texto);
   font-size: 0.9rem;
-  text-align: left;
-  font-weight: 500;
+  font-weight: 600;
+  line-height: 1.35;
+
+  color: #b71c1c; /* rojo oscuro, más elegante */
 }
+
 
 .pdf-block,
 .video-block {

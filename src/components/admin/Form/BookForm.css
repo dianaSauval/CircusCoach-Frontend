@@ -391,6 +391,71 @@
 }
 
 
+/* =========================
+   Error premium (BookForm)
+   ========================= */
+
+.book-error {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  background: rgba(215, 38, 56, 0.08); /* rojo suave, no agresivo */
+  border: 1px solid rgba(215, 38, 56, 0.25);
+
+  color: var(--color-azul-profundo);
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  line-height: 1.4;
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.book-error::before {
+  content: "⚠️";
+  font-size: 1.15rem;
+  line-height: 1;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.book-error strong {
+  font-weight: 800;
+}
+
+.book-error small {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+/* Variante más “warning” (por tamaño) */
+.book-error.is-warning {
+  background: rgba(255, 206, 0, 0.16);
+  border-color: rgba(255, 206, 0, 0.45);
+}
+
+/* Animación suave al aparecer */
+.book-error {
+  animation: bookErrorIn 180ms ease-out;
+}
+
+@keyframes bookErrorIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 
 
 /* Mobile */

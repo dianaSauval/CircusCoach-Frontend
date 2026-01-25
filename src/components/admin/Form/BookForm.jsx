@@ -1,7 +1,12 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./CourseForm.css";
 import "./BookForm.css";
-import { FaFilePdf, FaTrashAlt, FaExternalLinkAlt, FaImage } from "react-icons/fa";
+import {
+  FaFilePdf,
+  FaTrashAlt,
+  FaExternalLinkAlt,
+  FaImage,
+} from "react-icons/fa";
 
 import {
   subirPdfLibro,
@@ -9,8 +14,20 @@ import {
   eliminarArchivoDesdeFrontend,
 } from "../../../services/uploadCloudinary";
 
+const MAX_BOOK_PDF_MB = 10;
+const bytesToMb = (bytes) => bytes / (1024 * 1024);
+
 const BookForm = ({ initialData = {}, onSave, onCancel }) => {
+  const formRef = useRef(null);
+
   const [loadingUpload, setLoadingUpload] = useState(false);
+
+  // ✅ Errores específicos de subida (premium)
+  // pdf/cover: null | { message: string, type: "warning" | "error" }
+  const [uploadErrors, setUploadErrors] = useState({
+    pdf: null,
+    cover: null,
+  });
 
   // ✅ Track de temporales (si subís y borrás antes de guardar => borra Cloudinary)
   const [tempUploads, setTempUploads] = useState({
@@ -52,7 +69,30 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
   const priceRef = useRef(null);
   const pdfRef = useRef(null);
 
+  const pdfLoaded = !!formData.pdf?.url;
+  const coverLoaded = !!formData.coverImage?.url;
+
+  // =========================
+  // 🧼 Limpieza al click afuera
+  // =========================
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      const formEl = formRef.current;
+      if (!formEl) return;
+
+      if (!formEl.contains(e.target)) {
+        setUploadErrors({ pdf: null, cover: null });
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleChange = (field, value) => {
+    // ✅ si toca el form, sacamos error de subida (queda más humano)
+    setUploadErrors((prev) => ({ ...prev, pdf: null, cover: null }));
+
     setFormData((prev) => ({ ...prev, [field]: value }));
 
     setErrors((prev) => {
@@ -63,14 +103,30 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
     });
   };
 
-  const pdfLoaded = !!formData.pdf?.url;
-  const coverLoaded = !!formData.coverImage?.url;
-
   // =========================
   // 📄 PDF
   // =========================
   const handleUploadPdf = async (file) => {
     if (!file) return;
+
+    // ✅ limpiar error anterior
+    setUploadErrors((prev) => ({ ...prev, pdf: null }));
+
+    // ✅ Validación client-side (antes de subir)
+    const sizeMb = Number(bytesToMb(file.size).toFixed(2));
+    if (sizeMb > MAX_BOOK_PDF_MB) {
+      setUploadErrors((prev) => ({
+        ...prev,
+        pdf: {
+          type: "warning",
+          message: `Este PDF pesa ${sizeMb} MB y supera el máximo permitido (${MAX_BOOK_PDF_MB} MB). Comprimilo y volvé a intentarlo.`,
+        },
+      }));
+
+      if (pdfRef.current) pdfRef.current.value = "";
+      return;
+    }
+
     setLoadingUpload(true);
 
     try {
@@ -84,7 +140,7 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
       setFormData((prev) => ({ ...prev, pdf: uploaded }));
       setTempUploads((prev) => ({ ...prev, pdfPublicId: uploaded.public_id }));
 
-      // limpiar error
+      // limpiar error de validación del form
       setErrors((prev) => {
         if (!prev.pdf) return prev;
         const updated = { ...prev };
@@ -92,11 +148,35 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
         return updated;
       });
 
-      // opcional: limpiar el value del input para evitar “mismo archivo”
       if (pdfRef.current) pdfRef.current.value = "";
     } catch (err) {
       console.error(err);
-      alert("No se pudo subir el PDF del libro");
+
+      // si tu service ya arma {code, message, maxMb}, lo aprovechamos
+      if (err?.code === "BOOK_PDF_TOO_LARGE") {
+        const msg =
+          err.message ||
+          `El PDF supera el máximo permitido (${err.maxMb || MAX_BOOK_PDF_MB} MB).`;
+
+        setUploadErrors((prev) => ({
+          ...prev,
+          pdf: { type: "warning", message: msg },
+        }));
+      } else if (err?.code === "BOOK_PDF_INVALID_TYPE") {
+        setUploadErrors((prev) => ({
+          ...prev,
+          pdf: { type: "error", message: "Archivo inválido. Subí un PDF (.pdf)." },
+        }));
+      } else {
+        setUploadErrors((prev) => ({
+          ...prev,
+          pdf: {
+            type: "error",
+            message:
+              "No se pudo subir el PDF. Probá nuevamente o revisá tu conexión.",
+          },
+        }));
+      }
     } finally {
       setLoadingUpload(false);
     }
@@ -120,6 +200,7 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
     }
 
     setFormData((prev) => ({ ...prev, pdf: { url: "", public_id: "" } }));
+    setUploadErrors((prev) => ({ ...prev, pdf: null }));
   };
 
   // =========================
@@ -127,10 +208,15 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
   // =========================
   const handleUploadCover = async (file) => {
     if (!file) return;
+
+    setUploadErrors((prev) => ({ ...prev, cover: null }));
     setLoadingUpload(true);
 
     try {
-      const uploaded = await subirImagenCurso(file, `cover_${formData.title || "libro"}`);
+      const uploaded = await subirImagenCurso(
+        file,
+        `cover_${formData.title || "libro"}`
+      );
 
       const prevPublicId = formData.coverImage?.public_id;
       if (prevPublicId && prevPublicId !== uploaded.public_id) {
@@ -138,10 +224,19 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
       }
 
       setFormData((prev) => ({ ...prev, coverImage: uploaded }));
-      setTempUploads((prev) => ({ ...prev, coverPublicId: uploaded.public_id }));
+      setTempUploads((prev) => ({
+        ...prev,
+        coverPublicId: uploaded.public_id,
+      }));
     } catch (err) {
       console.error(err);
-      alert("No se pudo subir la portada");
+      setUploadErrors((prev) => ({
+        ...prev,
+        cover: {
+          type: "error",
+          message: "No se pudo subir la portada. Probá nuevamente.",
+        },
+      }));
     } finally {
       setLoadingUpload(false);
     }
@@ -164,7 +259,11 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
       setDeleteFlags((prev) => ({ ...prev, deletePreviousCover: true }));
     }
 
-    setFormData((prev) => ({ ...prev, coverImage: { url: "", public_id: "" } }));
+    setFormData((prev) => ({
+      ...prev,
+      coverImage: { url: "", public_id: "" },
+    }));
+    setUploadErrors((prev) => ({ ...prev, cover: null }));
   };
 
   const validate = () => {
@@ -218,7 +317,7 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="presential-form">
+    <form ref={formRef} onSubmit={handleSubmit} className="presential-form">
       <label className="label-formulario">📘 Título del libro:</label>
       <input
         ref={titleRef}
@@ -287,7 +386,7 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
       </div>
 
       {/* =========================
-          PDF: input (solo si no hay) + mini card
+          PDF
          ========================= */}
       <label className="label-formulario">📄 PDF del libro:</label>
 
@@ -320,7 +419,9 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
             <button
               type="button"
               className="book-file-btn"
-              onClick={() => window.open(formData.pdf.url, "_blank", "noopener,noreferrer")}
+              onClick={() =>
+                window.open(formData.pdf.url, "_blank", "noopener,noreferrer")
+              }
             >
               <FaExternalLinkAlt /> Ver
             </button>
@@ -342,8 +443,29 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
 
       {errors.pdf && <div className="field-error">{errors.pdf}</div>}
 
+      {/* ✅ Error premium de subida */}
+      {uploadErrors.pdf && (
+        <div
+          className={`book-error ${
+            uploadErrors.pdf.type === "warning" ? "is-warning" : ""
+          }`}
+        >
+          <div>
+            <strong>
+              {uploadErrors.pdf.type === "warning"
+                ? "Archivo demasiado grande"
+                : "Error al subir"}
+            </strong>
+            <div>{uploadErrors.pdf.message}</div>
+            {uploadErrors.pdf.type === "warning" && (
+              <small>Tip: si lo comprimís a 5–8 MB suele quedar perfecto.</small>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* =========================
-          COVER: input (solo si no hay) + mini card
+          COVER
          ========================= */}
       <label className="label-formulario">🖼️ Portada (opcional):</label>
 
@@ -356,7 +478,9 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
         />
       )}
 
-      <div className={`book-file-card ${coverLoaded ? "is-loaded" : "is-empty"}`}>
+      <div
+        className={`book-file-card ${coverLoaded ? "is-loaded" : "is-empty"}`}
+      >
         <div className="book-file-left">
           <div className="book-file-thumb">
             {coverLoaded ? (
@@ -379,7 +503,13 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
             <button
               type="button"
               className="book-file-btn"
-              onClick={() => window.open(formData.coverImage.url, "_blank", "noopener,noreferrer")}
+              onClick={() =>
+                window.open(
+                  formData.coverImage.url,
+                  "_blank",
+                  "noopener,noreferrer"
+                )
+              }
             >
               <FaExternalLinkAlt /> Ver
             </button>
@@ -399,11 +529,26 @@ const BookForm = ({ initialData = {}, onSave, onCancel }) => {
         </div>
       </div>
 
+      {/* (opcional) error premium cover */}
+      {uploadErrors.cover && (
+        <div className="book-error">
+          <div>
+            <strong>Error al subir</strong>
+            <div>{uploadErrors.cover.message}</div>
+          </div>
+        </div>
+      )}
+
       <div className="button-group">
         <button className="boton-agregar" type="submit" disabled={loadingUpload}>
           {loadingUpload ? "⏳ Subiendo..." : "✅ Guardar"}
         </button>
-        <button className="boton-eliminar" type="button" onClick={onCancel} disabled={loadingUpload}>
+        <button
+          className="boton-eliminar"
+          type="button"
+          onClick={onCancel}
+          disabled={loadingUpload}
+        >
           ❌ Cancelar
         </button>
       </div>
