@@ -296,7 +296,7 @@ export default function Header() {
             )}
           </div>
 
-          <NavLink to="/pago-embed" className="cart-icon-container">
+          <NavLink to="/mantenimiento" className="cart-icon-container">
             <FaShoppingBag className="header-icon" />
             {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
           </NavLink>

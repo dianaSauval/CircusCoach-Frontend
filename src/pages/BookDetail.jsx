@@ -70,7 +70,7 @@ export default function BookDetail() {
       image: book.coverImage?.url || "",
       price: Number(book.price) || 0,
     });
-    navigate("/pago-embed");
+    navigate("/mantenimiento");
   };
 
   return (
