@@ -1,8 +1,80 @@
+/* =========================
+   SHOP PAGE
+========================= */
+
 .shop-page {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0; /* el padding lo maneja el inner */
+  background-color: transparent;
+}
+
+/* =========================
+   BLOQUE CON FONDO (hero + físicos)
+   Full-bleed real + overlay blancuzco suave
+========================= */
+
+.shop-physical-wrap {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+
+  padding: clamp(18px, 3vw, 44px) 0;
+}
+
+/* Fondo imagen (ocupa toda la pantalla) */
+.shop-physical-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  background-image: url("https://res.cloudinary.com/dcsp3mhqa/image/upload/v1770896918/379_mi477o.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  transform: scale(1.03);
+}
+
+/* Overlay blancuzco elegante (deja ver la imagen y mantiene letras oscuras) */
+.shop-physical-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  /* truco: blanco suave + toque menta + degradado para que no quede plano */
+  background:
+    radial-gradient(
+      900px 520px at 50% 0%,
+      rgba(104, 208, 189, 0.22),
+      transparent 62%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.40),
+      rgba(255, 255, 255, 0.56)
+    );
+
+ backdrop-filter: blur(4px);
+-webkit-backdrop-filter: blur(4px);
+
+}
+
+/* Contenido centrado (tu ancho normal) */
+.shop-physical-inner {
   width: min(1100px, 92%);
   margin: 0 auto;
-  padding: clamp(16px, 2.5vw, 40px);
+  padding: 0 clamp(16px, 2.5vw, 40px);
 }
+
+/* =========================
+   HERO
+========================= */
 
 .shop-hero {
   padding-top: 10px;
@@ -13,10 +85,28 @@
   margin: 14px auto 0;
 }
 
+/* =========================
+   SECCIONES
+========================= */
+
 .shop-content {
   margin-top: 26px;
 }
 
+/* Panel suave sobre el fondo (sin blanco sólido cortante) */
+.shop-physical {
+  margin-top: 26px;
+  padding: clamp(16px, 2.4vw, 24px);
+  border-radius: 26px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 18px 55px rgba(0, 0, 0, 0.10);
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* loading / empty centrados */
 .shop-loading,
 .shop-empty {
   display: grid;
@@ -27,36 +117,37 @@
 
 /* =========================================================
    ✅ GRID centrado por filas (flex-wrap)
-   - 1 card: queda al medio
-   - última fila incompleta: también centrada
 ========================================================= */
 .shop-grid {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center; /* 🔑 centra cada fila */
+  justify-content: center;
   align-items: stretch;
   gap: clamp(14px, 2vw, 22px);
-  margin-top: 6px;
+  margin-top: 10px;
 }
 
-/* Card con ancho controlado para que no se estire feo */
+/* =========================
+   Cards
+========================= */
+
 .shop-card {
-  background: var(--color-blanco);
-  border: 1px solid rgba(20, 50, 81, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(20, 50, 81, 0.10);
   border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(20, 50, 81, 0.08);
+
+  box-shadow: 0 12px 28px rgba(20, 50, 81, 0.10);
   transition: transform 0.28s ease, box-shadow 0.28s ease;
 
-  /* 🔑 comportamiento responsive */
-  flex: 0 1 320px; /* base desktop */
+  flex: 0 1 320px;
   max-width: 360px;
   width: 100%;
 }
 
 .shop-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 35px rgba(20, 50, 81, 0.14);
+  box-shadow: 0 18px 45px rgba(20, 50, 81, 0.16);
 }
 
 /* Imagen */
@@ -68,7 +159,7 @@
   background: linear-gradient(
     135deg,
     rgba(104, 208, 189, 0.18),
-    rgba(68, 131, 143, 0.1)
+    rgba(68, 131, 143, 0.10)
   );
 }
 
@@ -95,8 +186,11 @@
   font-weight: 700;
   font-size: 0.85rem;
   letter-spacing: 0.3px;
+
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(255, 255, 255, 0.38);
 }
 
 .shop-stock-badge.in {
@@ -133,7 +227,6 @@
   line-height: 1.6;
   font-size: 1.02rem;
 
-  /* clamp a 4 líneas */
   display: -webkit-box;
   -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
@@ -141,7 +234,7 @@
 }
 
 .shop-card-desc.muted {
-  opacity: 0.5;
+  opacity: 0.55;
   min-height: 1.2rem;
 }
 
@@ -214,17 +307,83 @@
   color: var(--color-azul-profundo);
 }
 
+/* =========================
+   BLOQUE LIBROS (fuera del fondo)
+========================= */
+
+.shop-books-wrap {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+
+  /* ⬇️ mantenemos aire sin crear “brecha” blanca */
+  padding: clamp(40px, 6vw, 90px) 0;
+
+  margin-top: 0;      /* ⬅️ importante */
+  margin-bottom: 0;
+}
+
+/* 🔥 elimina costuras por subpixel entre secciones full-bleed */
+.shop-books-wrap {
+  margin-top: -1px; /* solapa 1px sobre la sección anterior */
+}
+
+
+/* Imagen de fondo */
+.shop-books-wrap::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+
+  background-image: url("https://res.cloudinary.com/dcsp3mhqa/image/upload/f_auto,q_100/v1770899074/hermann-books-5937823_1280_z515q4.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Overlay suave y claro (para que se vea bastante la foto) */
+.shop-books-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  background: rgba(255, 255, 255, 0.50);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+.shop-books-wrap > * {
+  width: min(1100px, 92%);
+  margin: 0 auto;
+  padding: 0 clamp(16px, 2.5vw, 40px);
+}
+
+
+.shop-books {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(20, 50, 81, 0.10);
+  border-radius: 26px;
+  padding: clamp(16px, 2.4vw, 24px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.shop-books-title {
+  font-size: 1.8rem;
+}
+
+.shop-books-subtitle {
+  margin-top: 8px;
+}
 
 /* =========================================================
    ✅ Responsive
 ========================================================= */
 
-/* Tablets: cards un poquito más anchas y 2 por fila normalmente */
 @media (max-width: 980px) {
-  .shop-page {
-    width: min(980px, 94%);
-  }
-
   .shop-card {
     flex: 0 1 340px;
     max-width: 380px;
@@ -235,7 +394,24 @@
   }
 }
 
-/* Mobile: 1 por fila, centrado, full width controlado */
+/* Mobile */
+@media (max-width: 768px) {
+  /* evita bugs de background fijo en iOS y similares */
+  .shop-physical-wrap::before {
+    transform: none;
+  }
+
+  .shop-physical {
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .shop-books {
+    border-radius: 22px;
+    padding: 16px;
+  }
+}
+
 @media (max-width: 640px) {
   .shop-grid {
     gap: 14px;
@@ -243,7 +419,7 @@
 
   .shop-card {
     flex: 1 1 100%;
-    max-width: 520px; /* para que no sea una sábana en móviles grandes */
+    max-width: 520px;
   }
 
   .shop-card-title {

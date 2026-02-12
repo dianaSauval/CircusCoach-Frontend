@@ -83,89 +83,96 @@ export default function ShopPage() {
         />
       </Helmet>
 
-      <section className="shop-hero">
-        <h1 className="titulo-principal">{t?.title}</h1>
+      {/* =========================
+          🛍️ BLOQUE CON FONDO:
+          Hero + Productos físicos
+         ========================= */}
+      <section className="shop-physical-wrap">
+        <div className="shop-physical-inner">
+          <section className="shop-hero">
+            <h1 className="titulo-principal">{t?.title}</h1>
 
-        <p className="shop-intro texto">
-          {(t?.intro || "")
-            .split("\n")
-            .filter(Boolean)
-            .map((p, idx) => (
-              <span key={idx}>
-                {p}
-                <br />
-                <br />
-              </span>
-            ))}
-        </p>
+            <p className="shop-intro texto">
+              {(t?.intro || "")
+                .split("\n")
+                .filter(Boolean)
+                .map((p, idx) => (
+                  <span key={idx}>
+                    {p}
+                    <br />
+                    <br />
+                  </span>
+                ))}
+            </p>
+          </section>
+
+          <section className="shop-content shop-physical">
+            {loading ? (
+              <div className="shop-loading">
+                <LoadingSpinner />
+                <p className="texto">{t?.loading}</p>
+              </div>
+            ) : !hasProducts ? (
+              <div className="shop-empty">
+                <EmptyState title={t?.emptyTitle} subtitle={t?.emptySubtitle} />
+              </div>
+            ) : (
+              <div className="shop-grid">
+                {products.map((p) => (
+                  <ShopProductCard
+                    key={p._id}
+                    product={p}
+                    language={language}
+                    t={t}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
       </section>
 
       {/* =========================
-          🛍️ Productos físicos
+          📚 Libros (eBooks) — SIN fondo
          ========================= */}
-      <section className="shop-content">
-        {loading ? (
-          <div className="shop-loading">
-            <LoadingSpinner />
-            <p className="texto">{t?.loading}</p>
-          </div>
-        ) : !hasProducts ? (
-          <div className="shop-empty">
-            <EmptyState title={t?.emptyTitle} subtitle={t?.emptySubtitle} />
-          </div>
-        ) : (
-          <div className="shop-grid">
-            {products.map((p) => (
-              <ShopProductCard
-                key={p._id}
-                product={p}
-                language={language}
-                t={t}
+      <section className="shop-books-wrap">
+        <section className="shop-content shop-books">
+          <h2 className="titulo-principal shop-books-title">
+            {t?.booksTitle || "Libros"}
+          </h2>
+
+          <p className="texto shop-books-subtitle">
+            {t?.booksSubtitle || "eBooks en PDF para ver online o descargar."}
+          </p>
+
+          {loadingBooks ? (
+            <div className="shop-loading">
+              <LoadingSpinner />
+              <p className="texto">{t?.loadingBooks || "Cargando libros..."}</p>
+            </div>
+          ) : books.length === 0 ? (
+            <div className="shop-empty">
+              <EmptyState
+                title={t?.booksEmptyTitle || "Todavía no hay libros disponibles"}
+                subtitle={
+                  t?.booksEmptySubtitle ||
+                  "Próximamente habrá nuevos títulos disponibles. Revisá esta sección más adelante."
+                }
               />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* =========================
-          📚 Libros (eBooks)
-         ========================= */}
-      <section className="shop-content shop-books" style={{ marginTop: 36 }}>
-        <h2 className="titulo-principal" style={{ fontSize: "1.8rem" }}>
-          {t?.booksTitle || "Libros"}
-        </h2>
-
-        <p className="texto" style={{ marginTop: 8 }}>
-          {t?.booksSubtitle || "eBooks en PDF para ver online o descargar."}
-        </p>
-
-        {loadingBooks ? (
-          <div className="shop-loading">
-            <LoadingSpinner />
-            <p className="texto">{t?.loadingBooks || "Cargando libros..."}</p>
-          </div>
-        ) : books.length === 0 ? (
-          <div className="shop-empty">
-            <EmptyState
-              title={t?.booksEmptyTitle || "Todavía no hay libros disponibles"}
-              subtitle={
-                t?.booksEmptySubtitle ||
-                "Próximamente habrá nuevos títulos disponibles. Revisá esta sección más adelante."
-              }
-            />
-          </div>
-        ) : (
-          <div className="shop-grid">
-            {books.map((b) => (
-              <ShopBookCard
-                key={b._id}
-                book={b}
-                t={t}
-                onAddToCart={handleAddBook}
-              />
-            ))}
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="shop-grid">
+              {books.map((b) => (
+                <ShopBookCard
+                  key={b._id}
+                  book={b}
+                  t={t}
+                  onAddToCart={handleAddBook}
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </section>
     </main>
   );
