@@ -29,14 +29,14 @@ const BioRocioGarrote = () => {
             <div className="firma-rocio">
               Rocío Garrote
               <a
-                href="https://res.cloudinary.com/dkdhdy9e5/raw/upload/v1743214000/CircusCoach/CV-RocioGarrote.pdf"
+                href="/pdfs/CV-RocioGarrote-2026-ES.pdf"
                 className="biografia-pdf"
                 target="_blank"
                 rel="noopener noreferrer"
-                download
+                download="CV-RocioGarrote-2026-ES.pdf"
               >
                 <FaFilePdf className="pdf-icon" />
-                <span> {t.downloadCV}</span>
+                <span>{t.downloadCV}</span>
               </a>
             </div>
           </div>
