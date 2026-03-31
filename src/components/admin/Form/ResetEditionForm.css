@@ -1,0 +1,76 @@
+.reset-form input[type="text"],
+.reset-form input[type="number"],
+.reset-form input[type="date"],
+.reset-form textarea,
+.reset-form select {
+  border: 1px solid rgba(20, 50, 81, 0.22);
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  background-color: var(--color-blanco);
+  color: var(--color-azul-profundo);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reset-form input:focus,
+.reset-form textarea:focus,
+.reset-form select:focus {
+  outline: none;
+  border-color: var(--color-menta);
+  box-shadow: 0 0 0 4px rgba(104, 208, 189, 0.28);
+}
+
+.reset-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.reset-form select {
+  cursor: pointer;
+}
+
+.reset-visible-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.4rem;
+}
+
+.reset-visible-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-menta);
+}
+
+.reset-sessions-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reset-session-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.reset-session-label {
+  font-weight: 600;
+}
+
+.reset-edition-meta {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+@media (max-width: 768px) {
+  .reset-form input[type="text"],
+  .reset-form input[type="number"],
+  .reset-form input[type="date"],
+  .reset-form textarea,
+  .reset-form select {
+    border-radius: 10px;
+    padding: 0.7rem 0.85rem;
+  }
+}

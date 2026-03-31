@@ -1,0 +1,366 @@
+.consultoria-form-section {
+  padding: 1rem 1.5rem 4rem;
+}
+
+.consultoria-section-heading {
+  max-width: 900px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.consultoria-section-heading h2 {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  color: var(--color-azul-profundo);
+  letter-spacing: 0.8px;
+}
+
+.consultoria-section-heading p {
+  margin: 0 auto;
+  max-width: 760px;
+  font-family: var(--font-texto);
+  line-height: 1.8;
+  font-weight: 700;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-form {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(68, 131, 143, 0.14);
+  box-shadow: 0 16px 40px rgba(20, 50, 81, 0.08);
+}
+
+.consultoria-form__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.consultoria-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.consultoria-field--full {
+  grid-column: 1 / -1;
+}
+
+.consultoria-field label {
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-azul-profundo);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.consultoria-field__description {
+  margin: -0.1rem 0 0.25rem;
+  font-family: var(--font-texto);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  font-weight: 600;
+  color: rgba(20, 50, 81, 0.8);
+}
+
+.consultoria-field input,
+.consultoria-field select,
+.consultoria-field textarea {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(68, 131, 143, 0.18);
+  background: #ffffff;
+  color: var(--color-azul-profundo);
+  padding: 0.95rem 1rem;
+  font-family: var(--font-texto);
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.consultoria-field input::placeholder,
+.consultoria-field textarea::placeholder {
+  color: rgba(20, 50, 81, 0.45);
+}
+
+.consultoria-field input:focus,
+.consultoria-field select:focus,
+.consultoria-field textarea:focus {
+  border-color: var(--color-menta);
+  box-shadow: 0 0 0 4px rgba(104, 208, 189, 0.14);
+}
+
+.consultoria-field textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.consultoria-field__hint {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  font-weight: 700;
+  color: var(--color-petroleo);
+}
+
+.consultoria-inline-message {
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  background: rgba(187, 223, 219, 0.36);
+  font-family: var(--font-texto);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-alert {
+  margin-top: 1.25rem;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  font-family: var(--font-texto);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  font-weight: 700;
+}
+
+.consultoria-alert--error {
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.22);
+  color: #b43728;
+}
+
+.consultoria-alert--success {
+  background: rgba(46, 204, 113, 0.1);
+  border: 1px solid rgba(46, 204, 113, 0.22);
+  color: #1e8b4c;
+}
+
+.consultoria-form__footer {
+  margin-top: 1.8rem;
+  display: flex;
+  justify-content: center;
+}
+
+/* RESET CARD */
+
+.consultoria-reset-card {
+  margin-top: 1rem;
+  padding: 1.4rem;
+  border-radius: 26px;
+  background: linear-gradient(
+    180deg,
+    rgba(187, 223, 219, 0.22) 0%,
+    rgba(255, 255, 255, 0.96) 100%
+  );
+  border: 1px solid rgba(68, 131, 143, 0.18);
+  box-shadow: 0 14px 34px rgba(20, 50, 81, 0.07);
+}
+
+.consultoria-reset-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.2rem;
+}
+
+.consultoria-reset-card__intro {
+  max-width: 640px;
+}
+
+.consultoria-reset-card__eyebrow {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-texto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-petroleo);
+}
+
+.consultoria-reset-card__title {
+  margin: 0;
+  font-family: var(--font-titulo);
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  line-height: 1.05;
+  color: var(--color-azul-profundo);
+  letter-spacing: 0.5px;
+}
+
+.consultoria-reset-card__subtitle {
+  margin: 0.65rem 0 0;
+  font-family: var(--font-texto);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  font-weight: 600;
+  color: rgba(20, 50, 81, 0.84);
+}
+
+.consultoria-reset-card__badge {
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  font-family: var(--font-texto);
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--color-azul-profundo);
+  color: var(--color-blanco);
+}
+
+.consultoria-reset-card__summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.2rem;
+}
+
+.consultoria-reset-card__item {
+  padding: 0.9rem 0.95rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(68, 131, 143, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+}
+
+.consultoria-reset-card__item span {
+  font-family: var(--font-texto);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(20, 50, 81, 0.68);
+}
+
+.consultoria-reset-card__item strong {
+  font-family: var(--font-texto);
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-reset-card__item--highlight {
+  background: rgba(104, 208, 189, 0.18);
+  border-color: rgba(68, 131, 143, 0.2);
+}
+
+.consultoria-reset-card__sessions {
+  margin-top: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(68, 131, 143, 0.12);
+}
+
+.consultoria-reset-card__sessions h4 {
+  margin: 0 0 0.9rem;
+  font-family: var(--font-texto);
+  font-size: 1rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-reset-card__sessions ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.consultoria-reset-card__sessions li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(68, 131, 143, 0.1);
+}
+
+.consultoria-reset-card__session-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-menta);
+  flex-shrink: 0;
+  margin-top: 0.35rem;
+  box-shadow: 0 0 0 4px rgba(104, 208, 189, 0.16);
+}
+
+.consultoria-reset-card__session-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.consultoria-reset-card__session-index {
+  font-family: var(--font-texto);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(20, 50, 81, 0.68);
+}
+
+.consultoria-reset-card__session-date {
+  font-family: var(--font-texto);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-azul-profundo);
+}
+
+@media (max-width: 960px) {
+  .consultoria-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .consultoria-reset-card__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .consultoria-form-section {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .consultoria-form {
+    padding: 1.3rem;
+    border-radius: 24px;
+  }
+
+  .consultoria-section-heading p {
+    font-size: 0.98rem;
+  }
+
+  .consultoria-reset-card {
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
+  .consultoria-reset-card__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .consultoria-reset-card__title {
+    font-size: 1.3rem;
+  }
+
+  .consultoria-reset-card__subtitle,
+  .consultoria-field__description {
+    font-size: 0.94rem;
+  }
+}

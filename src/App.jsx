@@ -38,6 +38,11 @@ import ShopPage from "./pages/ShopPage";
 import ManageBooks from "./pages/admin/ManageBooks";
 import MyBookDetail from "./pages/MyBookDetail";
 import BookDetail from "./pages/BookDetail";
+import ConsultoriaPersonalPage from "./pages/ConsultoriaPersonalPage";
+import ManageCoachingRequests from "./pages/admin/ManageCoachingRequests";
+import ManageResetEditions from "./pages/admin/ManageResetEditions";
+import ServicePaymentSuccessPage from "./pages/ServicePaymentSuccessPage";
+import ServicePaymentCanceledPage from "./pages/ServicePaymentCanceledPage";
 
 function App() {
   return (
@@ -63,8 +68,21 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/formaciones" element={<FormationPage />} />
           <Route path="/biografia" element={<BioRocioGarrote />} />
+          <Route
+            path="/consultoria-personal"
+            element={<ConsultoriaPersonalPage />}
+          />
           <Route path="/carrito" element={<CartPage />} />
           <Route path="/pago-exitoso" element={<PagoExitoso />} />
+          <Route
+            path="/servicios/pago-confirmado"
+            element={<ServicePaymentSuccessPage />}
+          />
+
+          <Route
+            path="/servicios/pago-cancelado"
+            element={<ServicePaymentCanceledPage />}
+          />
 
           <Route path="/pago-embed" element={<PagoEmbedPage />} />
 
@@ -93,9 +111,19 @@ function App() {
               path="/admin/formaciones-presenciales"
               element={<ManagePresentialFormations />}
             />
-            <Route path="/admin/productos-fisicos" element={<ManagePhysicalProducts />} />
+            <Route
+              path="/admin/productos-fisicos"
+              element={<ManagePhysicalProducts />}
+            />
             <Route path="/admin/libros" element={<ManageBooks />} />
-
+            <Route
+              path="/admin/solicitudes-coaching"
+              element={<ManageCoachingRequests />}
+            />
+            <Route
+              path="/admin/reset-ediciones"
+              element={<ManageResetEditions />}
+            />
           </Route>
         </Routes>
       </div>

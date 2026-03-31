@@ -1,0 +1,51 @@
+.consultoria-services {
+  padding: 1rem 1.5rem 4rem;
+}
+
+.consultoria-section-heading {
+  max-width: 900px;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.consultoria-section-heading h2 {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  color: var(--color-azul-profundo);
+  letter-spacing: 0.8px;
+}
+
+.consultoria-section-heading p {
+  margin: 0 auto;
+  max-width: 760px;
+  font-family: var(--font-texto);
+  line-height: 1.8;
+  font-weight: 700;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-cards {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+@media (max-width: 960px) {
+  .consultoria-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .consultoria-services {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .consultoria-section-heading p {
+    font-size: 0.98rem;
+  }
+}

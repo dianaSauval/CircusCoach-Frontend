@@ -19,10 +19,33 @@ function AdminDashboard() {
       <Helmet>
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
+
       <div className="admin-dashboard">
         <h1 className="titulo-principal">Panel de Administración</h1>
 
         <div className="admin-sections">
+          {/* Coaching - Solicitudes */}
+          <div className="admin-card admin-card--highlight">
+            <h2 className="titulo-principal">Solicitudes de Coaching</h2>
+            <p className="texto">
+              Revisá las solicitudes enviadas por clientes y aprobá o rechazá según tu agenda.
+            </p>
+            <Link to="/admin/solicitudes-coaching" className="boton-secundario">
+              Ver Solicitudes
+            </Link>
+          </div>
+
+          {/* Coaching - RESET */}
+          <div className="admin-card admin-card--highlight">
+            <h2 className="titulo-principal">Ediciones RESET</h2>
+            <p className="texto">
+              Creá nuevas fechas grupales de RESET y administrá cupos, precio y visibilidad.
+            </p>
+            <Link to="/admin/reset-ediciones" className="boton-secundario">
+              Gestionar RESET
+            </Link>
+          </div>
+
           {/* Formaciones Online */}
           <div className="admin-card">
             <h2 className="titulo-principal">Formaciones Online</h2>
@@ -83,7 +106,8 @@ function AdminDashboard() {
               Ver Productos
             </Link>
           </div>
-                    {/* Libros / E-books */}
+
+          {/* Libros / E-books */}
           <div className="admin-card">
             <h2 className="titulo-principal">Libros / E-books</h2>
             <p className="texto">

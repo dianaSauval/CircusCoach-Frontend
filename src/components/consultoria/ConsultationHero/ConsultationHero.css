@@ -1,0 +1,64 @@
+.consultoria-hero {
+  padding: 5rem 1.5rem 3rem;
+}
+
+.consultoria-hero__content {
+  max-width: 950px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.consultoria-hero__eyebrow {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-family: var(--font-texto);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-petroleo);
+}
+
+.consultoria-hero h1 {
+  margin: 0 0 1rem;
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  line-height: 1.08;
+  letter-spacing: 1px;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-hero__lead {
+  margin: 0 auto 0.5rem;
+  max-width: 760px;
+  font-family: var(--font-texto);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-hero__text {
+  max-width: 780px;
+  margin: 1rem auto 0;
+  font-family: var(--font-texto);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.8;
+  color: var(--color-azul-profundo);
+}
+
+@media (max-width: 768px) {
+  .consultoria-hero {
+    padding: 4rem 1rem 2.2rem;
+  }
+
+  .consultoria-hero__lead {
+    font-size: 1.05rem;
+  }
+
+  .consultoria-hero__text {
+    font-size: 0.98rem;
+  }
+}

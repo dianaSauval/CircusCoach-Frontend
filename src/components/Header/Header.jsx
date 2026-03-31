@@ -36,7 +36,6 @@ export default function Header() {
     logout();
   };
 
-  // Scroll helper
   const scrollTopAll = (smooth = true) => {
     const behavior = smooth ? "smooth" : "auto";
     const targets = [
@@ -59,12 +58,10 @@ export default function Header() {
     });
   };
 
-  // Navegación inteligente: si ya estás en la ruta, sólo scrollea arriba
   const handleSmartNav = (e, path) => {
     if (location.pathname === path) {
       e.preventDefault();
       setMenuOpen(false);
-      // Esperamos a que cierre el menú y se re‑pinte el layout
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           scrollTopAll(true);
@@ -114,7 +111,6 @@ export default function Header() {
       </button>
 
       <nav className={`header-nav ${menuOpen ? "open" : ""}`}>
-        {/* Home */}
         <NavLink
           to="/"
           className="nav-link"
@@ -123,7 +119,6 @@ export default function Header() {
           <p>{t.home}</p>
         </NavLink>
 
-        {/* Cursos */}
         <NavLink
           to="/cursos"
           className="nav-link"
@@ -132,7 +127,6 @@ export default function Header() {
           {t.courses}
         </NavLink>
 
-        {/* Formaciones */}
         <NavLink
           to="/formaciones"
           className="nav-link"
@@ -140,7 +134,7 @@ export default function Header() {
         >
           {t.formations}
         </NavLink>
-        {/* Tienda */}
+
         <NavLink
           to="/tienda"
           className="nav-link"
@@ -149,7 +143,14 @@ export default function Header() {
           {t.shop}
         </NavLink>
 
-        {/* Biografía */}
+        <NavLink
+          to="/consultoria-personal"
+          className="nav-link"
+          onClick={(e) => handleSmartNav(e, "/consultoria-personal")}
+        >
+          {t.personalConsulting}
+        </NavLink>
+
         <NavLink
           to="/biografia"
           className="nav-link"
@@ -160,7 +161,6 @@ export default function Header() {
 
         {isAuthenticated && (
           <>
-            {/* Mis cursos */}
             <NavLink
               to="/mis-cursos"
               className="nav-link"
@@ -169,7 +169,6 @@ export default function Header() {
               {t.myCourses}
             </NavLink>
 
-            {/* Admin */}
             {user?.role === "admin" && (
               <NavLink
                 to="/admin"
@@ -228,7 +227,6 @@ export default function Header() {
               )}
             </div>
 
-            {/* Carrito / mantenimiento: navegación normal */}
             <NavLink
               to="/mantenimiento"
               className="cart-icon-container"

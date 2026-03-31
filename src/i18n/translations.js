@@ -11,6 +11,7 @@ const translations = {
       logout: "CERRAR SESIÓN",
       language: "LENGUAJE",
       shop: "Tienda",
+      personalConsulting: "Coaching",
     },
     en: {
       home: "HOME",
@@ -23,6 +24,7 @@ const translations = {
       logout: "LOGOUT",
       language: "LANGUAGE",
       shop: "Shop",
+      personalConsulting: "Coaching",
     },
     fr: {
       home: "ACCUEIL",
@@ -35,6 +37,7 @@ const translations = {
       logout: "DÉCONNEXION",
       language: "LANGUE",
       shop: "Boutique",
+      personalConsulting: "Coaching",
     },
   },
 

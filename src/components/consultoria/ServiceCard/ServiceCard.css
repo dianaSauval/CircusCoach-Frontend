@@ -1,0 +1,259 @@
+.consultoria-card {
+  border: 1px solid rgba(68, 131, 143, 0.14);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 14px 34px rgba(20, 50, 81, 0.08);
+  display: flex;
+  flex-direction: column;
+  min-height: 590px;
+  overflow: hidden;
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.consultoria-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(68, 131, 143, 0.24);
+  box-shadow: 0 20px 42px rgba(20, 50, 81, 0.14);
+}
+
+.consultoria-card--selected {
+  border-color: var(--color-menta);
+  box-shadow: 0 18px 42px rgba(104, 208, 189, 0.22);
+}
+
+.consultoria-card__image {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(68, 131, 143, 0.12),
+    rgba(187, 223, 219, 0.22)
+  );
+}
+
+.consultoria-card__image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.55s ease;
+}
+
+.consultoria-card:hover .consultoria-card__image img {
+  transform: scale(1.04);
+}
+
+.consultoria-card__image-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to top, rgba(20, 50, 81, 0.22), rgba(20, 50, 81, 0.02) 45%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+
+.consultoria-card__badge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 2;
+  padding: 0.48rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(68, 131, 143, 0.14);
+  box-shadow: 0 8px 18px rgba(20, 50, 81, 0.1);
+  font-family: var(--font-texto);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-azul-profundo);
+}
+
+/* Acá está la parte importante */
+.consultoria-card__image--reset img {
+  object-position: center 52%;
+}
+
+.consultoria-card__image--coaching img {
+  object-position: center 84%;
+}
+
+.consultoria-card__image--artistic-direction img {
+  object-position: center 50%;
+}
+
+.consultoria-card__body {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  margin-top: -1.2rem;
+  padding: 1.5rem 1.6rem 1.6rem;
+  background: rgba(255, 255, 255, 0.98);
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.consultoria-card h3 {
+  margin: 0 0 0.45rem;
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  font-size: 1.8rem;
+  letter-spacing: 0.4px;
+  line-height: 1.05;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-card__subtitle {
+  margin: 0;
+  font-family: var(--font-texto);
+  font-size: 1.02rem;
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--color-petroleo);
+}
+
+.consultoria-card__description {
+  margin: 1rem 0 1.2rem;
+  font-family: var(--font-texto);
+  font-size: 1rem;
+  line-height: 1.75;
+  font-weight: 700;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-card__prices {
+  margin-bottom: 1.2rem;
+}
+
+.consultoria-card__prices h4 {
+  margin: 0 0 0.7rem;
+  font-family: var(--font-titulo);
+  text-transform: uppercase;
+  font-size: 1.08rem;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.consultoria-price-pill {
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: linear-gradient(
+    135deg,
+    rgba(104, 208, 189, 0.18),
+    rgba(187, 223, 219, 0.32)
+  );
+  border: 1px solid rgba(68, 131, 143, 0.12);
+  font-family: var(--font-texto);
+  font-size: 0.96rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--color-azul-profundo);
+}
+
+.consultoria-card__actions {
+  margin-top: auto;
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.consultoria-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.82rem 1.2rem;
+  font-family: var(--font-texto);
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.consultoria-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.consultoria-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.consultoria-btn--primary {
+  background-color: var(--color-menta);
+  color: var(--color-azul-profundo);
+  box-shadow: 0 8px 20px rgba(104, 208, 189, 0.26);
+}
+
+.consultoria-btn--ghost {
+  background-color: var(--color-azul-profundo);
+  color: var(--color-blanco);
+  border: 2px solid var(--color-azul-profundo);
+}
+
+.consultoria-btn--large {
+  min-width: 240px;
+}
+
+@media (max-width: 1100px) {
+  .consultoria-card {
+    min-height: 560px;
+  }
+
+  .consultoria-card__image {
+    height: 245px;
+  }
+}
+
+@media (max-width: 960px) {
+  .consultoria-card {
+    min-height: auto;
+  }
+
+  .consultoria-card__image {
+    height: 230px;
+  }
+}
+
+@media (max-width: 768px) {
+  .consultoria-card {
+    border-radius: 24px;
+  }
+
+  .consultoria-card__image {
+    height: 220px;
+  }
+
+  .consultoria-card__body {
+    margin-top: -1rem;
+    padding: 1.3rem;
+    border-top-left-radius: 24px;
+    border-top-right-radius: 24px;
+  }
+
+  .consultoria-card h3 {
+    font-size: 1.5rem;
+  }
+
+  .consultoria-btn {
+    width: 100%;
+  }
+
+  .consultoria-card__description,
+  .consultoria-price-pill {
+    font-size: 0.98rem;
+  }
+}
