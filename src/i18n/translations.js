@@ -9,7 +9,7 @@ const translations = {
       admin: "ADMIN",
       login: "INICIAR SESIÓN",
       logout: "CERRAR SESIÓN",
-      language: "LENGUAJE",
+      language: "Idioma",
       shop: "Tienda",
       personalConsulting: "Coaching",
     },
