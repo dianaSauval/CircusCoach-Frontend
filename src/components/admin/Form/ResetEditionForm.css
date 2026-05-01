@@ -64,6 +64,17 @@
   background: rgba(255, 255, 255, 0.08);
 }
 
+.reset-session-fields {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.reset-session-fields select {
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .reset-form input[type="text"],
   .reset-form input[type="number"],

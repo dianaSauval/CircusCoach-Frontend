@@ -15,15 +15,43 @@ const formatDateTimeLocal = (value) => {
   return localDate.toISOString().slice(0, 16);
 };
 
+const TIME_OPTIONS = Array.from({ length: 24 }, (_, hour) =>
+  ["00", "15", "30", "45"].map((minutes) => {
+    const value = `${String(hour).padStart(2, "0")}:${minutes}`;
+    return { value, label: value };
+  }),
+).flat();
+
+const splitDateTimeLocal = (value) => {
+  if (!value) return { date: "", time: "" };
+
+  const formatted = formatDateTimeLocal(value);
+
+  return {
+    date: formatted.slice(0, 10),
+    time: formatted.slice(11, 16),
+  };
+};
+
+const combineDateAndTime = (date, time) => {
+  if (!date || !time) return "";
+  return `${date}T${time}`;
+};
+
 const buildInitialSessions = (initialSessions = [], totalSessions = 4) => {
   const mapped = Array.isArray(initialSessions)
-    ? initialSessions.map((session) => ({
-        date: formatDateTimeLocal(session.date),
-      }))
+    ? initialSessions.map((session) => {
+        const { date, time } = splitDateTimeLocal(session.date);
+
+        return {
+          date,
+          time,
+        };
+      })
     : [];
 
   while (mapped.length < totalSessions) {
-    mapped.push({ date: "" });
+    mapped.push({ date: "", time: "" });
   }
 
   return mapped.slice(0, totalSessions);
@@ -57,7 +85,9 @@ const ResetEditionForm = ({
   onCancel,
   isSaving = false,
 }) => {
-  const [formData, setFormData] = useState(() => buildInitialFormData(initialData));
+  const [formData, setFormData] = useState(() =>
+    buildInitialFormData(initialData),
+  );
   const [errors, setErrors] = useState({});
 
   const titleRef = useRef(null);
@@ -88,10 +118,14 @@ const ResetEditionForm = ({
     clearError(field);
   };
 
-  const handleSessionChange = (index, value) => {
+  const handleSessionChange = (index, field, value) => {
     setFormData((prev) => {
       const updatedSessions = [...prev.sessions];
-      updatedSessions[index] = { ...updatedSessions[index], date: value };
+
+      updatedSessions[index] = {
+        ...updatedSessions[index],
+        [field]: value,
+      };
 
       return {
         ...prev,
@@ -153,10 +187,14 @@ const ResetEditionForm = ({
     }
 
     formData.sessions.forEach((session, index) => {
-      if (!session.date) {
-        newErrors[`session_${index}`] = `Completá la fecha y hora del encuentro ${index + 1}.`;
-      } else if (Number.isNaN(new Date(session.date).getTime())) {
-        newErrors[`session_${index}`] = `La fecha del encuentro ${index + 1} no es válida.`;
+      const dateTime = combineDateAndTime(session.date, session.time);
+
+      if (!session.date || !session.time) {
+        newErrors[`session_${index}`] =
+          `Completá la fecha y hora del encuentro ${index + 1}.`;
+      } else if (Number.isNaN(new Date(dateTime).getTime())) {
+        newErrors[`session_${index}`] =
+          `La fecha del encuentro ${index + 1} no es válida.`;
       }
     });
 
@@ -187,7 +225,10 @@ const ResetEditionForm = ({
         titleRef.current.focus();
       } else if (newErrors.totalSessions && totalSessionsRef.current) {
         totalSessionsRef.current.focus();
-      } else if ((newErrors.sessions || newErrors.session_0) && firstSessionRef.current) {
+      } else if (
+        (newErrors.sessions || newErrors.session_0) &&
+        firstSessionRef.current
+      ) {
         firstSessionRef.current.focus();
       } else if (newErrors.capacity && capacityRef.current) {
         capacityRef.current.focus();
@@ -204,7 +245,9 @@ const ResetEditionForm = ({
       durationWeeks: Number(formData.durationWeeks),
       totalSessions: Number(formData.totalSessions),
       sessions: formData.sessions.map((session) => ({
-        date: new Date(session.date).toISOString(),
+        date: new Date(
+          combineDateAndTime(session.date, session.time),
+        ).toISOString(),
       })),
       capacity: Number(formData.capacity),
       price: Number(formData.price),
@@ -242,7 +285,9 @@ const ResetEditionForm = ({
         onChange={(e) => handleChange("durationWeeks", e.target.value)}
         disabled={isSaving}
       />
-      {errors.durationWeeks && <div className="field-error">{errors.durationWeeks}</div>}
+      {errors.durationWeeks && (
+        <div className="field-error">{errors.durationWeeks}</div>
+      )}
 
       <label className="label-formulario">🗓️ Cantidad de encuentros:</label>
       <input
@@ -253,28 +298,53 @@ const ResetEditionForm = ({
         onChange={(e) => handleTotalSessionsChange(e.target.value)}
         disabled={isSaving}
       />
-      {errors.totalSessions && <div className="field-error">{errors.totalSessions}</div>}
+      {errors.totalSessions && (
+        <div className="field-error">{errors.totalSessions}</div>
+      )}
 
       <div className="reset-sessions-block">
-        <label className="label-formulario">📅 Día y hora de cada encuentro:</label>
+        <label className="label-formulario">
+          📅 Día y hora de cada encuentro:
+        </label>
 
         {formData.sessions.map((session, index) => (
           <div key={index} className="reset-session-row">
             <label className="reset-session-label">Encuentro {index + 1}</label>
-            <input
-              ref={index === 0 ? firstSessionRef : null}
-              type="datetime-local"
-              value={session.date}
-              onChange={(e) => handleSessionChange(index, e.target.value)}
-              disabled={isSaving}
-            />
+            <div className="reset-session-fields">
+              <input
+                ref={index === 0 ? firstSessionRef : null}
+                type="date"
+                value={session.date}
+                onChange={(e) =>
+                  handleSessionChange(index, "date", e.target.value)
+                }
+                disabled={isSaving}
+              />
+
+              <select
+                value={session.time}
+                onChange={(e) =>
+                  handleSessionChange(index, "time", e.target.value)
+                }
+                disabled={isSaving}
+              >
+                <option value="">Hora</option>
+                {TIME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
             {errors[`session_${index}`] && (
               <div className="field-error">{errors[`session_${index}`]}</div>
             )}
           </div>
         ))}
 
-        {errors.sessions && <div className="field-error">{errors.sessions}</div>}
+        {errors.sessions && (
+          <div className="field-error">{errors.sessions}</div>
+        )}
       </div>
 
       <label className="label-formulario">👥 Capacidad total:</label>
@@ -329,7 +399,9 @@ const ResetEditionForm = ({
         </label>
       </div>
 
-      <label className="label-formulario">🔒 Inscripción manualmente cerrada:</label>
+      <label className="label-formulario">
+        🔒 Inscripción manualmente cerrada:
+      </label>
       <div className="reset-visible-row">
         <input
           id="reset-closed"
