@@ -7,30 +7,128 @@ import { getPresentialFormationsByLang } from "../../services/presentialService"
 import EmptyState from "../EmptyState/EmptyState";
 
 const PresentialFormationCard = ({ formation }) => {
+  const { language } = useLanguage();
+
   const { title, location, dateType, singleDate, dateRange, registrationLink } =
     formation;
 
-  const formatFecha = (date, incluirAño = true) => {
-    const fecha = new Date(date);
-    const opciones = { day: "numeric", month: "long" };
-    const diaYMes = fecha.toLocaleDateString("es-ES", opciones);
-    const año = fecha.getFullYear();
-    return incluirAño ? `${diaYMes} del ${año}` : diaYMes;
+  const localeMap = {
+    es: "es-ES",
+    en: "en-GB",
+    fr: "fr-FR",
+  };
+
+  const locale = localeMap[language] || "es-ES";
+
+  const parseDate = (date) => {
+    if (!date) return null;
+
+    const cleanDate = date.split("T")[0];
+    const [year, month, day] = cleanDate.split("-").map(Number);
+
+    return new Date(year, month - 1, day);
+  };
+
+  const formatSingleDate = (date) => {
+    const fecha = parseDate(date);
+
+    if (!fecha) return "";
+
+    return fecha.toLocaleDateString(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  };
+
+  const formatDateRange = (start, end) => {
+    const inicio = parseDate(start);
+    const fin = parseDate(end);
+
+    if (!inicio || !fin) return "";
+
+    const mismoAño = inicio.getFullYear() === fin.getFullYear();
+
+    const mismoMes = mismoAño && inicio.getMonth() === fin.getMonth();
+
+    /*
+      MISMO MES Y MISMO AÑO
+      Ejemplo:
+      29 - 30 de agosto de 2026
+    */
+    if (mismoMes) {
+      if (language === "es") {
+        const mes = fin.toLocaleDateString(locale, {
+          month: "long",
+        });
+
+        return `${inicio.getDate()} - ${fin.getDate()} de ${mes} de ${fin.getFullYear()}`;
+      }
+
+      if (language === "fr") {
+        const mes = fin.toLocaleDateString(locale, {
+          month: "long",
+        });
+
+        return `${inicio.getDate()} - ${fin.getDate()} ${mes} ${fin.getFullYear()}`;
+      }
+
+      const monthYear = fin.toLocaleDateString(locale, {
+        month: "long",
+        year: "numeric",
+      });
+
+      return `${inicio.getDate()} - ${fin.getDate()} ${monthYear}`;
+    }
+
+    /*
+      DISTINTO MES, MISMO AÑO
+      Ejemplo:
+      29 de agosto - 2 de septiembre de 2026
+    */
+    if (mismoAño) {
+      const inicioFormateado = inicio.toLocaleDateString(locale, {
+        day: "numeric",
+        month: "long",
+      });
+
+      const finFormateado = fin.toLocaleDateString(locale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+
+      return `${inicioFormateado} - ${finFormateado}`;
+    }
+
+    /*
+      DISTINTO AÑO
+      Ejemplo:
+      29 de diciembre de 2026 - 2 de enero de 2027
+    */
+    const inicioFormateado = inicio.toLocaleDateString(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    const finFormateado = fin.toLocaleDateString(locale, {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    return `${inicioFormateado} - ${finFormateado}`;
   };
 
   const dateDisplay =
-    dateType === "single" ? (
-      <span>{formatFecha(singleDate)}</span>
-    ) : (
-      <span>
-        {formatFecha(dateRange.start, false)} -{" "}
-        {formatFecha(dateRange.end, false)}
-      </span>
-    );
+    dateType === "single"
+      ? formatSingleDate(singleDate)
+      : formatDateRange(dateRange?.start, dateRange?.end);
 
   const handleClick = () => {
     if (registrationLink) {
-      window.open(registrationLink, "_blank");
+      window.open(registrationLink, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -39,16 +137,20 @@ const PresentialFormationCard = ({ formation }) => {
       <div
         className={`circle-icon ${registrationLink ? "clickable" : ""}`}
         onClick={handleClick}
-      ></div>
+        aria-hidden="true"
+      />
 
       <div className="formation-text">
         <div className="line-top">
-          <div>
+          <div className="formation-info-row">
             <FaRegCalendarAlt className="icon" />
+
             <span>{dateDisplay}</span>
           </div>
-          <div>
-            <FaMapMarkerAlt className="icon location-icon" />
+
+          <div className="formation-info-row">
+            <FaMapMarkerAlt className="icon" />
+
             <span>{location}</span>
           </div>
         </div>
@@ -74,13 +176,16 @@ const PresentialFormationCard = ({ formation }) => {
 
 const PresentialFormationsList = () => {
   const [formations, setFormations] = useState([]);
+
   const { language } = useLanguage();
+
   const t = translations.formations[language];
 
   useEffect(() => {
     const fetchFormations = async () => {
       try {
         const data = await getPresentialFormationsByLang(language);
+
         setFormations(data);
       } catch (err) {
         console.error("Error al traer formaciones presenciales:", err);
@@ -90,27 +195,23 @@ const PresentialFormationsList = () => {
     fetchFormations();
   }, [language]);
 
-  // ✅ Solo mostramos las formaciones que estén completas en este idioma
   const isFormationComplete = (formation) => {
     if (!formation) return false;
 
     const { title, location, dateType, singleDate, dateRange } = formation;
 
-    if (!title || !location || !dateType) return false;
+    if (!title || !location || !dateType) {
+      return false;
+    }
 
     if (dateType === "single") {
       return Boolean(singleDate);
     }
 
     if (dateType === "range") {
-      return Boolean(
-        dateRange &&
-          dateRange.start &&
-          dateRange.end
-      );
+      return Boolean(dateRange && dateRange.start && dateRange.end);
     }
 
-    // Por si algún día aparece otro tipo de dateType raro
     return false;
   };
 
@@ -130,6 +231,5 @@ const PresentialFormationsList = () => {
     </div>
   );
 };
-
 
 export default PresentialFormationsList;
